@@ -1,0 +1,35 @@
+# PAUdm - Common configuration File (YAML)
+
+general:
+    env_mode        :   GRID                       # Environment [PC/GRID]
+    archive_path    :   /nfs/pau/PAUdm/runs/tonello/bt_test/archive/      # Archive path in storage
+    working_path    :   $HOME                      # Working path
+    red_release     :   DC3                        # Reduction Release that identifies a Production (DB)
+    red_revision    :   0                          # Reduction Revision number for Production (DB)
+    project         :   PAU                        # Project Name
+
+logging:
+    screen_level    :   DEBUG                      # Log level for the screen handler [DEBUG/INFO/WARNING/CRITICAL/ERROR]
+    file_level      :   DEBUG                      # Log level for the file handler   [DEBUG/INFO/WARNING/CRITICAL/ERROR]
+    sql_level       :   WARNING                    # Base log level for sqlalchemy    [DEBUG/INFO/WARNING/CRITICAL/ERROR]
+    path            :   Default                    # Log file path (Default is WORKING_PATH/PAUdm.log )
+
+database:
+    create_db       :   False                      # Create new DB or overrite existing one - BE CAREFULL!
+    db_name         :   test_tonello               # Name for the data base (in SQLite has .db extension)
+    path            :   /home/paus001/.sqlite/     # Path for the data base (PC Only)
+
+grid:
+    ARCHIVE_TYPE    :   NFS                        # Choose where to export the produced simulation [STORAGE; NFS; NONE] 
+    NFS_PATH        :   /nfs/pau/PAUdm/runs/tonello/bt_test/
+    SEXTRACTOR_BIN  :   $VO_VO_PAUS_PIC_ES_SW_DIR/sextractor/2.14.7/bin/sex
+    SCAMP_BIN       :   $VO_VO_PAUS_PIC_ES_SW_DIR/scamp/1.7.0/bin/scamp
+    ACLIENT_BIN     :   $VO_VO_PAUS_PIC_ES_SW_DIR/cdsclient/3.6/bin/aclient
+    MISSFITS_BIN    :   $VO_VO_PAUS_PIC_ES_SW_DIR/missfits/2.4.0/bin/missfits
+    SKYMAKER_BIN    :   $VO_VO_PAUS_PIC_ES_SW_DIR/skymaker/3.8.2-flat/bin/sky
+    PSFEX_BIN       :   $VO_VO_PAUS_PIC_ES_SW_DIR/psfex/3.14.0/bin/psfex
+    FUNPACK_BIN     :   /software/vo.paus.pic.es/funpack/1.6.0/bin/funpack
+    FILE_PREFIX     :   file:////                  # File prefix used at SRM copies
+    SRM_PREFIX      :   srm://srm.pic.es:8443/srm/managerv2?SFN=   # SRM prefix
+    SRM_COPY_CMD    :   lcg-cp                     # SRM copy command [srmcp/lcg-cp]
+
