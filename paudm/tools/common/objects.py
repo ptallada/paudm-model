@@ -29,12 +29,12 @@ import numpy as np
 import pyfits
 from scipy.interpolate import interp1d
 from astropysics.coords.coordsys import AngularCoordinate
-from paudm.pipeline.common import constants
-from pkg_resources import resource_listdir, resource_filename
+from paudm.tools.common import constants
+from pkg_resources import resource_listdir, resource_string, resource_filename
 config = {}
 from paudm.tools.db import model
 
-instrument = yaml.safe_load(open(resource_filename('paudm.resources.instrument.pau','general.yaml')))
+#instrument = yaml.safe_load(resource_string('paudm.resources.instrument.pau','general.yaml'))
 
 
 
@@ -239,7 +239,6 @@ class Image(object):
       - status = set_keyword(key, value)
       - status = db_insert( )
     '''
-    import pyfits
     
     def __init__(self, mode, path = None, filename = None, extension = None, image_header = None, parent_mosaic = None):
         # Image Constructor
@@ -317,8 +316,8 @@ class Image(object):
         
         # Calculate Sky Corners of the image
         if self.parent_mosaic.header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
-            from pipeline.pixelsim import wcsUtils
-            from pipeline.pixelsim import simUtils
+            from paudm.pipeline.pixelsim import wcsUtils
+            from paudm.pipeline.pixelsim import simUtils
             
             # Load CRVAL
             image_wcs = wcsUtils.wcsType(sky_ref=simUtils.skyPoint(ra=self.header['CRVAL1'], dec=self.header['CRVAL2']),

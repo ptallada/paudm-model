@@ -151,7 +151,11 @@ def init_db(config):
     # Create tmp directory in WORKING_PATH
     try:
         if config['general']['env_mode'] == 'GRID':
-            os.makedirs(os.path.join(config['common']['general']['working_path'], 'job_data'))
+            if config['common']['general']['working_path'][0] == '$':
+                working_path = os.getenv(config['common']['general']['working_path'][1:])
+            else:
+                working_path = config['common']['general']['working_path']
+            os.makedirs(os.path.join(working_path), 'job_data')
     except os.error, e:
         if e.errno != errno.EEXIST:
             raise
