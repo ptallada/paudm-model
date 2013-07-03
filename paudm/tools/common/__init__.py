@@ -6,10 +6,10 @@ import time
 import errno
 import logging.config
 import yaml
-log = logging.getLogger('paudm.pipeline.common')
+log = logging.getLogger('paudm.tools.common')
 
 from paudm.tools.db import model
-from pkg_resources import resource_filename
+from pkg_resources import resource_string
 _config = None
 
 #print "Initializing PAUdm system..."
@@ -23,7 +23,7 @@ def get_config():
     
     ### Load Common Configuration ###
     print "Loading common configuration..."
-    config = yaml.safe_load(open(resource_filename('paudm.pipeline.common','config/common.yaml')))
+    config = yaml.safe_load(resource_string('paudm.tools.common','config/common.yaml'))
     
     ### Load Command Line configuration (overwrites default) ###
     print "Loading command line configuration..."
@@ -119,7 +119,7 @@ def init_db(config):
     if config['general']['env_mode'] == 'PC':
         log.info("Setting up local %s SQLite database..." %config['common']['database']['db_name'])
         db_full_path = os.path.join(config['common']['database']['path'], config['common']['database']['db_name'] + '.db')
-        db_config_file = resource_filename('paudm.tools.db.config','local.yaml')
+        db_config_file = resource_string('paudm.tools.db.config','local.yaml')
         if not os.path.exists(db_config_file):
             error_msg = "Local SQLite configuration file not found. Add local.yaml to tools/db/config/"
             log.error(error_msg)
@@ -127,14 +127,14 @@ def init_db(config):
     else:
         log.info("Setting up PIC's %s PostrgreSQL database..." %config['common']['database']['db_name'])
         db_full_path = config['common']['database']['db_name']
-        db_config_file = resource_filename('paudm.tools.db.config','paudb.yaml')
+        db_config_file = resource_string('paudm.tools.db.config','paudb.yaml')
         if not os.path.exists(db_config_file):
             error_msg = "PAUdb configuration file not found. Add paudb.yaml to tools/db/config/"
             log.error(error_msg)
             raise Exception, error_msg
         
     # Initialize DB
-    settings = yaml.safe_load(open(db_config_file, "r"))
+    settings = yaml.safe_load(db_config_file, "r")
     url      = settings.get('engine', 'sqlite:///') + db_full_path
     model.init(url)
     # model.metadata.create_all()
@@ -147,18 +147,6 @@ def init_db(config):
             log.info ("Creating new DB...")
             model.recreate()
             log.info("...DB successfully created.")
-    
-    # Create tmp directory in WORKING_PATH
-    try:
-        if config['general']['env_mode'] == 'GRID':
-            if config['common']['general']['working_path'][0] == '$':
-                working_path = os.getenv(config['common']['general']['working_path'][1:])
-            else:
-                working_path = config['common']['general']['working_path']
-            os.makedirs(os.path.join(working_path), 'job_data')
-    except os.error, e:
-        if e.errno != errno.EEXIST:
-            raise
     
     ### Obtain REVISION Number ###
     # Will work only under svn revision
