@@ -120,18 +120,10 @@ def init_db(config):
         log.info("Setting up local %s SQLite database..." %config['common']['database']['db_name'])
         db_full_path = os.path.join(config['common']['database']['path'], config['common']['database']['db_name'] + '.db')
         db_config_file = resource_string('paudm.tools.db.config','local.yaml')
-        if not os.path.exists(db_config_file):
-            error_msg = "Local SQLite configuration file not found. Add local.yaml to tools/db/config/"
-            log.error(error_msg)
-            raise Exception, error_msg
     else:
         log.info("Setting up PIC's %s PostrgreSQL database..." %config['common']['database']['db_name'])
         db_full_path = config['common']['database']['db_name']
         db_config_file = resource_string('paudm.tools.db.config','paudb.yaml')
-        if not os.path.exists(db_config_file):
-            error_msg = "PAUdb configuration file not found. Add paudb.yaml to tools/db/config/"
-            log.error(error_msg)
-            raise Exception, error_msg
         
     # Initialize DB
     settings = yaml.safe_load(db_config_file, "r")
