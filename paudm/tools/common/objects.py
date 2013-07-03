@@ -18,7 +18,7 @@ for ccd_id in range(1, in_mosaic.get_keyword('NEXTEND')+1):
 """
 
 import logging
-log = logging.getLogger('paudm.pipeline.common.objects')
+log = logging.getLogger('paudm.tools.common.objects')
 import os
 import datetime
 import time
@@ -213,9 +213,9 @@ class Mosaic(object):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.simulate_mosaic(self, config, instrument)
     
-    def initialize_global_header(self, config):
+    def initialize_global_header(self, config, AMPS_X_CCD):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.initialize_global_header(self, config['release'], config['ccd_limit'], instrument['AMPS_X_CCD'], config['post_prod'])
+        return paudm.pipeline.pixelsim.delegates.initialize_global_header(self, config['common']['general']['project'].lower(), config['release'], config['ccd_limit'], AMPS_X_CCD, config['post_prod'])
     
     def infer_pixel_rectangle(self, config, instrument):
         import paudm.pipeline.pixelsim.delegates
@@ -918,14 +918,14 @@ class Catalogue(object):
         log.debug( "Loaded %d SDSS objects from the local DB" %len(self.objects) )
         
     
-    def removeExtinction(self):
+    def removeExtinction(self, instrument):
         
         log.debug( "Removing extinction!" )
         
         # load schlegel maps
-        hdulist_n = pyfits.open(resource_filename('paudm.resources.extinct', "SFD_dust_4096_ngp.fits"))
+        hdulist_n = pyfits.open(resource_filename('paudm.resources','extinct/SFD_dust_4096_ngp.fits'))
         SFD_north = hdulist_n[0].data
-        hdulist_s = pyfits.open(resource_filename('paudm.resources.extinct', "SFD_dust_4096_sgp.fits"))
+        hdulist_s = pyfits.open(resource_filename('paudm.resources','extinct/SFD_dust_4096_sgp.fits'))
         SFD_south = hdulist_s[0].data
         
         # assuming sdss filter constants from Schlafly & Finkbeiner 2010
@@ -1008,14 +1008,14 @@ class Catalogue(object):
             
     
     # extinct the ideal objects to make realistic observations
-    def addExtinction(self, detection_filter=None):
+    def addExtinction(self, instrument, detection_filter=None):
         
         log.debug( "Adding extinction!" )
         
         # load schlegel maps
-        hdulist_n = pyfits.open(resource_filename('paudm.resources.extinct', "SFD_dust_4096_ngp.fits"))
+        hdulist_n = pyfits.open(resource_filename('paudm.resources',"extinct/SFD_dust_4096_ngp.fits"))
         SFD_north = hdulist_n[0].data
-        hdulist_s = pyfits.open(resource_filename('paudm.resources.extinct', "SFD_dust_4096_sgp.fits"))
+        hdulist_s = pyfits.open(resource_filename('paudm.resources',"extinct/SFD_dust_4096_sgp.fits"))
         SFD_south = hdulist_s[0].data
         
         # assuming sdss filter constants from Schlafly & Finkbeiner 2010
@@ -1939,7 +1939,7 @@ class FilterSystem(object):
         with a wavelength array given by wvl_list
     '''
     
-    def __init__(self, sysname, add_efficiency=True):
+    def __init__(self, sysname, instrument, add_efficiency=True):
         self.system = sysname
         
         # a good range, given our input files
@@ -1948,18 +1948,18 @@ class FilterSystem(object):
         wvl_list = np.arange(95.0,14500.0,2.0) 
         #wvl_list = np.arange(95.0,18500.0,2.0) 
         
-        self.filters = self.read_filter_curves( self.system, wvl_list, add_efficiency )
+        self.filters = self.read_filter_curves( self.system, wvl_list, instrument, add_efficiency )
     
     
     
-    def read_filter_curves( self, system, wvl_list, add_efficiency=True ):
+    def read_filter_curves( self, system, wvl_list, instrument, add_efficiency=True ):
         
         filter_curves = {}
         filter_curves_matchedwvls = {}
         
-        atmosphere_file = open(resource_filename('paudm.resources.atmosphere','transmission.sdss.stdunits.dat'))
-        qe_file = open(resource_filename('paudm.resources.detector','HPK.real.stdunits.dat'))
-        wht_throughput_file = open(resource_filename('paudm.resources.telescope','WHT_throughput_stdunits.dat'))
+        atmosphere_file = open(resource_filename('paudm.resources','atmosphere/transmission.sdss.stdunits.dat'))
+        qe_file = open(resource_filename('paudm.resources','detector/HPK.real.stdunits.dat'))
+        wht_throughput_file = open(resource_filename('paudm.resources','telescope/WHT_throughput_stdunits.dat'))
         
         if( system == "pau" ):
             
@@ -1969,7 +1969,7 @@ class FilterSystem(object):
                 filter_curves_matchedwvls[filter_name] = Spectrum(np.zeros(len(wvl_list)),np.zeros(len(wvl_list)))
             
             for filter_name in instrument['BROAD_FILTERS'] + instrument['NARROW_FILTERS']:
-                filter_file = open(resource_filename('paudm.resources.filters.pau',instrument['FILTER_ASSOCIATIONS'][filter_name]['FILENAME']))
+                filter_file = open(resource_filename('paudm.resources', 'filters/pau/'+instrument['FILTER_ASSOCIATIONS'][filter_name]['FILENAME']))
                 for line in filter_file:
                     if re.search("(\S+)", line) is None:
                         continue
@@ -2022,7 +2022,7 @@ class FilterSystem(object):
                 filter_curves[filter_name] = Spectrum([],[])
                 filter_curves_matchedwvls[filter_name] = Spectrum(np.zeros(len(wvl_list)),np.zeros(len(wvl_list)))
             for filter_name in sdss_filter_names:
-                filter_file = open(resource_filename('paudm.resources.filters.sdss', filter_name+".dat"))
+                filter_file = open(resource_filename('paudm.resources','filters/sdss/'+ filter_name+'.dat'))
                 for line in filter_file:
                     if re.search("(\S+)", line) is None:
                         continue
@@ -2061,7 +2061,7 @@ class FilterSystem(object):
                 filter_curves[filter_name] = Spectrum([],[])
                 filter_curves_matchedwvls[filter_name] = Spectrum(np.zeros(len(wvl_list)),np.zeros(len(wvl_list)))
             for filter_name in johnson_filter_names:
-                filter_file = open(resource_filename("paudm.resources.filters.johnson",filter_name + ".pb"))
+                filter_file = open(resource_filename("paudm.resources","filters/johnson/"+filter_name + ".pb"))
                 for line in filter_file:
                     if re.search("(\S+)", line) is None:
                         continue
@@ -2115,7 +2115,7 @@ class FilterSystem(object):
                 filter_curves[filter_name] = Spectrum([],[])
                 filter_curves_matchedwvls[filter_name] = Spectrum(np.zeros(len(wvl_list)),np.zeros(len(wvl_list)))
             for filter_name in bessell_filter_names:
-                filter_file = open(resource_filename("paudm.resources.filters.bessell" ,filter_name + ".pb"))
+                filter_file = open(resource_filename("paudm.resources", "filters/bessell/" +filter_name + ".pb"))
                 for line in filter_file:
                     if re.search("(\S+)", line) is None:
                         continue
@@ -2211,7 +2211,7 @@ class StarSEDs(object):
     def __init__(self):
         self.seds = dict()
         
-        sed_files = resource_listdir('paudm.resources.seds.stars','')
+        sed_files = resource_listdir('paudm.resources','seds/stars')
         
         # matches the one in FilterSystem
         #wvl_list = np.arange(95.0,12000.0,2.0)
@@ -2222,7 +2222,7 @@ class StarSEDs(object):
                 continue
             self.seds[file] = Spectrum([],[])
             
-            sed_file = open(resource_filename ('paudm.resources.seds.stars', file))
+            sed_file = open(resource_filename ('paudm.resources','seds/stars/'+file))
             for line in sed_file:
                 if re.search("(\S+)", line) is None:
                     continue
