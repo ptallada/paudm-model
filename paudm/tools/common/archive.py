@@ -16,13 +16,10 @@ import os
 import shutil
 
 import logging
-log = logging.getLogger('paudm.pipeline.common.archive')
+log = logging.getLogger('paudm.tools.common.archive')
 
-from paudm.pipeline import common
 from paudm.tools.grid import storage_utils
-from paudm.tools.db import model
 
-import re
 
 # Makedirs wrapper to avoid race conditions
 def mkdir_p(path):
@@ -121,7 +118,9 @@ def copy_to_nfs(file_in, file_out):
         os.chmod(directory, 0775)
             
     log.info("copy %s to %s"% (file_in,file_out))
-    shutil.copy(file_in, file_out)
+    if os.path.exists(file_out):
+        os.remove(file_out)
+    shutil.copyfile(file_in, file_out)
     
 
 
