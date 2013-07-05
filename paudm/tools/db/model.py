@@ -144,18 +144,17 @@ class Production(Base):
         # Primary key
         PrimaryKeyConstraint('id'),
         # Unique key
-        UniqueConstraint('project', 'origin', 'origin_release', 'red_revision', 'red_release'),
+        UniqueConstraint('pipeline', 'release'),
+        UniqueConstraint('input_production_id', 'pipeline', 'software_release'),
     )
     # Columns
-    id        = Column(Integer,     nullable=False )   # 
-    project = Column(String(16),  nullable=False)    # Project Name [PAU, DES]
-    origin =  Column(String(16),  nullable=False)        # Where data is generated [PAUsim, ING la Palma]
-    origin_release = Column(String(16),  nullable=False)     # Data release [DCX, vX.X]
-    red_revision = Column(Integer,  nullable=True)     #Revision number @ PAUdm code [XXXX]"
-    red_release = Column(String(16),  nullable=True)             #Major release name that holds data with minor revision differences [TESTX, DRX]
+    id                  = Column(Integer,    nullable=False ) #
+    input_production_id = Column(Integer,    nullable=True )  # input release id (from configuration)
+    pipeline            = Column(String(16), nullable=True)  # Pipeline Name [pixelsim, nightly, memba, analysis]
+    release             = Column(String(16), nullable=False)   # Major release name [TESTX, DRX]
+    software_release    = Column(String(16), nullable=False)  # Package release [DCX, vX.X]
 
     #Relationships
-
     mosaics        = relationship('Mosaic',         back_populates="production")
     zp_phots       = relationship('Zp_phot',        back_populates="production")
     detections     = relationship('Detection',      back_populates="production")
@@ -165,8 +164,8 @@ class Production(Base):
     
     #The production table holds information about the hardware and software used to process the data.\n"
     #"Each time the software is updated, configuration changes or computing system has been modified, a new production entry is stored.   
-
-
+    
+    
 class Zp_phot(Base): 
     __tablename__ = 'zp_phot'
     __table_args__ = (

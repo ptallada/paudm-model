@@ -29,11 +29,10 @@ def bench_insert(count = 100, *args):
     )
     
     production = model.Production(
-        project = 'BENCH',
-        origin = 'BENCH',
-        origin_release = 'BENCH',
-        red_revision = randi,
-        red_release = 'BENCH'
+        pipeline = 'BENCH',
+        release = 'BENCH',
+        input_production_id = randi,
+        software_release = 'BENCH',
     )
 
     mosaic = model.Mosaic(
