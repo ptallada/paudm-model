@@ -738,18 +738,11 @@ class USNO(Base):
 
 Index('ik_usnolocation', USNO.ra, USNO.dec)
   
-
-
- 
-
-    
-    
     
     ###########    EXTERNAL Tables    ###########
     
     # SDSS External Table
 
-    
     
     ###########    SIMULATION Tables    ###########
     
@@ -840,30 +833,56 @@ class Target(Base):
         PrimaryKeyConstraint('id'),
             ) 
     # Keys
-    id = Column(             Integer,      nullable=False) #Unique identifier"),
-    exp_num = Column(        Integer,      nullable=True) #  comment="Camera exposure unique identifier"),
-    field = Column(          String(16),   nullable=True) #  comment="Field Name"),
-    origin = Column(         String(16),   nullable=False) #Where data is generated [PAUsim, ING la Palma]"),
-    origin_release = Column( String(16),   nullable=False) #Data release [DCX, vX.X]"),
+    id = Column(                Integer,      nullable=False) #Unique identifier"),
+    exp_num = Column(           Integer,      nullable=True) #  comment="Camera exposure unique identifier"),
+    field = Column(             String(16),   nullable=True) #  comment="Field Name"),
+    origin = Column(            String(16),   nullable=False) #Where data is generated [PAUsim, ING la Palma]"),
+    origin_release = Column(    String(16),   nullable=False) #Data release [DCX, vX.X]"),
     # Fields
-    ra = Column(             Float(53),    nullable=True) #Target RA"),
-    dec = Column(            Float(53),    nullable=True) #Target DEC"),
-    filtertray = Column(     String(16),   nullable=True) #Filter Tray name"),
-    kind = Column(           Enum('BIAS', 'FLAT', 'TARGET', name='target_kind'), nullable=False) #Target kind"),
+    ra = Column(                Float(53),    nullable=True) #Target RA"),
+    dec = Column(               Float(53),    nullable=True) #Target DEC"),
+    filtertray = Column(        String(16),   nullable=True) #Filter Tray name"),
+    kind = Column(              Enum('BIAS', 'FLAT', 'TARGET', name='target_kind'), nullable=False) #Target kind"),
                                            
-    status = Column(         Enum('PLANNED', 'SCHEDULED', 'SIMULATED', 'EXPOSED', name='target_status'),nullable=False) #  comment="Target status"),
+    status = Column(            Enum('PLANNED', 'SCHEDULED', 'SIMULATED', 'EXPOSED', name='target_status'),nullable=False) #  comment="Target status"),
                                            
-    rjd_obs = Column(        Float(53),    nullable=True) #Observation Reduced Modified Julian Day"),
-
+    rjd_obs = Column(           Float(53),    nullable=True) #Observation Reduced Modified Julian Day"),
+    exptime = Column(           Float(24),    nullable=True) # comment="Exposure Time",
+    airmass = Column(           Float(24),    nullable=True) # comment="Airmass",
+    seeing  = Column(           Float(24),    nullable=True) # comment="Seeing",
+    moon_mag = Column(          Float(24),    nullable=True) # comment="Moon Magnitude",
+    moon_phase = Column(        Float(24),    nullable=True) # comment="Moon Phase",
+    moon_distance =  Column(    Float(24),    nullable=True) # comment="Moon Distance (degrees)",
+    moon_set = Column(          Boolean,      nullable=True) # comment="Moon is set?",
+    ecliptic_dist = Column(     Float(24),    nullable=True) # comment="Distance to ecliptic (degrees)",
+    ecliptic_zodiacal = Column( Float(24),  nullable=True) # comment="Ecliptic Zodiacal Light",
+    ecliptic_airglow = Column(  Float(24),  nullable=True) # comment="Ecliptic Airglow Light",
+    
     # Documentation
     #comment="target",
 
 Index('ik_targetlocation', Target.ra, Target.dec)
+
+
+class Bkg_mag(Base):
+    __tablename__ = 'bkg_mag'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('target_id', 'filter'),
+        ForeignKeyConstraint(['target_id'], ['target.id'], ondelete='CASCADE')
+        )
+    # Keys
+    target_id = Column( Integer,      nullable=False) # comment="Unique identifier",
+    filter    = Column( String(16),   nullable=False) # comment="Filter Name"),
+    # Fields
+    mag       = Column( Float(24),    nullable=False) # comment="Magnitude value"),
+    # Documentation
+    #comment="Background Magnitude",
     
     
     ###########    OPERATION Tables    ###########
     
-
+    
     # Job Table
 class Job_pau(brownthrower.model.Job) :
         
@@ -871,10 +890,6 @@ class Job_pau(brownthrower.model.Job) :
     
     # Documentation
     #comment="Job",
-
-    
-
-
     
     # Quality Control Table
 class Quality_control(Base):
@@ -897,10 +912,10 @@ class Quality_control(Base):
     qc_pass = Column(           Boolean,      nullable=False) #QC pass?"),
     time = Column(              DateTime,     nullable=False,default=func.current_timestamp() ) #comment="Timestamp of creation", ),
     plot_file = Column(         Text,         nullable=True) #  comment="Plot file full name and path"),
-
+    
     # Relationships
     job           = relationship('Job_pau',              back_populates="quality_controls")
-
+    
     #comment="Quality Control",
     
 Index('ik_qcjob', Quality_control.job_id)

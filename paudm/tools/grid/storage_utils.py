@@ -24,7 +24,7 @@ Finally, files temporally created are deleted and working directory cleaned.
 import os
 import time
 import subprocess
-
+import shutil
 import logging
 log = logging.getLogger('paudm.tools.grid.storage_utils') 
 
@@ -110,7 +110,7 @@ def list_storage_directory(path, config, pattern = '', file_list_file = None):
     return file_list
     
 
-def bring_online(dest_path, file_list, config, DCAP_prefix = "dcap://dcap.pic.es"):
+def bring_online(config_grid, dest_path, file_list, DCAP_prefix = "dcap://dcap.pic.es"):
     '''
     Bring online the files listed in tape_file_list and to be copied.
     This function call the dccp -P command and checks the status of the files every minute.
@@ -124,9 +124,13 @@ def bring_online(dest_path, file_list, config, DCAP_prefix = "dcap://dcap.pic.es
     
     log.info("--- PreStage : Bring Online ---")
     
-    
     for file in file_list:
-        # pnfs Test
+        file_path = file['path']
+        # nfs origin
+        if file['path'].split('/')[1] == 'nfs':
+            shutil.copyfile(os.path.join(file['path'], file['name']), os.path.join(dest_path, file['name']))
+            continue
+        # pnfs origin
         if file['path'].split('/')[0] == 'pnfs':
             file_path = DCAP_prefix + "/"+file['path']
         elif file['path'].split('/')[1] == 'pnfs':
@@ -142,8 +146,8 @@ def bring_online(dest_path, file_list, config, DCAP_prefix = "dcap://dcap.pic.es
         if not os.path.exists(os.path.join(dest_path, file['name'])):
             ready = 'false'
             while ready != 'true':
-                if config['grid']['SRM_COPY_CMD'] == "srmcp":
-                    srmls_cmd = 'srmls -l ' +  os.path.join(config['grid']['SRM_prefix'] + file['path'], file['name'])
+                if config_grid['SRM_COPY_CMD'] == "srmcp":
+                    srmls_cmd = 'srmls -l ' +  os.path.join(config_grid['SRM_prefix'] + file['path'], file['name'])
                     srmls_response = os.popen(srmls_cmd).read()
                     file_status = srmls_response.split()
                     if ('locality:ONLINE_AND_NEARLINE' in file_status) or ('locality:ONLINE' in file_status):
@@ -154,8 +158,8 @@ def bring_online(dest_path, file_list, config, DCAP_prefix = "dcap://dcap.pic.es
                     else:
                         log.debug("File status: %s"%file_status)
                         time.sleep(30)
-                elif config['grid']['SRM_COPY_CMD'] == "lcg-cp":
-                    lcg_cmd = 'lcg-ls -l -D srmv2 -b ' +  os.path.join(config['grid']['SRM_prefix'] + file['path'], file['name'])
+                elif config_grid['SRM_COPY_CMD'] == "lcg-cp":
+                    lcg_cmd = 'lcg-ls -l -D srmv2 -b ' +  os.path.join(config_grid['SRM_prefix'] + file['path'], file['name'])
                     lcg_response = os.popen(lcg_cmd).read()
                     file_status = lcg_response.split()
                     if ('ONLINE_AND_NEARLINE' in file_status) or ('ONLINE' in file_status):
@@ -165,11 +169,11 @@ def bring_online(dest_path, file_list, config, DCAP_prefix = "dcap://dcap.pic.es
                         log.debug("File status: %s"%file_status)
                         time.sleep(30)
                 else:
-                    log.error("An error occurred: %s is not a valid SRM_COPY_CMD"%config['grid']['SRM_COPY_CMD'])
+                    log.error("An error occurred: %s is not a valid SRM_COPY_CMD"%config_grid['SRM_COPY_CMD'])
                     break
 
 
-def srm_download(config, dest_path, file_list = None, decompress_at_destination = False):
+def srm_download(config_grid, dest_path, file_list = None, decompress_at_destination = False):
     '''
     Copy the files listed with the command specified in common config['grid']['SRM_COPY_CMD']. 
     
@@ -178,15 +182,18 @@ def srm_download(config, dest_path, file_list = None, decompress_at_destination 
     @param decompress_at_destination:  boolean default value False, unzip/unpack the files after copying them
     '''
     
-    
+ 
     log.debug( "--- Download files (SRM protocol) ---" )
     
-    srm_prefix  = config['grid']['SRM_PREFIX']
-    file_prefix = config['grid']['FILE_PREFIX']
+    srm_prefix  = config_grid['SRM_PREFIX']
+    file_prefix = config_grid['FILE_PREFIX']
     if len(file_list) > 0:
         for file in file_list:
+            if os.path.exists(os.path.join(dest_path, file['name'])):
+                log.info("File %s already in destination path %s"% (file['name'], dest_path))
+                continue
             file_tape = os.path.join(srm_prefix + file['path'], file['name'])
-            if config['grid']['SRM_COPY_CMD'] == "lcg-cp":
+            if config_grid['SRM_COPY_CMD'] == "lcg-cp":
                 # pnfs Test
                 if dest_path.split('/')[0] == 'pnfs':
                     file_nfs = os.path.join(srm_prefix + dest_path, file['name'])
@@ -197,7 +204,7 @@ def srm_download(config, dest_path, file_list = None, decompress_at_destination 
                 else:
                     file_nfs  = os.path.join(file_prefix+ dest_path, file['name'])
                 srm_cp_cmd = "lcg-cp -b -D srmv2 "
-            elif config['grid']['SRM_COPY_CMD'] == "srmcp":
+            elif config_grid['SRM_COPY_CMD'] == "srmcp":
                 # pnfs Test
                 if dest_path.split('/')[1] == 'pnfs':
                     file_nfs = os.path.join(srm_prefix + dest_path, file['name'])
@@ -210,7 +217,7 @@ def srm_download(config, dest_path, file_list = None, decompress_at_destination 
                 cmd_cp =  srm_cp_cmd + " %s %s" % (file_tape, file_nfs)
                 log.debug(cmd_cp)
                 if subprocess.call(cmd_cp, shell=True) > 0:
-                    error_msg = config['grid']['SRM_COPY_CMD'] + " error while downloading %s to %s" %(file_tape, file_nfs)
+                    error_msg = config_grid['SRM_COPY_CMD'] + " error while downloading %s to %s" %(file_tape, file_nfs)
                     log.error(error_msg)
                     raise Exception, error_msg
     else:
@@ -281,7 +288,7 @@ def decompress_file(file_name, file_path, funpack_bin= "funpack"):
             log.debug("Unknown extension for decompression: %s. Ignoring it." %extension)
 
 
-def download(file_list, dest_path = "./", protocol = "SRM"):
+def download(config_grid, file_list, dest_path = "./", protocol = "SRM"):
     '''
     Function Calls:
         - L{bring_online}
@@ -289,10 +296,10 @@ def download(file_list, dest_path = "./", protocol = "SRM"):
         - L{srm_download}
     '''
     
-    bring_online(dest_path, file_list = file_list)
+    bring_online(config_grid, dest_path, file_list = file_list)
     
     if protocol == 'SRM':
-        srm_download(dest_path, file_list = file_list, decompress_at_destination=True)
+        srm_download(config_grid, dest_path, file_list = file_list, decompress_at_destination=True)
     else:
         msg_error = "Unknown protocol %s" %protocol
         log.error(msg_error)

@@ -126,7 +126,7 @@ def init_db(config):
         db_config_file = resource_string('paudm.tools.db.config','paudb.yaml')
         
     # Initialize DB
-    settings = yaml.safe_load(db_config_file, "r")
+    settings = yaml.safe_load(db_config_file)
     url      = settings.get('engine', 'sqlite:///') + db_full_path
     model.init(url)
     # model.metadata.create_all()

@@ -73,7 +73,7 @@ def list_query(query):
     return file_list
     
 
-def download(file_list, dest_path, env_mode , grid_protocol = None):
+def download(config_grid, file_list, dest_path, env_mode , grid_protocol = None):
     #config['general']['ENV_MODE'] needed
     #config['grid']['PROTOCOL'] optional
     # Add only files not yet in the working directory
@@ -89,8 +89,8 @@ def download(file_list, dest_path, env_mode , grid_protocol = None):
     # PRESTAGE
     if env_mode != 'PC':
         # If environment is GRID, download from storage
-        grid_protocol = "lcg-cp " if grid_protocol==None else grid_protocol
-        storage_utils.download(dest_path = dest_path, file_list = file_list_to_download, protocol = grid_protocol)
+        grid_protocol = "SRM" if grid_protocol==None else grid_protocol
+        storage_utils.download(config_grid, dest_path = dest_path, file_list = file_list_to_download, protocol = grid_protocol)
     else:
         # If environment is PC, just do symbolic link
         for file in file_list_to_download:
