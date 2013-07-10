@@ -8,7 +8,6 @@ from sqlalchemy import ForeignKeyConstraint, Index, PrimaryKeyConstraint, Unique
 from sqlalchemy import create_engine
 from sqlalchemy.types import BigInteger, Boolean, Date, Enum, Float, Integer, SmallInteger, String, Text, Time, DateTime
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import mapper, relationship, sessionmaker, scoped_session, synonym, contains_eager
 from zope.sqlalchemy import ZopeTransactionExtension
 from sqlalchemy.orm.collections import attribute_mapped_collection
@@ -843,9 +842,9 @@ class Target(Base):
     dec = Column(               Float(53),    nullable=True) #Target DEC"),
     filtertray = Column(        String(16),   nullable=True) #Filter Tray name"),
     kind = Column(              Enum('BIAS', 'FLAT', 'TARGET', name='target_kind'), nullable=False) #Target kind"),
-                                           
+    
     status = Column(            Enum('PLANNED', 'SCHEDULED', 'SIMULATED', 'EXPOSED', name='target_status'),nullable=False) #  comment="Target status"),
-                                           
+    
     rjd_obs = Column(           Float(53),    nullable=True) #Observation Reduced Modified Julian Day"),
     exptime = Column(           Float(24),    nullable=True) # comment="Exposure Time",
     airmass = Column(           Float(24),    nullable=True) # comment="Airmass",
@@ -858,11 +857,14 @@ class Target(Base):
     ecliptic_zodiacal = Column( Float(24),  nullable=True) # comment="Ecliptic Zodiacal Light",
     ecliptic_airglow = Column(  Float(24),  nullable=True) # comment="Ecliptic Airglow Light",
     
+    # Relationships
+    bkg_mags = relationship('Bkg_mag', back_populates="target")
+    
+    
     # Documentation
     #comment="target",
 
 Index('ik_targetlocation', Target.ra, Target.dec)
-
 
 class Bkg_mag(Base):
     __tablename__ = 'bkg_mag'
@@ -879,6 +881,8 @@ class Bkg_mag(Base):
     # Documentation
     #comment="Background Magnitude",
     
+    # Relationships
+    target = relationship('Target', back_populates="bkg_mags")
     
     ###########    OPERATION Tables    ###########
     
