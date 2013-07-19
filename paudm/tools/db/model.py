@@ -144,14 +144,14 @@ class Production(Base):
         PrimaryKeyConstraint('id'),
         # Unique key
         UniqueConstraint('pipeline', 'release'),
-        UniqueConstraint('input_production_id', 'pipeline', 'software_release'),
+        UniqueConstraint('input_production_id', 'pipeline', 'software_version'),
     )
     # Columns
     id                  = Column(Integer,    nullable=False ) #
     input_production_id = Column(Integer,    nullable=True )  # input release id (from configuration)
-    pipeline            = Column(String(16), nullable=True)  # Pipeline Name [pixelsim, nightly, memba, analysis]
-    release             = Column(String(16), nullable=False)   # Major release name [TESTX, DRX]
-    software_release    = Column(String(16), nullable=False)  # Package release [DCX, vX.X]
+    pipeline            = Column(String(16), nullable=True)   # Pipeline Name [pixelsim, nightly, memba, analysis]
+    release             = Column(String(16), nullable=False)  # Major release name [TESTX, DRX]
+    software_version    = Column(String(16), nullable=False)  # Package version [DCX, vX.X]
 
     #Relationships
     mosaics        = relationship('Mosaic',         back_populates="production")
@@ -160,6 +160,9 @@ class Production(Base):
     global_objects = relationship('Global_object',  back_populates="production")
     coadd_objects  = relationship('Coadd_object',   back_populates="production")
     photo_zs       = relationship('Photo_z',        back_populates="production")
+    truth_objects  = relationship('Truth_Object',   back_populates="production")
+    targets        = relationship('Target',         back_populates="production")
+    
     
     #The production table holds information about the hardware and software used to process the data.\n"
     #"Each time the software is updated, configuration changes or computing system has been modified, a new production entry is stored.   
@@ -751,11 +754,12 @@ class Truth_Object(Base):
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
+        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
             ) 
     # Keys
     id = Column(               BigInteger,   nullable=False) #Unique identifier"),
-    # Fields                   
-    simulation = Column(       String(128),  nullable=False) #Name of the simulation"),
+    # Fields
+    production_id = Column(    Integer,      nullable=False) #Production number"),
     stargalaxy = Column(       Boolean,      nullable=False) #0(False):galaxy, 1(True):star"),
     sed_type = Column(         Float(24),    nullable=False) #SED type"),
     sed_em_line = Column(      Float(24),    nullable=False) #SED emission line type"),
@@ -818,7 +822,7 @@ class Truth_Object(Base):
     disk_angle = Column(       Float(24),    nullable=True) #Galaxy only - Disk position angle"),
     redshift = Column(         Float(24),    nullable=True) #Galaxy only - Truth redshift"),
     # Constraints
-
+    production    = relationship('Production',       back_populates="truth_objects")
     # Documentation
     #comment="The truth object table contains all objects used in the simulated images for all PAU data challenges.\n"
     #"Each row corresponds to a truth object and for this reason all parameters do not have associated errors.",
@@ -830,21 +834,19 @@ class Target(Base):
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
+        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
             ) 
     # Keys
     id = Column(                Integer,      nullable=False) #Unique identifier"),
+    production_id = Column(     Integer,      nullable=False) #Production number"),
+    # Fields
     exp_num = Column(           Integer,      nullable=True) #  comment="Camera exposure unique identifier"),
     field = Column(             String(16),   nullable=True) #  comment="Field Name"),
-    origin = Column(            String(16),   nullable=False) #Where data is generated [PAUsim, ING la Palma]"),
-    origin_release = Column(    String(16),   nullable=False) #Data release [DCX, vX.X]"),
-    # Fields
     ra = Column(                Float(53),    nullable=True) #Target RA"),
     dec = Column(               Float(53),    nullable=True) #Target DEC"),
     filtertray = Column(        String(16),   nullable=True) #Filter Tray name"),
-    kind = Column(              Enum('BIAS', 'FLAT', 'TARGET', name='target_kind'), nullable=False) #Target kind"),
-    
+    kind = Column(              Enum('BIAS', 'FLAT', 'TARGET', name='target_kind'), nullable=False) #Target kind"),    
     status = Column(            Enum('PLANNED', 'SCHEDULED', 'SIMULATED', 'EXPOSED', name='target_status'),nullable=False) #  comment="Target status"),
-    
     rjd_obs = Column(           Float(53),    nullable=True) #Observation Reduced Modified Julian Day"),
     exptime = Column(           Float(24),    nullable=True) # comment="Exposure Time",
     airmass = Column(           Float(24),    nullable=True) # comment="Airmass",
@@ -858,9 +860,8 @@ class Target(Base):
     ecliptic_airglow = Column(  Float(24),  nullable=True) # comment="Ecliptic Airglow Light",
     
     # Relationships
-    bkg_mags = relationship('Bkg_mag', back_populates="target")
-    
-    
+    bkg_mags   = relationship('Bkg_mag',    back_populates="target")
+    production = relationship('Production', back_populates="targets")
     # Documentation
     #comment="target",
 

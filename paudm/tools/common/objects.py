@@ -115,11 +115,11 @@ class Mosaic(object):
     
     def store_image(self, image):
         # Overrite an image in Mosaic
-        pyfits.update(os.path.join(self.path, self.filename), data = image.data, header = image.header, ext = image.id)
+        pyfits.update(str(os.path.join(self.path, self.filename)), data = image.data, header = image.header, ext = image.id)
     
     def append_image(self, image):
         # Append an image to Mosaic
-        pyfits.append(os.path.join(self.path, self.filename), data = image.data, header = image.header)
+        pyfits.append(str(os.path.join(self.path, self.filename)), data = image.data, header = image.header)
     
     def append_image_fast(self, image):
         # Manual appending with regular i/o files (faster than Pyfits)
@@ -438,7 +438,13 @@ class Catalogue(object):
         if len(self.objects) == 0:
             log.warning("No objects in the catalogue list. Try load_all_query?")
         for db_element in self.objects:
+            if db_element.sed_type == None or db_element < 0:
+                log.warning("Why this is here???")
+                log.warning("%s"%vars(db_element))
+                print "-------!!!!!!!!!!!!!!!!------------"
+
             session.add(db_element)
+            session.flush()
     
     def merge_with_db(self, session):
         # Synchronize the objects list with the data base
@@ -516,7 +522,7 @@ class Catalogue(object):
     
     # TRUTH_OBJECT TABLE methods
     @classmethod
-    def create_db_truth_object_catalogue(cls, input_type = 'mice_galaxy_cat', truth_objects_list = [], sim_name = 'Default'):
+    def create_db_truth_object_catalogue(cls, input_type = 'mice_galaxy_cat', truth_objects_list = [], production = None):
         # Create a list of truth objects
         """
         Available input types:
@@ -532,20 +538,20 @@ class Catalogue(object):
                 fields = catalog.sim_gal_mapping(gal)
                 # Create truth_object db element
                 gal_tmp = model.Truth_Object( stargalaxy = False,
-                                              simulation = sim_name,
+                                              production = production,
                                               **fields)
                 # Append to catalog.objects list
                 catalog.objects.append(gal_tmp)
             
         elif input_type == 'star_cat':
             
-            for index, star in enumerate(truth_objects_list):
+            for star in truth_objects_list:
                 
                 # Mapping between starType and truth_object (star)
                 fields = catalog.sim_star_mapping(star)
                 # Create truth_object db element
                 star_tmp = model.Truth_Object( stargalaxy = True,
-                                               simulation = sim_name,
+                                               production = production,
                                                **fields)
                 # Append to catalog.objects list
                 catalog.objects.append(star_tmp)
@@ -679,12 +685,13 @@ class Catalogue(object):
             #print "USNO OUTPUT:"
             #print usno_out
             usno_catalogue = usno_out.split('\n')
-            
+            re_comm =  re.compile("\\\\|\|") ##if( re.match("\\\\", usno_line[0]) is not None  or re.match("\|", usno_line[0]) is not None )
+            re_html = re.compile("html")
             for usno_line in usno_catalogue:
                 if( len(usno_line) > 0 ):
-                    if( re.match("\\\\", usno_line[0]) is not None  or re.match("\|", usno_line[0]) is not None ):
+                    if re_comm.match(usno_line):
                         continue
-                    elif re.search("html", usno_line):
+                    elif re_html.search(usno_line):
                         error_msg = "Problem querying USNO database.  Returned an HTML FILE: \n %s" %usno_out
                         log.error(error_msg)
                         raise Exception, error_msg
@@ -781,7 +788,9 @@ class Catalogue(object):
         alternative_url = us_url # don't use another one because there is only one for dr8.
         
         fmt='csv'
-        
+        re_pass = re.compile("null|NONLEGACY")
+        re_nogood = re.compile("GALAXY|QSO|STAR_CARBON|STAR_BROWN_DWARF|STAR_CATY_VAR|STAR_WHITE_DWARF")
+
         sky_regions = []
         if sky_region['ra']['max'] > sky_region['ra']['min']:
             sky_regions.append(sky_region)
@@ -831,6 +840,7 @@ class Catalogue(object):
                 log.debug("Found %d stars in SDSS catalogue" %len(sdss_catalogue))
             
             # Main loop
+            
             for sdss_star in sdss_catalogue:
                 sdss_star_splitted = sdss_star.split(',')
             
@@ -852,9 +862,11 @@ class Catalogue(object):
                 # brown dwarfs, galaxies.
                 specType = sdss_star_splitted[12]
                 good = True
-                if re.search("null", specType) is not None or re.search("NONLEGACY", specType) is not None:
+                #if re.search("null", specType) is not None or re.search("NONLEGACY", specType) is not None:
+                if re_pass.search(specType):
                     pass
-                elif re.search("GALAXY", specType) is not None or re.search("QSO", specType) is not None or re.search("STAR_CARBON", specType) is not None or re.search("STAR_BROWN_DWARF", specType) is not None or re.search("STAR_CATY_VAR", specType) is not None or re.search("STAR_WHITE_DWARF", specType) is not None:
+                #elif re.search("GALAXY", specType) is not None or re.search("QSO", specType) is not None or re.search("STAR_CARBON", specType) is not None or re.search("STAR_BROWN_DWARF", specType) is not None or re.search("STAR_CATY_VAR", specType) is not None or re.search("STAR_WHITE_DWARF", specType) is not None:
+                elif re_nogood.search(specType):
                     good = False
                 elif isinstance( specType, int ):
                     typeNum = int(specType)
@@ -2217,6 +2229,8 @@ class StarSEDs(object):
         #wvl_list = np.arange(95.0,12000.0,2.0)
         wvl_list = np.arange(95.0,14500.0,2.0)
         #wvl_list = np.arange(95.0,18500.0,2.0)
+        re_sed = re.compile("(\S+)")
+        re_comm = re.compile("#")
         for index, file in enumerate(sed_files):
             if file[-3:] != "sed":
                 continue
@@ -2224,10 +2238,11 @@ class StarSEDs(object):
             
             sed_file = open(resource_filename ('paudm.resources','seds/stars/'+file))
             for line in sed_file:
-                if re.search("(\S+)", line) is None:
+                #if re.search("(\S+)", line) is None:
+                if not re_sed.search(line):
                     continue
                 splitted_line = line.split()
-                if re.match("#", splitted_line[0]):
+                if re_comm.match(splitted_line[0]):
                     continue
                 else:
                     self.seds[file].wavelengths.append(float(splitted_line[0]))
