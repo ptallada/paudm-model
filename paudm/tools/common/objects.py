@@ -149,7 +149,7 @@ class Mosaic(object):
         # Get mosaic header fields needed in the data base
         header = self.header
         fields = {}
-        if header.has_key('KIND'):
+        if 'KIND' in header:
             fields['kind']       = header['KIND']
         else:
             fields['kind']       = header['OBSTYPE']
@@ -252,8 +252,12 @@ class Image(object):
         self._db_object = None
         
         if mode == 'open':
+            if parent_mosaic == None:
+                parent_mosaic = pyfits.open(os.path.join(path, filename))
             # Load image
-            self.data, self.header = pyfits.getdata(os.path.join(path, filename), ext = self.id, header=True)
+            self.py_image = parent_mosaic[self.id]
+            self.header = self.py_image.header
+            self.data = self.py_image.data
         elif mode == 'new':
             # New image
             # Create new Primary fits
@@ -292,7 +296,7 @@ class Image(object):
     
     
     # DATA BASE Methods
-    def fields_from_header(self):
+    def fields_from_header(self, pixel_scale):
         fields = {}
         #mapping
         fields['image_num']  = self.header['IMAGEID']
@@ -315,15 +319,15 @@ class Image(object):
         fields['cqa_5']      = self.header['CQA05']
         
         # Calculate Sky Corners of the image
-        if self.parent_mosaic.header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
+        if self.parent_mosaic[0].header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
             from paudm.pipeline.pixelsim import wcsUtils
             from paudm.pipeline.pixelsim import simUtils
             
             # Load CRVAL
             image_wcs = wcsUtils.wcsType(sky_ref=simUtils.skyPoint(ra=self.header['CRVAL1'], dec=self.header['CRVAL2']),
                                          pix_ref=simUtils.pixelPoint(0, 0), # Dummy Value
-                                         rot_degrees=0 ) # Dummy Value
-            
+                                         rot_degrees=0,
+                                         instrument_PIXEL_SCALE = pixel_scale) # Dummy Value
             # Override WCS
             image_wcs.CRPIX1 = self.header['CRPIX1']
             image_wcs.CRPIX2 = self.header['CRPIX2']
@@ -347,20 +351,20 @@ class Image(object):
     
     # NIGHTLY Methods
     def bias_subtract(self):
-        import pipeline.nightly.delegates
-        return pipeline.nightly.delegates.bias_subtract(self)
+        import paudm.pipeline.nightly.delegates
+        return paudm.pipeline.nightly.delegates.bias_subtract(self)
     
     def flatfield_correct(self):
-        import pipeline.nightly.delegates
-        return pipeline.nightly.delegates.flatfield_correct(self)
+        import paudm.pipeline.nightly.delegates
+        return paudm.pipeline.nightly.delegates.flatfield_correct(self)
     
     def badcols_interpolate(self):
-        import pipeline.nightly.delegates
-        return pipeline.nightly.delegates.badcols_interpolate(self)
+        import paudm.pipeline.nightly.delegates
+        return paudm.pipeline.nightly.delegates.badcols_interpolate(self)
     
     def badpix_interpolate(self):
-        import pipeline.nightly.delegates
-        return pipeline.nightly.delegates.badpix_interpolate(self)
+        import paudm.pipeline.nightly.delegates
+        return paudm.pipeline.nightly.delegates.badpix_interpolate(self)
     
     # PIXELSIM Methods
     def initialize_extension_header(self, config, instrument):
