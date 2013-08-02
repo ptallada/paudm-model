@@ -71,10 +71,12 @@ class Mosaic(object):
         self.assoc_mosaic = {}
         self.assoc_db = None
         self.badcols = {}
+        self.pyfits_mosaic = None
         
         if mode.lower() == 'open':
             # Load global header
             self.header = pyfits.getheader(os.path.join(self.path, self.filename))
+            self.pyfits_mosaic = pyfits.open(os.path.join(self.path, self.filename))
         elif mode.lower() == 'new':
             # Remove if exists
             if os.path.exists(os.path.join(self.path, self.filename)):
@@ -111,7 +113,6 @@ class Mosaic(object):
     def load_image(self, image_id):
         # Build and return image from Mosaic
         return Image(mode = 'open', path = self.path, filename = self.filename, extension = image_id, parent_mosaic = self)
-        
     
     def store_image(self, image):
         # Overrite an image in Mosaic
@@ -199,10 +200,10 @@ class Mosaic(object):
         import paudm.pipeline.nightly.delegates
         return paudm.pipeline.nightly.delegates.mosaic_create_overscanned_mosaic(self)
     
-    def load_ccd_raw(self, ccd_num, correct_overscan = True):
+    def load_ccd_raw(self, instrument, ccd_num, correct_overscan = True, max_overscan_dev = None):
         # Load amps and build overscan-corrected CCD
         import paudm.pipeline.nightly.delegates
-        return paudm.pipeline.nightly.delegates.load_ccd_raw(self, ccd_num, correct_overscan)
+        return paudm.pipeline.nightly.delegates.load_ccd_raw(self, instrument, ccd_num, correct_overscan, max_overscan_dev)
     
     # PIXELSIM Delegates
     def initialize_sim_params(self, exposure, environment, config, instrument):
@@ -252,10 +253,8 @@ class Image(object):
         self._db_object = None
         
         if mode == 'open':
-            if parent_mosaic == None:
-                parent_mosaic = pyfits.open(os.path.join(path, filename))
             # Load image
-            self.py_image = parent_mosaic[self.id]
+            self.py_image = self.parent_mosaic.pyfits_mosaic[self.id]
             self.header = self.py_image.header
             self.data = self.py_image.data
         elif mode == 'new':
@@ -319,7 +318,7 @@ class Image(object):
         fields['cqa_5']      = self.header['CQA05']
         
         # Calculate Sky Corners of the image
-        if self.parent_mosaic[0].header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
+        if self.parent_mosaic.header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
             from paudm.pipeline.pixelsim import wcsUtils
             from paudm.pipeline.pixelsim import simUtils
             
