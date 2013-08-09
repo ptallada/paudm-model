@@ -447,7 +447,7 @@ class Detection(Base):
     production_id = Column(       Integer,      nullable=False) #Production number"),
     image_id = Column(            BigInteger,   nullable=False) #CCD image number"),
     #Column('global_object_id = Column(    BigInteger,   nullable=True,  comment="Global Object number"),
-    insert_date = Column(         DateTime,     nullable=False) #Timestamp of insertion", default=func.current_timestamp()),
+    insert_date = Column(         DateTime,     nullable=False, default=func.current_timestamp()) #Timestamp of insertion"
     band = Column(                String(4),    nullable=False) #Band name"),
     # Fields
     background = Column(          Float(24),    nullable=False) #Background at centroid position [BACKGROUND] (count)"),
