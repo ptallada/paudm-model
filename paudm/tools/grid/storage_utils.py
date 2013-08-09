@@ -185,7 +185,7 @@ def srm_download(config_grid, dest_path, file_list = None, decompress_at_destina
  
     log.debug( "--- Download files (SRM protocol) ---" )
     
-    srm_prefix  = config_grid['SRM_PREFIX']
+    srm_prefix  = config_grid['SRM_prefix']
     file_prefix = config_grid['FILE_PREFIX']
     if len(file_list) > 0:
         for file in file_list:
@@ -389,9 +389,9 @@ def upload(config, dir_in = None, dir_out= None, file_in = None, file_out = None
         cp_cmd = "srmcp "
         ls_cmd = "srmls "
         if dir_out.split("/")[0] == 'pnfs':
-            dir_out = config['grid']['SRM_PREFIX'] + "/" + dir_out
+            dir_out = config['grid']['SRM_prefix'] + "/" + dir_out
     
-    srm_dirout =  config['grid']['SRM_PREFIX']+ dir_out
+    srm_dirout =  config['grid']['SRM_prefix']+ dir_out
     if  subprocess.call(ls_cmd + srm_dirout, shell=True) == 1:
         log.warning( "%s does not exist. It will be automatically created."% dir_out)
 
