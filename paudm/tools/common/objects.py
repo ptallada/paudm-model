@@ -441,11 +441,6 @@ class Catalogue(object):
         if len(self.objects) == 0:
             log.warning("No objects in the catalogue list. Try load_all_query?")
         for db_element in self.objects:
-            if db_element.sed_type == None or db_element < 0:
-                log.warning("Why this is here???")
-                log.warning("%s"%vars(db_element))
-                print "-------!!!!!!!!!!!!!!!!------------"
-
             session.add(db_element)
             session.flush()
     
@@ -488,7 +483,7 @@ class Catalogue(object):
                     det_tmp = model.Detection(band = db_image.filter,
                                               production = mosaic.assoc_db.production,
                                               image = db_image,
-                                              ccd = catalog.extension,
+                                              #ccd = catalog.extension,
                                               zp_offset = 0.0,
                                               **fields)
                     catalog.objects.append(det_tmp)
@@ -1128,7 +1123,7 @@ class Catalogue(object):
     # the data are taken from predictions in Gunn's SDSS camera paper:
     # http://iopscience.iop.org/1538-3881/116/6/3040/fulltext/
     # Table 5, plus an ubercal-like systematic error.
-    def sdss_error_from_mag( self, mag, filter ):
+    def sdss_error_from_mag(self, instrument, mag, filter):
         
         # These systematic errors are meant to be ubercal-appropriate
         systematics = dict()
@@ -1331,7 +1326,7 @@ class Catalogue(object):
         # add extinction to the magnitudes
         self.addExtinction( filter )
         
-    def truth_to_detection(self, filter):
+    def truth_to_detection(self, instrument, filter):
         
         detection_objects = []
         for s in range( len(self.objects) ):
@@ -1348,7 +1343,7 @@ class Catalogue(object):
             mag_name = "mag_" + "%s" %filter
             mag = self.objects[s].__getattribute__(mag_name)
             fields['flux_auto'] = 10.0**((constants.mag_zp-mag)/2.5)
-            mag_err = self.sdss_error_from_mag( mag, filter )
+            mag_err = self.sdss_error_from_mag(instrument,mag, filter )
             fields['flux_err_auto'] = math.fabs(10.0**(mag_err/2.5)*fields['flux_auto'] - fields['flux_auto'])
             
             # fill in all flux fields with the same info
@@ -1746,16 +1741,17 @@ class Phot_Calibrator(object):
         self.params['zp_phot'] = [ 0.0 ] # for fictitious CCD #0
         self.params['zp_phot_err'] = [ 0.0 ]
         
-        db_zp_phots = model.session.query(model.ZP_Phot).filter(model.ZP_Phot.id == db_mosaic.zp_phot_id).all()
+        db_zp_phots = model.session.query(model.Zp_phot).filter(model.Zp_phot.id == db_mosaic.zp_phot_id).all()
         
         # If we haven't already assigned the correct ZP_phots to this mosaic, then figure it out.
         if( len(db_zp_phots) == 0 ):
             # First, any ZPs for the right filter tray and the right date
-            db_zp_phot_query = model.session.query(model.ZP_Phot).filter(model.ZP_Phot.filtertray==db_mosaic.filtertray,model.ZP_Phot.start_date<db_mosaic.date_obs,((model.ZP_Phot.end_date == None) | (model.ZP_Phot.end_date<db_mosaic.date_obs)) )
+            db_zp_phot_query = model.session.query(model.Zp_phot).filter(model.Zp_phot.filtertray==db_mosaic.filtertray,
+                                                                         model.Zp_phot.start_date<db_mosaic.date_obs,
+                                                                         ((model.Zp_phot.end_date == None) | (model.Zp_phot.end_date<db_mosaic.date_obs)) )
             # Now check the production info
             db_production = model.session.query(model.Production).filter(model.Production.id==db_mosaic.production_id).one()
-            db_zp_phot_query = db_zp_phot_query.join(model.Production)
-            db_zp_phot_query = db_zp_phot_query.filter(model.Production.project==db_production.project,model.Production.origin==db_production.origin,model.Production.red_release==db_production.red_release)
+            db_zp_phot_query = db_zp_phot_query.join(model.Production).filter_by(id=db_production.id)
             db_zp_phots = db_zp_phot_query.all()
             if( len(db_zp_phots) == 0 ):
                 error_msg = "No appropriate ZP_Phot entries found!  Do you need to run the commissioning pipeline?"
