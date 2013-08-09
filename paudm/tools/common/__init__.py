@@ -116,7 +116,7 @@ def init_db(config):
     #config = get_config()
     #log = get_logger()
     ### DATA BASE Configuration ###
-    if config['general']['env_mode'] == 'PC':
+    if config['common']['general']['env_mode'] == 'PC':
         log.info("Setting up local %s SQLite database..." %config['common']['database']['db_name'])
         db_full_path = os.path.join(config['common']['database']['path'], config['common']['database']['db_name'] + '.db')
         db_config_file = resource_string('paudm.tools.db.config','local.yaml')
@@ -129,7 +129,7 @@ def init_db(config):
     settings = yaml.safe_load(db_config_file)
     url      = settings.get('engine', 'sqlite:///') + db_full_path
     model.init(url)
-    # model.metadata.create_all()
+    model.metadata.create_all()
     # Create DB if requested
     if config['common']['database']['create_db']:
         answer = raw_input("The database will be ERASED and recreated. Do you want to proceed? (y/N): ")
@@ -142,14 +142,14 @@ def init_db(config):
     
     ### Obtain REVISION Number ###
     # Will work only under svn revision
-    svnversion_string = os.popen('svnversion -n').read().split(':')[0]
-    try:
-        while svnversion_string[-1].isalpha():
-            svnversion_string = svnversion_string[:-1]
-    except Exception:
-        svnversion_string = '-1'
-    config['general']['red_revision'] = int(svnversion_string)
-    log.info ("SVN Revision number: %d" %config['general']['red_revision'])
+    #svnversion_string = os.popen('svnversion -n').read().split(':')[0]
+    #try:
+    #    while svnversion_string[-1].isalpha():
+    #        svnversion_string = svnversion_string[:-1]
+    #except Exception:
+    #    svnversion_string = '-1'
+    #config['software_revision'] = int(svnversion_string)
+    #log.info ("SVN Revision number: %d" %config['software_version'])
     
     log.info("PAUdm initialization complete.")
     return model.session
