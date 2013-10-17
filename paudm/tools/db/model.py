@@ -40,7 +40,7 @@ def init(url):
     if url.startswith('postgresql'):
         engine = create_engine(url)
     else:
-        engine = create_engine(url, connect_args={'check_same_thread':False})
+        engine = create_engine(url, connect_args={'check_same_thread':False}, echo = True)
         twophase = False
     metadata.bind = engine
     
@@ -77,7 +77,7 @@ class User(Base):
         self.name = name
         self.surname = surname 
         self._password = hashlib.sha512(password + _salt).hexdigest()
-        self.validated = 0
+        self.validated = False
         self.permissions = permissions
         
     def _get_password(self):
@@ -889,20 +889,20 @@ class Bkg_mag(Base):
     
     
     # Job Table
-class Job_pau(brownthrower.model.Job) :
-        
-        quality_controls = relationship('Quality_control',  back_populates="job")   
-    
-    # Documentation
-    #comment="Job",
-    
-    # Quality Control Table
+# class Job_pau(brownthrower.model.Job) :
+#         
+#         quality_controls = relationship('Quality_control',  back_populates="job")   
+#     
+#     # Documentation
+#     #comment="Job",
+#     
+#     # Quality Control Table
 class Quality_control(Base):
     __tablename__ = 'quality_control'
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
-        ForeignKeyConstraint(['job_id'], ['job.id'], ondelete='CASCADE'),
+        
             )
     # Keys
     id = Column(                Integer,      nullable=False) #Unique identifier"),
@@ -919,11 +919,11 @@ class Quality_control(Base):
     plot_file = Column(         Text,         nullable=True) #  comment="Plot file full name and path"),
     
     # Relationships
-    job           = relationship('Job_pau',              back_populates="quality_controls")
+#     job           = relationship('Job_pau',              back_populates="quality_controls")
     
     #comment="Quality Control",
     
-Index('ik_qcjob', Quality_control.job_id)
+
 
 
     

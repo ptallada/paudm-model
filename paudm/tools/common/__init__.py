@@ -128,6 +128,10 @@ def init_db(config):
     # Initialize DB
     settings = yaml.safe_load(db_config_file)
     url      = settings.get('engine', 'sqlite:///') + db_full_path
+    url = 'postgresql://dpiscia:Iris82Da,@localhost/paudm_post'
+    #url = 'sqlite:////Users/dpiscia/sqlite_db/prova_bt.db'
+    print "url davide"
+    print url
     model.init(url)
     model.metadata.create_all()
     # Create DB if requested

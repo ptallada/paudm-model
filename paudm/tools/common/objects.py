@@ -450,6 +450,8 @@ class Catalogue(object):
             log.warning("No objects in the catalogue list. Try load_all_query?")
         for db_element in self.objects:
             session.merge(db_element)
+            
+        
     
     # DETECTION TABLE methods
     @classmethod

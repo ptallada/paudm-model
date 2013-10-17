@@ -129,7 +129,7 @@ def upload(config, file_in = None, file_out = None):
     if file_in == None or not os.path.exists(file_in):
         log.warning("No file to upload... file = %s"% file_in)
         return
-    archive_type = config['common']['grid']['archive_type']
+    
     # PC mode
     if config['general']['env_mode'] == 'PC':
         # Make whatever directories are necessary.  Archive path should exist.
@@ -145,6 +145,7 @@ def upload(config, file_in = None, file_out = None):
     
     # GRID mode
     else:
+        archive_type = config['common']['grid']['archive_type']
         if archive_type == 'STORAGE':
             from paudm.tools.grid.storage_utils import upload as grid_upload
             log.info("Uploading file %s to archive in STORAGE at location %s..." %(file_in, file_out))
