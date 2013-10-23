@@ -210,9 +210,9 @@ class Mosaic(object):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.initialize_sim_params(self, exposure, environment, config, instrument)
     
-    def simulate(self,config, instrument ):
+    def simulate(self,config, instrument, production_id  ):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.simulate_mosaic(self, config, instrument)
+        return paudm.pipeline.pixelsim.delegates.simulate_mosaic(self, config, instrument, production_id )
     
     def initialize_global_header(self, config, AMPS_X_CCD):
         import paudm.pipeline.pixelsim.delegates
