@@ -12,6 +12,7 @@ from sqlalchemy.orm import mapper, relationship, sessionmaker, scoped_session, s
 from zope.sqlalchemy import ZopeTransactionExtension
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound #@UnusedImport
+from sqlalchemy.orm import backref
 from sqlalchemy.sql.expression import func
 from sqlalchemy.ext.declarative import declarative_base
 from base import Column, MetaData, Table
@@ -145,6 +146,7 @@ class Production(Base):
         # Unique key
         UniqueConstraint('pipeline', 'release'),
         UniqueConstraint('input_production_id', 'pipeline', 'software_version'),
+        ForeignKeyConstraint(['input_production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Columns
     id                  = Column(Integer,    nullable=False ) #
@@ -152,6 +154,7 @@ class Production(Base):
     pipeline            = Column(String(16), nullable=True)   # Pipeline Name [pixelsim, nightly, memba, analysis]
     release             = Column(String(16), nullable=False)  # Major release name [TESTX, DRX]
     software_version    = Column(String(16), nullable=False)  # Package version [DCX, vX.X]
+    job_id              = Column(Integer,    nullable=False)  # id of the job that generates the current production
 
     #Relationships
     mosaics        = relationship('Mosaic',         back_populates="production")
@@ -162,6 +165,18 @@ class Production(Base):
     photo_zs       = relationship('Photo_z',        back_populates="production")
     truth_objects  = relationship('Truth_Object',   back_populates="production")
     targets        = relationship('Target',         back_populates="production")
+    parent         = relationship('Production',     back_populates = 'children',
+                         primaryjoin = 'Production.input_production_id == Production.id',
+                         remote_side = 'Production.id')
+    children       = relationship('Production',     back_populates = 'parent',
+                         primaryjoin = 'Production.input_production_id == Production.id',
+                         cascade     = 'all, delete-orphan', passive_deletes = True)
+    job            = relationship('Job',
+                          primaryjoin = 'Production.job_id == Job.id',
+                          foreign_keys = '[ Production.job_id ]',
+                          remote_side = '[ Job.id ]',
+                          uselist = False,
+                          backref = backref("production", uselist = False))
     
     
     #The production table holds information about the hardware and software used to process the data.\n"
@@ -922,9 +937,6 @@ class Quality_control(Base):
 #     job           = relationship('Job_pau',              back_populates="quality_controls")
     
     #comment="Quality Control",
-    
-
-
 
     
 @compiles(BigInteger, "sqlite")
