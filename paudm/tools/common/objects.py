@@ -71,12 +71,10 @@ class Mosaic(object):
         self.assoc_mosaic = {}
         self.assoc_db = None
         self.badcols = {}
-        self.pyfits_mosaic = None
         
         if mode.lower() == 'open':
             # Load global header
             self.header = pyfits.getheader(os.path.join(self.path, self.filename))
-            self.pyfits_mosaic = pyfits.open(os.path.join(self.path, self.filename))
         elif mode.lower() == 'new':
             # Remove if exists
             if os.path.exists(os.path.join(self.path, self.filename)):
@@ -113,6 +111,10 @@ class Mosaic(object):
     def load_image(self, image_id):
         # Build and return image from Mosaic
         return Image(mode = 'open', path = self.path, filename = self.filename, extension = image_id, parent_mosaic = self)
+    
+    def load_image_header(self, image_id, pymosaic = None):
+        # Build and return image from Mosaic
+        return Image(mode = 'open_header', path = self.path, filename = self.filename, extension = image_id, parent_mosaic = self, pymosaic = pymosaic)
     
     def store_image(self, image):
         # Overrite an image in Mosaic
@@ -210,9 +212,9 @@ class Mosaic(object):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.initialize_sim_params(self, exposure, environment, config, instrument)
     
-    def simulate(self,config, instrument, production_id  ):
+    def simulate(self,config, instrument, production_id ):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.simulate_mosaic(self, config, instrument, production_id )
+        return paudm.pipeline.pixelsim.delegates.simulate_mosaic(self, config, instrument, production_id)
     
     def initialize_global_header(self, config, AMPS_X_CCD):
         import paudm.pipeline.pixelsim.delegates
@@ -241,7 +243,7 @@ class Image(object):
       - status = db_insert( )
     '''
     
-    def __init__(self, mode, path = None, filename = None, extension = None, image_header = None, parent_mosaic = None):
+    def __init__(self, mode, path = None, filename = None, extension = None, image_header = None, parent_mosaic = None, pymosaic = None):
         # Image Constructor
         self.id = extension
         self.header = image_header # TODO: Turn into a property
@@ -254,9 +256,13 @@ class Image(object):
         
         if mode == 'open':
             # Load image
-            self.py_image = self.parent_mosaic.pyfits_mosaic[self.id]
-            self.header = self.py_image.header
-            self.data = self.py_image.data
+            self.data, self.header = pyfits.getdata(os.path.join(path, filename), ext = self.id, header=True)
+        if mode == 'open_header':
+            # Load image
+            if parent_mosaic != None:
+                self.header = pyfits.getheader(os.path.join(parent_mosaic.path, parent_mosaic.filename), self.id)
+            else:
+                self.header = pyfits.getheader(os.path.join(path, filename), self.id)
         elif mode == 'new':
             # New image
             # Create new Primary fits
@@ -438,12 +444,13 @@ class Catalogue(object):
     
     def sync_with_db(self, session):
         # Synchronize the objects list with the data base
+        log.debug("This catalogue has %d elements to be inserted into the db..."%len(self.objects))
         if len(self.objects) == 0:
             log.warning("No objects in the catalogue list. Try load_all_query?")
         for db_element in self.objects:
             session.add(db_element)
             session.flush()
-    
+        log.debug("Catalogue elements insertion done!")
     def merge_with_db(self, session):
         # Synchronize the objects list with the data base
         if len(self.objects) == 0:
@@ -470,10 +477,12 @@ class Catalogue(object):
             n_extensions = 0
             while n_extensions < total_extensions:
                 catalog.extension = extension #First CCD to compute
+                log.debug("CCD n. %d" % extension)
                 detections = pyfits.getdata(os.path.join(catalog.path, catalog.filename), ext = 2 * catalog.extension)
                 catalog._names = detections.dtype.names
                 extension +=1
                 n_extensions +=1
+                db_image = model.session.query(model.Image).filter_by(mosaic = mosaic.assoc_db, image_num = catalog.extension).one()
                 
                 for detection in detections:
                     dict_tmp = {}
@@ -481,11 +490,9 @@ class Catalogue(object):
                         property = catalog._names[property_id]
                         dict_tmp[property] = detection[property_id]
                     fields = catalog.detections_mapping(dict = dict_tmp)
-                    db_image = model.session.query(model.Image).filter_by(mosaic = mosaic.assoc_db, image_num = catalog.extension).one()
                     det_tmp = model.Detection(band = db_image.filter,
                                               production = mosaic.assoc_db.production,
                                               image = db_image,
-                                              #ccd = catalog.extension,
                                               zp_offset = 0.0,
                                               **fields)
                     catalog.objects.append(det_tmp)
