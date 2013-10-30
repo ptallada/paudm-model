@@ -9,7 +9,7 @@ install_requires = [
     'astropysics',
     'matplotlib',
     'numpy',
-    'pyfits<3.0.0',
+    'pyfits==3.0.11',
     'pyyaml',
     'scipy',
     'setuptools',
