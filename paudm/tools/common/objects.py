@@ -992,8 +992,8 @@ class Catalogue(object):
             y = -2048. * n * math.sqrt(1-n*math.sin(b))*math.sin(l) + 2047.5
             
             # look up the value of that pixel in the dust map
-            x_int = math.floor(x+0.5)
-            y_int = math.floor(y+0.5)
+            x_int = int(math.floor(x+0.5))
+            y_int = int(math.floor(y+0.5))
             if n == 1:
                 extinction = SFD_north[y_int-1, x_int-1];
             else:
@@ -1081,8 +1081,8 @@ class Catalogue(object):
             y = -2048. * n * math.sqrt(1-n*math.sin(b))*math.sin(l) + 2047.5
             
             # look up the value of that pixel in the dust map
-            x_int = math.floor(x+0.5)
-            y_int = math.floor(y+0.5)
+            x_int = int(math.floor(x+0.5))
+            y_int = int(math.floor(y+0.5))
             if n == 1:
                 extinction = SFD_north[y_int-1, x_int-1];
             else:
