@@ -16,7 +16,7 @@ def plot_xy(x_data,y_data, xlabel = None, ylabel = None,  filename = None, title
     heatmap, xedges, yedges = numpy.histogram2d(x_data, y_data, bins=25)
     extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
     pyplot.clf()
-    pyplot.imshow(heatmap, extent = extent, aspect='auto')
+    pyplot.imshow(heatmap, extent = extent, aspect='auto', interpolation='nearest')
     pyplot.colorbar()
     pyplot.grid()
     pyplot.xlabel(xlabel)
