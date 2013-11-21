@@ -61,7 +61,7 @@ def list_storage_directory(path, config, pattern = '', file_list_file = None):
         ls_cmd = "srmls "
         use_srmls = True
     elif config['grid']['SRM_COPY_CMD'] == "lcg-cp":
-        ls_cmd = "lcg-ls -D srmv2 -b "
+        ls_cmd = "lcg-ls -D srmv2 -b --connect-timeout=500 "
 
     if pattern == '':
         cmd = ls_cmd + config['grid']['SRM_prefix'] + path + ' | sort -k 2 > ' + out_file
@@ -159,7 +159,7 @@ def bring_online(config_grid, dest_path, file_list, DCAP_prefix = "dcap://dcap.p
                         log.debug("File status: %s"%file_status)
                         time.sleep(30)
                 elif config_grid['SRM_COPY_CMD'] == "lcg-cp":
-                    lcg_cmd = 'lcg-ls -l -D srmv2 -b ' +  os.path.join(config_grid['SRM_prefix'] + file['path'], file['name'])
+                    lcg_cmd = 'lcg-ls -l -D srmv2 -b --connect-timeout=500 ' +  os.path.join(config_grid['SRM_prefix'] + file['path'], file['name'])
                     lcg_response = os.popen(lcg_cmd).read()
                     file_status = lcg_response.split()
                     if ('ONLINE_AND_NEARLINE' in file_status) or ('ONLINE' in file_status):
@@ -203,7 +203,7 @@ def srm_download(config_grid, dest_path, file_list = None, decompress_at_destina
                     file_nfs = os.path.join(srm_prefix + dest_path_formatted, file['name'])
                 else:
                     file_nfs  = os.path.join(file_prefix+ dest_path, file['name'])
-                srm_cp_cmd = "lcg-cp -b -D srmv2 "
+                srm_cp_cmd = "lcg-cp -b --connect-timeout=500 -D srmv2 "
             elif config_grid['SRM_COPY_CMD'] == "srmcp":
                 # pnfs Test
                 if dest_path.split('/')[1] == 'pnfs':
@@ -379,8 +379,8 @@ def upload(config, dir_in = None, dir_out= None, file_in = None, file_out = None
             dir_out = os.path.dirname(file_out)
             
     if config['grid']['SRM_COPY_CMD'] == 'lcg-cp':
-        cp_cmd = "lcg-cp -b -D srmv2 "
-        ls_cmd = "lcg-ls -b -D srmv2 "
+        cp_cmd = "lcg-cp -b --connect-timeout=500 -D srmv2 "
+        ls_cmd = "lcg-ls -b --connect-timeout=500 -D srmv2 --count 10 "
         if dir_out.split("/")[1] == 'pnfs':
             dir_out_list = list(dir_out)[1:]
             dir_out = "".join(dir_out_list)
