@@ -319,7 +319,9 @@ class Mosaic(Base):
     zp_phot_id = Column(Integer,  nullable=True)     # ZPphot identifier
     filename = Column(String(128),  nullable=False)     #File name
     archivepath = Column(String(128),  nullable=False)             #Path in the archive
-    kind = Column(Enum('ARC', 'BIAS', 'DARK', 'FLASH', 'FLAT', 'FOCUS', 'GLANCE', 'PUPIL', 'SCRATCH', 'SKY', 'TARGET','MBIAS','MFLAT','RED_SCI','RED_WEIGHT','RED_MASK', name='mosaic_kind'),  nullable=False)             #Mosaic image type
+    kind = Column(Enum('ARC', 'BIAS', 'DARK', 'FLASH', 'FLAT', 'FOCUS', 'GLANCE', 'PUPIL',
+                       'SCRATCH', 'SKY', 'TARGET','MBIAS','MFLAT','RED_SCI','RED_WEIGHT','RED_MASK',
+                       name='mosaic_kind'),  nullable=False)             #Mosaic image type
     exp_num = Column(Integer,  nullable=False)     # Exposure number
     obs_title = Column(String(32),   nullable=False)     #Observation title
     ra = Column(Float(53),    nullable=False)      #Telescope Right Ascension pointing (deg)
@@ -860,7 +862,7 @@ class Target(Base):
     ra = Column(                Float(53),    nullable=True) #Target RA"),
     dec = Column(               Float(53),    nullable=True) #Target DEC"),
     filtertray = Column(        String(16),   nullable=True) #Filter Tray name"),
-    kind = Column(              Enum('BIAS', 'FLAT', 'TARGET', name='target_kind'), nullable=False) #Target kind"),    
+    kind = Column(              Enum('BIAS', 'FLAT', 'TARGET', name='target_kind'), nullable=False) #Target kind"),
     status = Column(            Enum('PLANNED', 'SCHEDULED', 'SIMULATED', 'EXPOSED', name='target_status'),nullable=False) #  comment="Target status"),
     rjd_obs = Column(           Float(53),    nullable=True) #Observation Reduced Modified Julian Day"),
     exptime = Column(           Float(24),    nullable=True) # comment="Exposure Time",
