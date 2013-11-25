@@ -51,7 +51,7 @@ def init(url):
        ))()
     
     return session
-
+'''
 class User(Base):
     __tablename__ = 'user'
     __table_args__ = (
@@ -112,7 +112,7 @@ class User(Base):
     @hybrid_property
     def password(self):
         return self._password
-
+'''
 class Run(Base): 
     __tablename__ = 'run'
     __table_args__ = (
