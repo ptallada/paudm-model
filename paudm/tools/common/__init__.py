@@ -129,7 +129,6 @@ def init_db(config):
     settings = yaml.safe_load(db_config_file)
     url      = settings.get('engine', 'sqlite:///') + db_full_path
     model.init(url)
-    model.metadata.create_all()
     # Create DB if requested
     if config['common']['database']['create_db']:
         answer = raw_input("The database will be ERASED and recreated. Do you want to proceed? (y/N): ")
@@ -137,7 +136,7 @@ def init_db(config):
             log.info("Data Base not restored.")
         else:
             log.info ("Creating new DB...")
-            model.recreate()
+            model.metadata.create_all()
             log.info("...DB successfully created.")
     
     ### Obtain REVISION Number ###

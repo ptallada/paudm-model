@@ -14,7 +14,7 @@ logging:
 
 database:
     create_db       :   False                      # Create new DB or overrite existing one - BE CAREFULL!
-    db_name         :   test_tonello               # Name for the data base (in SQLite has .db extension)
+    db_name         :   dm                         # Name for the data base (in SQLite has .db extension)
     path            :   /home/paus001/.sqlite/     # Path for the data base (PC Only)
 
 grid:
