@@ -131,24 +131,16 @@ def init_db(config):
     model.init(url)
     # Create DB if requested
     if config['common']['database']['create_db']:
-        answer = raw_input("The database will be ERASED and recreated. Do you want to proceed? (y/N): ")
-        if answer.upper() != "Y":
-            log.info("Data Base not restored.")
-        else:
+        db_create = True
+        if config['common']['general']['env_mode'] == 'PC':
+            answer = raw_input("The database will be ERASED and recreated. Do you want to proceed? (y/N): ")
+            if answer.upper() != "Y":
+                log.info("Data Base not restored.")
+                db_create = False
+        if db_create == True:
             log.info ("Creating new DB...")
             model.metadata.create_all()
             log.info("...DB successfully created.")
-    
-    ### Obtain REVISION Number ###
-    # Will work only under svn revision
-    #svnversion_string = os.popen('svnversion -n').read().split(':')[0]
-    #try:
-    #    while svnversion_string[-1].isalpha():
-    #        svnversion_string = svnversion_string[:-1]
-    #except Exception:
-    #    svnversion_string = '-1'
-    #config['software_revision'] = int(svnversion_string)
-    #log.info ("SVN Revision number: %d" %config['software_version'])
-    
+            
     log.info("PAUdm initialization complete.")
     return model.session
