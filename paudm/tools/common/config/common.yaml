@@ -2,7 +2,7 @@
 
 general:
     env_mode        :   GRID                       # Environment [PC/GRID]
-    archive_path    :   /pnfs/pic.es/data/vo.paus.pic.es/paus/tape/eraseme/preDC4_bt_4/
+    archive_path    :   /pnfs/pic.es/data/vo.paus.pic.es/paus/tape/eraseme/preDC4_bt_8/
     working_path    :   $HOME                      # Working path
     project         :   PAU
 
@@ -13,13 +13,13 @@ logging:
     path            :   Default                    # Log file path (Default is WORKING_PATH/PAUdm.log )
 
 database:
-    create_db       :   False                      # Create new DB or overrite existing one - BE CAREFULL!
+    create_db       :   False                      # Create new DB (create_all)- BE CAREFUL! Public tables will be not accessible
     db_name         :   dm                         # Name for the data base (in SQLite has .db extension)
     path            :   /home/paus001/.sqlite/     # Path for the data base (PC Only)
 
 grid:
     archive_type    :   STORAGE                        # Choose where to export the produced simulation [STORAGE; NFS; NONE] 
-    NFS_PATH        :   /nfs/pau/PAUdm/runs/tonello/bt_test_nt/shared_1/
+    NFS_PATH        :   /nfs/pau/PAUdm/runs/tonello/bt_test_nt/shared_8/
     SEXTRACTOR_BIN  :   $VO_VO_PAUS_PIC_ES_SW_DIR/sextractor/r321/bin/sex
     SCAMP_BIN       :   $VO_VO_PAUS_PIC_ES_SW_DIR/scamp/r314/bin/scamp
     ACLIENT_BIN     :   $VO_VO_PAUS_PIC_ES_SW_DIR/cdsclient/3.6/bin/aclient
