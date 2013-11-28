@@ -305,9 +305,9 @@ class Mosaic(Base):
 
 
         # Foreign key
-        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['run_id'],        ['run.id'],        onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['zp_phot_id'],    ['zp_phot.id'],    onupdate='CASCADE', ondelete='RESTRICT'),
+        ForeignKeyConstraint(['production_id'], ['production.id'],                                     onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['run_id'],        ['run.id'],                                            onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['production_id', 'zp_phot_id'], ['zp_phot.production_id', 'zp_phot.id'], onupdate='CASCADE', ondelete='RESTRICT'),
         UniqueConstraint('archivepath', 'filename'),
         UniqueConstraint('production_id', 'run_id', 'kind', 'exp_num'),
 
@@ -456,12 +456,12 @@ class Detection(Base):
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['image_id'],          ['image.id'],      onupdate='CASCADE', ondelete='RESTRICT'),
         #ForeignKeyConstraint(['global_object_id'],  ['global_object.id'],      onupdate='CASCADE', ondelete='RESTRICT'),
-        ForeignKeyConstraint(['production_id'],     ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('production_id', 'image_id', 'band', 'x', 'y'),
+        #ForeignKeyConstraint(['production_id'],     ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        #UniqueConstraint('production_id', 'image_id', 'band', 'x', 'y'),
         )
     # Keys
     id = Column(                 BigInteger,   nullable=False) #Unique identifier"),
-    production_id = Column(       Integer,      nullable=False) #Production number"),
+    #production_id = Column(       Integer,      nullable=False) #Production number"),
     image_id = Column(            BigInteger,   nullable=False) #CCD image number"),
     #Column('global_object_id = Column(    BigInteger,   nullable=True,  comment="Global Object number"),
     insert_date = Column(         DateTime,     nullable=False, default=func.current_timestamp()) #Timestamp of insertion"
@@ -483,7 +483,7 @@ class Detection(Base):
     y = Column(                   Float(24),    nullable=False) #Windowed position estimate along y [YWIN_IMAGE] (pix)"),
     zp_offset = Column(           Float(24),    nullable=False) #Offset zeropoint magnitude for unexpected corrections"),
     #relationships
-    production  = relationship('Production',       back_populates='detections')
+    #production  = relationship('Production',       back_populates='detections')
     image       = relationship('Image',            back_populates="detections")
     global_objects =  relationship('Global_object',    back_populates="detections", secondary=lambda:Global_object_detections.__table__)
     # Documentation
