@@ -159,7 +159,6 @@ class Production(Base):
     #Relationships
     mosaics        = relationship('Mosaic',         back_populates="production")
     zp_phots       = relationship('Zp_phot',        back_populates="production")
-    detections     = relationship('Detection',      back_populates="production")
     global_objects = relationship('Global_object',  back_populates="production")
     coadd_objects  = relationship('Coadd_object',   back_populates="production")
     photo_zs       = relationship('Photo_z',        back_populates="production")
@@ -189,6 +188,7 @@ class Zp_phot(Base):
         # Primary key
         PrimaryKeyConstraint('id'),
         # Unique key
+        UniqueConstraint('production_id', 'id'),
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Columns
@@ -237,6 +237,7 @@ class Zp_phot(Base):
     #Relationships
 
     production    = relationship('Production',       back_populates="zp_phots")
+Index('uk_production_zp_phot', Zp_phot.production_id, Zp_phot.id)
 
 #        "Contains information for the photometric calibration.\n"
 #        "Holds a filter tray set (18 CCDs) of ZPphot for an interval of time."
