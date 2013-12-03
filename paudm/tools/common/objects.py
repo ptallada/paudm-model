@@ -491,7 +491,7 @@ class Catalogue(object):
                         dict_tmp[property] = detection[property_id]
                     fields = catalog.detections_mapping(dict = dict_tmp)
                     det_tmp = model.Detection(band = db_image.filter,
-                                              #production = mosaic.assoc_db.production,
+                                              production = mosaic.assoc_db.production,
                                               image = db_image,
                                               zp_offset = 0.0,
                                               **fields)
