@@ -77,11 +77,7 @@ def get_config():
     print "Setting file mode creation mask to 0002..."
     os.umask(0002)
     
-    if config['general']['WORKING_PATH'][0] == '$':
-        working_path = os.getenv(config['general']['WORKING_PATH'][1:])
-        # When WORKING_PATH is the name of a variable, substitute it with its value (only if exists)
-        if working_path != None:
-            config['general']['WORKING_PATH'] = working_path
+    # CHDIR to WORKING PATH! TBD with context
 
     _config = config
     return _config
@@ -97,7 +93,7 @@ def get_logger():
         log_filename = config['logging']['path']
     else:
         # Default log file name and path
-        log_filename = os.path.join(config['general']['working_path'], 'PAUdm.log')
+        log_filename = 'PAUdm.log'
     if not os.path.exists(log_filename):
         open(log_filename, 'w').close()
         os.chmod(log_filename, 0664)
