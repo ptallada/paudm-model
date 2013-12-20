@@ -218,7 +218,7 @@ class Mosaic(object):
     
     def initialize_global_header(self, config, AMPS_X_CCD):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.initialize_global_header(self, config['common']['general']['project'].lower(), config['release'], config['ccd_limit'], AMPS_X_CCD, config['post_prod'])
+        return paudm.pipeline.pixelsim.delegates.initialize_global_header(self, config['project_name'].lower(), config['release'], config['ccd_limit'], AMPS_X_CCD, config['post_prod'])
     
     def infer_pixel_rectangle(self, config, instrument):
         import paudm.pipeline.pixelsim.delegates
