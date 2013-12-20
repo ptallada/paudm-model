@@ -63,7 +63,7 @@ class Mosaic(object):
     '''
     
     
-    def __init__(self, path, filename, mode, global_header = None):
+    def __init__(self, filename, mode, global_header = None, path = '.'):
         # Mosaic Constructor
         self.filename = filename
         self.path = path
@@ -243,7 +243,7 @@ class Image(object):
       - status = db_insert( )
     '''
     
-    def __init__(self, mode, path = None, filename = None, extension = None, image_header = None, parent_mosaic = None, pymosaic = None):
+    def __init__(self, mode, filename = None, extension = None, image_header = None, parent_mosaic = None, pymosaic = None, path = None, ):
         # Image Constructor
         self.id = extension
         self.header = image_header # TODO: Turn into a property
