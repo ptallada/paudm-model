@@ -57,16 +57,16 @@ def list_storage_directory(path, config, pattern = '', file_list_file = None):
         out_file = file_list_file
     use_srmls = False
     # SRMLS command
-    if config['grid']['SRM_COPY_CMD'] == "srmcp":
+    if config['grid']['srm_copy_cmd'] == "srmcp":
         ls_cmd = "srmls "
         use_srmls = True
-    elif config['grid']['SRM_COPY_CMD'] == "lcg-cp":
+    elif config['grid']['srm_copy_cmd'] == "lcg-cp":
         ls_cmd = "lcg-ls -D srmv2 -b --connect-timeout=500 "
 
     if pattern == '':
-        cmd = ls_cmd + config['grid']['SRM_prefix'] + path + ' | sort -k 2 > ' + out_file
+        cmd = ls_cmd + config['grid']['srm_prefix'] + path + ' | sort -k 2 > ' + out_file
     else:
-        cmd = ls_cmd + config['grid']['SRM_prefix'] + path + ' | grep ' + pattern + ' | sort -k 2 > ' + out_file
+        cmd = ls_cmd + config['grid']['srm_prefix'] + path + ' | grep ' + pattern + ' | sort -k 2 > ' + out_file
     log.debug("Listing files in %s with %s..." %(path,ls_cmd))
     log.debug(cmd)
     subprocess.call(cmd, shell=True)
@@ -146,8 +146,8 @@ def bring_online(config_grid, dest_path, file_list, DCAP_prefix = "dcap://dcap.p
         if not os.path.exists(os.path.join(dest_path, file['name'])):
             ready = 'false'
             while ready != 'true':
-                if config_grid['SRM_COPY_CMD'] == "srmcp":
-                    srmls_cmd = 'srmls -l ' +  os.path.join(config_grid['SRM_prefix'] + file['path'], file['name'])
+                if config_grid['srm_copy_cmd'] == "srmcp":
+                    srmls_cmd = 'srmls -l ' +  os.path.join(config_grid['srm_prefix'] + file['path'], file['name'])
                     srmls_response = os.popen(srmls_cmd).read()
                     file_status = srmls_response.split()
                     if ('locality:ONLINE_AND_NEARLINE' in file_status) or ('locality:ONLINE' in file_status):
@@ -158,8 +158,8 @@ def bring_online(config_grid, dest_path, file_list, DCAP_prefix = "dcap://dcap.p
                     else:
                         log.debug("File status: %s"%file_status)
                         time.sleep(30)
-                elif config_grid['SRM_COPY_CMD'] == "lcg-cp":
-                    lcg_cmd = 'lcg-ls -l -D srmv2 -b --connect-timeout=500 ' +  os.path.join(config_grid['SRM_prefix'] + file['path'], file['name'])
+                elif config_grid['srm_copy_cmd'] == "lcg-cp":
+                    lcg_cmd = 'lcg-ls -l -D srmv2 -b --connect-timeout=500 ' +  os.path.join(config_grid['srm_prefix'] + file['path'], file['name'])
                     lcg_response = os.popen(lcg_cmd).read()
                     file_status = lcg_response.split()
                     if ('ONLINE_AND_NEARLINE' in file_status) or ('ONLINE' in file_status):
@@ -169,13 +169,13 @@ def bring_online(config_grid, dest_path, file_list, DCAP_prefix = "dcap://dcap.p
                         log.debug("File status: %s"%file_status)
                         time.sleep(30)
                 else:
-                    log.error("An error occurred: %s is not a valid SRM_COPY_CMD"%config_grid['SRM_COPY_CMD'])
+                    log.error("An error occurred: %s is not a valid SRM_COPY_CMD"%config_grid['srm_copy_cmd'])
                     break
 
 
 def srm_download(config_grid, dest_path, file_list = None, decompress_at_destination = False):
     '''
-    Copy the files listed with the command specified in common config['grid']['SRM_COPY_CMD']. 
+    Copy the files listed with the command specified in common config['grid']['srm_copy_cmd']. 
     
     @param dest_path: NFS destination path
     @param file_list: dictionary with 'name' as filename and 'path' as storage path
@@ -185,15 +185,15 @@ def srm_download(config_grid, dest_path, file_list = None, decompress_at_destina
  
     log.debug( "--- Download files (SRM protocol) ---" )
     
-    srm_prefix  = config_grid['SRM_prefix']
-    file_prefix = config_grid['FILE_PREFIX']
+    srm_prefix  = config_grid['srm_prefix']
+    file_prefix = config_grid['file_prefix']
     if len(file_list) > 0:
         for file in file_list:
             if os.path.exists(os.path.join(dest_path, file['name'])):
                 log.info("File %s already in destination path %s"% (file['name'], dest_path))
                 continue
             file_tape = os.path.join(srm_prefix + file['path'], file['name'])
-            if config_grid['SRM_COPY_CMD'] == "lcg-cp":
+            if config_grid['srm_copy_cmd'] == "lcg-cp":
                 # pnfs Test
                 if dest_path.split('/')[0] == 'pnfs':
                     file_nfs = os.path.join(srm_prefix + dest_path, file['name'])
@@ -204,7 +204,7 @@ def srm_download(config_grid, dest_path, file_list = None, decompress_at_destina
                 else:
                     file_nfs  = os.path.join(file_prefix+ dest_path, file['name'])
                 srm_cp_cmd = "lcg-cp -b --connect-timeout=500 -D srmv2 "
-            elif config_grid['SRM_COPY_CMD'] == "srmcp":
+            elif config_grid['srm_copy_cmd'] == "srmcp":
                 # pnfs Test
                 if dest_path.split('/')[1] == 'pnfs':
                     file_nfs = os.path.join(srm_prefix + dest_path, file['name'])
@@ -217,7 +217,7 @@ def srm_download(config_grid, dest_path, file_list = None, decompress_at_destina
                 cmd_cp =  srm_cp_cmd + " %s %s" % (file_tape, file_nfs)
                 log.debug(cmd_cp)
                 if subprocess.call(cmd_cp, shell=True) > 0:
-                    error_msg = config_grid['SRM_COPY_CMD'] + " error while downloading %s to %s" %(file_tape, file_nfs)
+                    error_msg = config_grid['srm_copy_cmd'] + " error while downloading %s to %s" %(file_tape, file_nfs)
                     log.error(error_msg)
                     raise Exception, error_msg
     else:
@@ -378,20 +378,20 @@ def upload(config, dir_in = None, dir_out= None, file_in = None, file_out = None
         else:
             dir_out = os.path.dirname(file_out)
             
-    if config['grid']['SRM_COPY_CMD'] == 'lcg-cp':
+    if config['grid']['srm_copy_cmd'] == 'lcg-cp':
         cp_cmd = "lcg-cp -b --connect-timeout=500 -D srmv2 "
         ls_cmd = "lcg-ls -b --connect-timeout=500 -D srmv2 --count 10 "
         if dir_out.split("/")[1] == 'pnfs':
             dir_out_list = list(dir_out)[1:]
             dir_out = "".join(dir_out_list)
             
-    elif config['grid']['SRM_COPY_CMD'] == 'srmcp':
+    elif config['grid']['srm_copy_cmd'] == 'srmcp':
         cp_cmd = "srmcp "
         ls_cmd = "srmls "
         if dir_out.split("/")[0] == 'pnfs':
-            dir_out = config['grid']['SRM_prefix'] + "/" + dir_out
+            dir_out = config['grid']['srm_prefix'] + "/" + dir_out
     
-    srm_dirout =  config['grid']['SRM_prefix']+ dir_out
+    srm_dirout =  config['grid']['srm_prefix']+ dir_out
     if  subprocess.call(ls_cmd + srm_dirout, shell=True) == 1:
         log.warning( "%s does not exist. It will be automatically created."% dir_out)
 
