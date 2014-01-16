@@ -195,12 +195,13 @@ def srm_download(config_grid, dest_path, file_list = None, decompress_at_destina
             file_tape = os.path.join(srm_prefix + file['path'], file['name'])
             if config_grid['srm_copy_cmd'] == "lcg-cp":
                 # pnfs Test
-                if dest_path.split('/')[0] == 'pnfs':
-                    file_nfs = os.path.join(srm_prefix + dest_path, file['name'])
-                elif dest_path.split('/')[1] == 'pnfs':
-                    dest_path_list = list(dest_path)[1:]
-                    dest_path_formatted = "".join(dest_path_list)
-                    file_nfs = os.path.join(srm_prefix + dest_path_formatted, file['name'])
+                if 'pnfs' in dest_path.split('/'):
+                    if dest_path.split('/')[0] == 'pnfs':
+                        file_nfs = os.path.join(srm_prefix + dest_path, file['name'])
+                    elif dest_path.split('/')[1] == 'pnfs':
+                        dest_path_list = list(dest_path)[1:]
+                        dest_path_formatted = "".join(dest_path_list)
+                        file_nfs = os.path.join(srm_prefix + dest_path_formatted, file['name'])
                 else:
                     file_nfs  = os.path.join(file_prefix+ dest_path, file['name'])
                 srm_cp_cmd = "lcg-cp -b --connect-timeout=500 -D srmv2 "
