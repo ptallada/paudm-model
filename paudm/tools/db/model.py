@@ -145,7 +145,6 @@ class Production(Base):
         PrimaryKeyConstraint('id'),
         # Unique key
         UniqueConstraint('pipeline', 'release'),
-        UniqueConstraint('input_production_id', 'pipeline', 'software_version'),
         ForeignKeyConstraint(['input_production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Columns
