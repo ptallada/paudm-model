@@ -13,7 +13,7 @@ install_requires = [
     'pyyaml',
     'scipy',
     'setuptools',
-    'sqlalchemy',
+    'sqlalchemy<0.9',
     'zope.sqlalchemy',
 ]
 

@@ -39,9 +39,9 @@ def init(url):
 
     twophase = True    
     if url.startswith('postgresql'):
-        engine = create_engine(url)
+        engine = create_engine(url, echo = False)
     else:
-        engine = create_engine(url, connect_args={'check_same_thread':False}, echo = True)
+        engine = create_engine(url, connect_args={'check_same_thread':False}, echo = False)
         twophase = False
     metadata.bind = engine
     
