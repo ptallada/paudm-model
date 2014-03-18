@@ -511,6 +511,8 @@ class Catalogue(object):
         #mapping
         fields['background'] = float(dict['BACKGROUND'])
         fields['class_star'] = float(dict['CLASS_STAR'])
+        fields['spread_model'] = float(dict['SPREAD_MODEL'])
+        fields['spreaderr_model'] = float(dict['SPREADERR_MODEL'])
         fields['flux_auto'] = float(dict['FLUX_AUTO'])
         fields['flux_err_auto'] = float(dict['FLUXERR_AUTO'])
         fields['flux_psf'] = float(dict['FLUX_PSF'])
