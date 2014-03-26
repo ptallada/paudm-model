@@ -1710,17 +1710,18 @@ class Catalogue(object):
         counter = 1
         counter_found = 1
         if format == None: 
-            for db_object in iterator:
-                value = db_object.__getattribute__(parameter)
-                if parameter == 'mag_auto':
-                    image = model.session.query(model.Image).join(model.Detection).filter(model.Detection.id == db_object.id).one()
-                    mosaic = model.session.query(model.Mosaic).join(model.Image).filter(model.Image.id == image.id).one()
-                    zp_nightly = image.zp_nightly
-                    if type(zp_nightly).__name__=='NoneType':
-                        continue
-                    airmass = mosaic.air_mass
-                    value = value + zp_nightly*airmass
+            log.info("Loop over the %d objects to plot..."%iterator.count())
+            for db_object in iterator.yield_per(100000):
+                value = getattr(db_object, parameter)
+                if parameter == 'flux_auto' and value>0:
+                    parameter_error = 'flux_err_auto'
+                    # phot_cal = Phot_Calibrator(db_object.image.mosaic, use_zp_nightly=False)
+                    # (calibrated_mag, calibrated_mag_error) = phot_cal.flux_to_mag(getattr(db_object, parameter), getattr(db_object, parameter_error), db_object.image.ccd_num)
+                    # value = calibrated_mag
+                    value = 2.5*math.log10(value) - (db_object.image.zp_nightly*db_object.image.mosaic.airmass)
                 x_array = np.append(x_array,value)
+            log.info("...done!")
+
         else:
             x_array = parameter
             #x_array.append(value)
