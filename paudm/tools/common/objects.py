@@ -1727,7 +1727,7 @@ class Catalogue(object):
             ##print >> f,value
         ##f.close()
         
-        # Create Histogram plot 
+        # Create Histogram plot
         ##x_array = np.array([])
         plt.hist(x_array,bins,range=range)
         
@@ -1743,8 +1743,6 @@ class Catalogue(object):
             plt.show()
         else:
             plt.savefig(filename)
-    
-
             
             
 class Phot_Calibrator(object):
