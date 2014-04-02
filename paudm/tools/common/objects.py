@@ -2037,7 +2037,7 @@ class FilterSystem(object):
                     filter_curves_matchedwvls[filter_name].fluxes *= efficiency
                 
         elif( system == "sdss" ):
-            sdss_filter_names = ['u', 'g', 'r', 'i', 'z']
+            sdss_filter_names = ['u', 'g', 'r', 'r01', 'i', 'z']
             for filter_name in sdss_filter_names:
                 filter_curves[filter_name] = Spectrum([],[])
                 filter_curves_matchedwvls[filter_name] = Spectrum(np.zeros(len(wvl_list)),np.zeros(len(wvl_list)))
