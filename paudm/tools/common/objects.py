@@ -212,17 +212,17 @@ class Mosaic(object):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.initialize_sim_params(self, exposure, environment, config, instrument)
     
-    def simulate(self,config, instrument, production_id ):
+    def simulate(self,config, instrument, production_id, extra_skymaker_confs):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.simulate_mosaic(self, config, instrument, production_id)
+        return paudm.pipeline.pixelsim.delegates.simulate_mosaic(self, config, instrument, production_id, extra_skymaker_confs)
     
     def initialize_global_header(self, config, AMPS_X_CCD):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.initialize_global_header(self, config['project_name'].lower(), config['release'], config['ccd_limit'], AMPS_X_CCD, config['post_prod'])
     
-    def infer_pixel_rectangle(self, config, instrument):
+    def infer_pixel_rectangle(self, instrument):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.infer_pixel_rectangle(self, config, instrument)
+        return paudm.pipeline.pixelsim.delegates.infer_pixel_rectangle(self, instrument)
     
 
 
@@ -392,9 +392,9 @@ class Image(object):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.prepare_psf(self)
     
-    def simulate_image(self, config, instrument):
+    def simulate_image(self, config, instrument, extra_skymaker_conf):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.simulate_image(self, config, instrument)
+        return paudm.pipeline.pixelsim.delegates.simulate_image(self, config, instrument, extra_skymaker_conf)
     
     def post_production(self, config, instrument):
         import paudm.pipeline.pixelsim.delegates
