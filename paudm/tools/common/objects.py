@@ -212,7 +212,7 @@ class Mosaic(object):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.initialize_sim_params(self, exposure, environment, config, instrument)
     
-    def simulate(self,config, instrument, production_id, extra_skymaker_confs):
+    def simulate(self,config, instrument, production_id, extra_skymaker_confs = None):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.simulate_mosaic(self, config, instrument, production_id, extra_skymaker_confs)
     
@@ -392,7 +392,7 @@ class Image(object):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.prepare_psf(self)
     
-    def simulate_image(self, config, instrument, extra_skymaker_conf):
+    def simulate_image(self, config, instrument, extra_skymaker_conf = None):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.simulate_image(self, config, instrument, extra_skymaker_conf)
     
