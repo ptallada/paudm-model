@@ -47,7 +47,7 @@ def init(url):
     
     session = scoped_session(sessionmaker(bind=engine,
         twophase = twophase,
-       extension = ZopeTransactionExtension()
+       #extension = ZopeTransactionExtension()
        ))()
     
     return session
@@ -469,8 +469,8 @@ class Detection(Base):
     # Fields
     background = Column(          Float(24),    nullable=False) #Background at centroid position [BACKGROUND] (count)"),
     class_star = Column(          Float(24),    nullable=False) #Star-Galaxy classifier output [CLASS_STAR]"),
-    spread_model = Column(        Float(24),    nullable=False) #Spread parameter from model-fitting [SPREAD_MODEL]"),
-    spreaderr_model = Column(     Float(24),    nullable=False) #Spread parameter error from model-fitting [SPREADERR_MODEL]"),
+    spread_model = Column(        Float(24),    nullable=True) #Spread parameter from model-fitting [SPREAD_MODEL]"),
+    spreaderr_model = Column(     Float(24),    nullable=True) #Spread parameter error from model-fitting [SPREADERR_MODEL]"),
     flux_auto = Column(           Float(24),    nullable=False) #Flux within a Kron-like elliptical aperture [FLUX_AUTO] (count)"),
     flux_err_auto = Column(       Float(24),    nullable=False) #RMS error for AUTO flux  [FLUXERR_AUTO] (count)"),
     flux_psf = Column(            Float(24),    nullable=False) #Flux fitted using the PSF model (count)"),
@@ -1003,7 +1003,7 @@ def main(argv = None):
 def recreate():
     # Drop and recreate the database
     metadata.drop_all()
-    metadata.create_all()
+    #metadata.create_all()
     if metadata.bind.url.database == 'paudb' and metadata.bind.url.drivername == 'postgresql':
         metadata.create_comments()
         metadata.set_permissions()

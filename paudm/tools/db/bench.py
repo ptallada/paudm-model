@@ -8,7 +8,7 @@ import model
 
 def recreate():
     model.metadata.drop_all()
-    model.metadata.create_all()
+    #model.metadata.create_all()
     model.metadata.create_comments()
 
 def bench_insert(count = 100, *args):
