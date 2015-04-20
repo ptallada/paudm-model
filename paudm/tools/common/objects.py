@@ -392,7 +392,7 @@ class Image(object):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.prepare_psf(self)
     
-    def simulate_image(self, config, instrument, extra_skymaker_conf=None):
+    def simulate_image(self, config, instrument, extra_skymaker_conf=""):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.simulate_image(self, config, instrument, extra_skymaker_conf)
     
