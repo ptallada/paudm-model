@@ -372,27 +372,27 @@ class Image(object):
         return paudm.pipeline.nightly.delegates.badpix_interpolate(self)
     
     # PIXELSIM Methods
-    def initialize_extension_header(self, config, instrument):
+    def initialize_extension_header(self, config, instrument, ccd_id, amp_id):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.initialize_extension_header(self, config, instrument)
+        return paudm.pipeline.pixelsim.delegates.initialize_extension_header(self, config, instrument, ccd_id, amp_id)
     
     def update_simulation_keywords(self):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.update_simulation_keywords(self)
     
-    def set_sim_WCS(self, telescope_pointing, config,instrument):
+    def set_sim_WCS(self, telescope_pointing,instrument, ccd_id, amp_id=None):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.set_sim_WCS(self, telescope_pointing, config, instrument)
+        return paudm.pipeline.pixelsim.delegates.set_sim_WCS(self, telescope_pointing, instrument, ccd_id, amp_id)
     
-    def contains_pixels( self, pixelPos, buffer_width=0 ):
+    def contains_pixels(self, pixelPos, buffer_width=0):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.contains_pixels( self, pixelPos, buffer_width=0 )
+        return paudm.pipeline.pixelsim.delegates.contains_pixels(self, pixelPos, buffer_width=0)
     
     def prepare_psf(self):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.prepare_psf(self)
     
-    def simulate_image(self, config, instrument, extra_skymaker_conf = None):
+    def simulate_image(self, config, instrument, extra_skymaker_conf=None):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.simulate_image(self, config, instrument, extra_skymaker_conf)
     
@@ -403,7 +403,12 @@ class Image(object):
     def get_sim_amp(self, amp_num, config, instrument):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.get_sim_amp(self, amp_num, config, instrument)
-    
+
+    def add_bias_and_overscan(self, config, instrument, ccd_id, amp_id):
+        import paudm.pipeline.pixelsim.delegates
+        return paudm.pipeline.pixelsim.delegates.add_bias_and_overscan(self, config, instrument, ccd_id, amp_id)
+
+
 
 
 class Catalogue(object):
