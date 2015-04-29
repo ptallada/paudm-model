@@ -386,7 +386,7 @@ class Image(object):
     
     def contains_pixels(self, pixelPos, buffer_width=0):
         import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.contains_pixels(self, pixelPos, buffer_width=0)
+        return paudm.pipeline.pixelsim.delegates.contains_pixels(self, pixelPos, buffer_width)
     
     def prepare_psf(self):
         import paudm.pipeline.pixelsim.delegates
