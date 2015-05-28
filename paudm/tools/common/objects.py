@@ -71,6 +71,7 @@ class Mosaic(object):
         self.assoc_mosaic = {}
         self.assoc_db = None
         self.badcols = {}
+        self.telfocus = None
         
         if mode.lower() == 'open':
             # Load global header
