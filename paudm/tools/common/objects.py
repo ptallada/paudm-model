@@ -26,7 +26,7 @@ import re
 import math
 import yaml
 import numpy as np
-import pyfits
+from astropy.io import fits
 from scipy.interpolate import interp1d
 from astropysics.coords.coordsys import AngularCoordinate
 from paudm.tools.common import constants
@@ -34,7 +34,6 @@ from pkg_resources import resource_listdir, resource_string, resource_filename
 config = {}
 from paudm.tools.db import model
 
-#instrument = yaml.safe_load(resource_string('paudm.resources.instrument.pau','general.yaml'))
 
 
 
@@ -75,17 +74,17 @@ class Mosaic(object):
         
         if mode.lower() == 'open':
             # Load global header
-            self.header = pyfits.getheader(os.path.join(self.path, self.filename))
+            self.header = fits.getheader(os.path.join(self.path, self.filename))
         elif mode.lower() == 'new':
             # Remove if exists
             if os.path.exists(os.path.join(self.path, self.filename)):
                 os.remove(os.path.join(self.path, self.filename))
             # Create new Primary fits
-            new_hdu = pyfits.PrimaryHDU()
+            new_hdu = fits.PrimaryHDU()
             # Use blank header if not given
             if self.header == None:
                 self.header = new_hdu.header
-            pyfits.writeto(os.path.join(self.path, self.filename), data = np.array([], dtype = 'uint8'), header = self.header)
+            fits.writeto(os.path.join(self.path, self.filename), data = np.array([], dtype = 'uint8'), header = self.header)
         
     
     # TODO: Turn into the getter of self.header
@@ -116,18 +115,18 @@ class Mosaic(object):
     def load_image_header(self, image_id, pymosaic = None):
         # Build and return image from Mosaic
         return Image(mode = 'open_header', path = self.path, filename = self.filename, extension = image_id, parent_mosaic = self, pymosaic = pymosaic)
-    
+
     def store_image(self, image):
         # Overrite an image in Mosaic
-        pyfits.update(str(os.path.join(self.path, self.filename)), data = image.data, header = image.header, ext = image.id)
+        fits.update(str(os.path.join(self.path, self.filename)), data = image.data, header = image.header, ext = image.id)
     
     def append_image(self, image):
         # Append an image to Mosaic
-        pyfits.append(str(os.path.join(self.path, self.filename)), data = image.data, header = image.header)
+        fits.append(str(os.path.join(self.path, self.filename)), data = image.data, header = image.header)
     
     def append_image_fast(self, image):
-        # Manual appending with regular i/o files (faster than Pyfits)
-        hdu_tmp = pyfits.ImageHDU(image.data)
+        # Manual appending with regular i/o files (faster than astropy fits)
+        hdu_tmp = fits.ImageHDU(image.data)
         hdu_tmp.header = image.header
         hdu_tmp.writeto(os.path.join(self.path, self.filename) + '.tmp', clobber = True)
         hdu_fid = open(os.path.join(self.path, self.filename) + '.tmp','r')
@@ -146,7 +145,7 @@ class Mosaic(object):
     
     def store_global_header(self):
         # Save changes in global header
-        pyfits.update(os.path.join(self.path, self.filename), data = np.array([], dtype = 'uint8'), header = self.header)
+        fits.update(os.path.join(self.path, self.filename), data = np.array([], dtype = 'uint8'), header = self.header)
     
     # DATA BASE methods
     def fields_from_header(self):
@@ -257,17 +256,17 @@ class Image(object):
         
         if mode == 'open':
             # Load image
-            self.data, self.header = pyfits.getdata(os.path.join(path, filename), ext = self.id, header=True)
+            self.data, self.header = fits.getdata(os.path.join(path, filename), ext = self.id, header=True)
         if mode == 'open_header':
             # Load image
             if parent_mosaic != None:
-                self.header = pyfits.getheader(os.path.join(parent_mosaic.path, parent_mosaic.filename), self.id)
+                self.header = fits.getheader(os.path.join(parent_mosaic.path, parent_mosaic.filename), self.id)
             else:
-                self.header = pyfits.getheader(os.path.join(path, filename), self.id)
+                self.header = fits.getheader(os.path.join(path, filename), self.id)
         elif mode == 'new':
             # New image
             # Create new Primary fits
-            new_hdu = pyfits.ImageHDU()
+            new_hdu = fits.ImageHDU()
             self.data = new_hdu.data
             # Use blank header if not given
             if self.header == None:
@@ -298,7 +297,7 @@ class Image(object):
         # Save a single extension file with image data for visual check
         if os.path.exists(filename):
             os.remove(filename)
-        pyfits.writeto(filename, data = self.data, header = self.header)
+        fits.writeto(filename, data = self.data, header = self.header)
     
     
     # DATA BASE Methods
@@ -484,7 +483,7 @@ class Catalogue(object):
             while n_extensions < total_extensions:
                 catalog.extension = extension #First CCD to compute
                 log.debug("CCD n. %d" % extension)
-                detections = pyfits.getdata(os.path.join(catalog.path, catalog.filename), ext = 2 * catalog.extension)
+                detections = fits.getdata(os.path.join(catalog.path, catalog.filename), ext = 2 * catalog.extension)
                 catalog._names = detections.dtype.names
                 extension +=1
                 n_extensions +=1
@@ -950,9 +949,9 @@ class Catalogue(object):
         log.debug( "Removing extinction!" )
         
         # load schlegel maps
-        hdulist_n = pyfits.open(resource_filename('paudm.resources','extinct/SFD_dust_4096_ngp.fits'))
+        hdulist_n = fits.open(resource_filename('paudm.resources','extinct/SFD_dust_4096_ngp.fits'))
         SFD_north = hdulist_n[0].data
-        hdulist_s = pyfits.open(resource_filename('paudm.resources','extinct/SFD_dust_4096_sgp.fits'))
+        hdulist_s = fits.open(resource_filename('paudm.resources','extinct/SFD_dust_4096_sgp.fits'))
         SFD_south = hdulist_s[0].data
         
         # assuming sdss filter constants from Schlafly & Finkbeiner 2010
@@ -1040,9 +1039,9 @@ class Catalogue(object):
         log.debug( "Adding extinction!" )
         
         # load schlegel maps
-        hdulist_n = pyfits.open(resource_filename('paudm.resources',"extinct/SFD_dust_4096_ngp.fits"))
+        hdulist_n = fits.open(resource_filename('paudm.resources',"extinct/SFD_dust_4096_ngp.fits"))
         SFD_north = hdulist_n[0].data
-        hdulist_s = pyfits.open(resource_filename('paudm.resources',"extinct/SFD_dust_4096_sgp.fits"))
+        hdulist_s = fits.open(resource_filename('paudm.resources',"extinct/SFD_dust_4096_sgp.fits"))
         SFD_south = hdulist_s[0].data
         
         # assuming sdss filter constants from Schlafly & Finkbeiner 2010
@@ -1197,7 +1196,9 @@ class Catalogue(object):
         
     
     def sdss_mag_from_error( self, error, filter ):
-        
+
+        instrument = yaml.safe_load(resource_string('paudm.resources.instrument.pau','general.yaml'))
+
         # These systematic errors are meant to be ubercal-appropriate
         systematics = dict()
         systematics['u'] = 0.02
