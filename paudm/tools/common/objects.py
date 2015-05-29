@@ -1707,7 +1707,6 @@ class Catalogue(object):
             iterator = self.objects
         
         # Loop
-        ##f = file('/nfs/pau/PAUdm/runs/isevilla/analysis/out_data/histo.dat', 'w')
         counter = 1
         counter_found = 1
         if format == None: 
@@ -1730,8 +1729,7 @@ class Catalogue(object):
         
         # Create Histogram plot 
         ##x_array = np.array([])
-        ##x_array = np.genfromtxt('/nfs/paus/PAUdm/runs/isevilla/analysis/out_data/histo.dat', dtype=None)
-        plt.hist(x_array,bins,range=range)        
+        plt.hist(x_array,bins,range=range)
         
         # Configure plot
         if xlabel == None:

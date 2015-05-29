@@ -17,7 +17,7 @@ def bench_insert(count = 100, *args):
     randf = random.random()
     randi = random.randint(0, 0x7fffffffL)
     
-    run = model.Run(
+    obs_set = model.Obs_set(
         instrument = 'BENCH',
         log = 'BENCH',
         rjd_start = randf,
@@ -25,7 +25,7 @@ def bench_insert(count = 100, *args):
         night = datetime.date.today(),
         notes = 'BENCH',
         operator = 'BENCH',
-        run_number = randi,
+        obs_set = randi,
     )
     
     production = model.Production(
@@ -37,7 +37,7 @@ def bench_insert(count = 100, *args):
 
     mosaic = model.Mosaic(
         production = production,
-        run = run,
+        obs_set = obs_set,
         filename = 'BENCH %s' % randi,
         archivepath = 'BENCH %s' % randi,
         kind = random.choice(['ARC', 'BIAS', 'DARK', 'FLASH', 'FLAT', 'FOCUS', 'GLANCE', 'PUPIL', 'SCRATCH', 'SKY', 'TARGET','MBIAS','MFLAT','RED_SCI','RED_WEIGHT','RED_MASK']),

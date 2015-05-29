@@ -113,30 +113,30 @@ class User(Base):
     def password(self):
         return self._password
 '''
-class Run(Base): 
-    __tablename__ = 'run'
+class Obs_set(Base):
+    __tablename__ = 'obs_set'
     __table_args__ = (
         # Primary key
         PrimaryKeyConstraint('id'),
         # Unique key
-        UniqueConstraint('run_number', 'instrument'),
+        UniqueConstraint('obs_set', 'instrument'),
     )
     # Columns
     id        = Column(Integer,     nullable=False )   # 
     instrument = Column(String(16),  nullable=False)    # Name of the instrument used at the observation (i.e. PAUCam1.0)
     log =  Column(String(128),  nullable=True)        # Camera XML log file path
-    rjd_start = Column(Float(53),  nullable=False, index = True)     # First exposure observation time from current run
-    rjd_stop = Column(Float(53),  nullable=False)     #Last exposure observation time from current run
+    rjd_start = Column(Float(53),  nullable=False, index = True)     # First exposure observation time from current obs_set
+    rjd_stop = Column(Float(53),  nullable=False)     #Last exposure observation time from current obs_set
     night = Column(Date,  nullable=False)             #Observation date
     notes = Column(Text,  nullable=False)             #Observer's notes and comments
     operator = Column(String(128),  nullable=False)    #Observer's name
-    run_number = Column(Integer,  nullable=False)      #Run identifier, from header
+    obs_set = Column(String(128),  nullable=False)      # Observation Set identifier, from header
     
     #Relationships
 
-    mosaics      = relationship('Mosaic',           back_populates="run")
+    mosaics      = relationship('Mosaic',           back_populates="obs_set")
    
-    #The run table tracks observation nights. Each entry corresponds to a night of observation
+    #The obs_set table tracks observation nights. Each entry corresponds to a night of observation
 
 class Production(Base): 
     __tablename__ = 'production'
@@ -247,7 +247,7 @@ class Mosaic(Base):
     Keys:
      - id
      - production_id
-     - run_id
+     - obs_set_id
      - zp_phot_id
      
      Fields:
@@ -289,7 +289,7 @@ class Mosaic(Base):
     
     Relationships:
      - production
-     - run
+     - obs_set
      - images
     """
     #TODO: evaluate and remove maybe?
@@ -306,16 +306,16 @@ class Mosaic(Base):
 
         # Foreign key
         ForeignKeyConstraint(['production_id'], ['production.id'],                                     onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['run_id'],        ['run.id'],                                            onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['obs_set_id'],        ['obs_set.id'],                                            onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['production_id', 'zp_phot_id'], ['zp_phot.production_id', 'zp_phot.id'], onupdate='CASCADE', ondelete='RESTRICT'),
         UniqueConstraint('archivepath', 'filename'),
-        UniqueConstraint('production_id', 'run_id', 'kind', 'exp_num'),
+        UniqueConstraint('production_id', 'obs_set_id', 'kind', 'exp_num'),
 
     )
     # Columns
     id        = Column(BigInteger,     nullable=False )   # 
     production_id = Column(Integer,  nullable=False)    # Production identifier
-    run_id =  Column(Integer,  nullable=False)        # Run number
+    obs_set_id =  Column(Integer,  nullable=False)        # obs_set number
     zp_phot_id = Column(Integer,  nullable=True)     # ZPphot identifier
     filename = Column(String(128),  nullable=False)     #File name
     archivepath = Column(String(128),  nullable=False)             #Path in the archive
@@ -357,14 +357,14 @@ class Mosaic(Base):
     # Relationships
 
     production = relationship('Production', back_populates="mosaics")
-    run        = relationship('Run',        back_populates="mosaics")
+    obs_set        = relationship('Obs_set',        back_populates="mosaics")
     images = relationship('Image',      back_populates="mosaic")
     @classmethod
     def criteria_query(cls, criteria={}):
         """
-        Runs a query to retrieve Mosaic instances to be prestaged
+        obs_sets a query to retrieve Mosaic instances to be prestaged
         """
-        q = session.query(cls).join(cls.production).join(cls.run)
+        q = session.query(cls).join(cls.production).join(cls.obs_set)
         q = add_criteria(q, criteria)
         return q
 Index('ik_location', Mosaic.production_id, Mosaic.ra, Mosaic.dec)
