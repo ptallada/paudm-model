@@ -28,7 +28,7 @@ import yaml
 import numpy as np
 from astropy.io import fits
 from scipy.interpolate import interp1d
-from astropysics.coords.coordsys import AngularCoordinate
+from astropy.coordinates import Angle
 from paudm.tools.common import constants
 from pkg_resources import resource_listdir, resource_string, resource_filename
 config = {}
@@ -158,8 +158,8 @@ class Mosaic(object):
             fields['kind']       = header['OBSTYPE']
         fields['exp_num']    = header['EXPNUM']
         fields['obs_title']  = header['OBJECT']
-        fields['ra']         = AngularCoordinate(header['RA'], sghms=True).degrees
-        fields['dec']        = AngularCoordinate(header['DEC'], sghms=False).degrees
+        fields['ra']         = Angle(header['RA'], unit='hour').degree
+        fields['dec']        = Angle(header['DEC'], unit='degree').degree
         fields['equinox']    = header['EQUINOX']
         fields['date_obs']   = datetime.date(*(time.strptime(header['DATE-OBS'],'%Y-%m-%d')[:3]))
         fields['time_obs']   = datetime.time(*(time.strptime(header['UTSTART'].split('.')[0],'%H:%M:%S')[3:6]))
