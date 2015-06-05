@@ -581,7 +581,6 @@ class Catalogue(object):
     
     def sim_star_mapping(self, star):
         # Map data base truth_object elements from pixelsim starType
-        
         fields = {}
         #mapping
         fields['ra'] = star.ra
@@ -592,48 +591,49 @@ class Catalogue(object):
         fields['mag_i'] = star.mags['i']
         fields['mag_z'] = star.mags['z']
         fields['mag_y'] = star.mags['y']
-        fields['mag_n01'] = star.mags['n01']
-        fields['mag_n02'] = star.mags['n02']
-        fields['mag_n03'] = star.mags['n03']
-        fields['mag_n04'] = star.mags['n04']
-        fields['mag_n05'] = star.mags['n05']
-        fields['mag_n06'] = star.mags['n06']
-        fields['mag_n07'] = star.mags['n07']
-        fields['mag_n08'] = star.mags['n08']
-        fields['mag_n09'] = star.mags['n09']
-        fields['mag_n10'] = star.mags['n10']
-        fields['mag_n11'] = star.mags['n11']
-        fields['mag_n12'] = star.mags['n12']
-        fields['mag_n13'] = star.mags['n13']
-        fields['mag_n14'] = star.mags['n14']
-        fields['mag_n15'] = star.mags['n15']
-        fields['mag_n16'] = star.mags['n16']
-        fields['mag_n17'] = star.mags['n17']
-        fields['mag_n18'] = star.mags['n18']
-        fields['mag_n19'] = star.mags['n19']
-        fields['mag_n20'] = star.mags['n20']
-        fields['mag_n21'] = star.mags['n21']
-        fields['mag_n22'] = star.mags['n22']
-        fields['mag_n23'] = star.mags['n23']
-        fields['mag_n24'] = star.mags['n24']
-        fields['mag_n25'] = star.mags['n25']
-        fields['mag_n26'] = star.mags['n26']
-        fields['mag_n27'] = star.mags['n27']
-        fields['mag_n28'] = star.mags['n28']
-        fields['mag_n29'] = star.mags['n29']
-        fields['mag_n30'] = star.mags['n30']
-        fields['mag_n31'] = star.mags['n31']
-        fields['mag_n32'] = star.mags['n32']
-        fields['mag_n33'] = star.mags['n33']
-        fields['mag_n34'] = star.mags['n34']
-        fields['mag_n35'] = star.mags['n35']
-        fields['mag_n36'] = star.mags['n36']
-        fields['mag_n37'] = star.mags['n37']
-        fields['mag_n38'] = star.mags['n38']
-        fields['mag_n39'] = star.mags['n39']
-        fields['mag_n40'] = star.mags['n40']
-        fields['mag_n41'] = star.mags['n41']
-        fields['mag_n42'] = star.mags['n42']
+        fields['mag_NB455'] = star.mags['NB455']
+        fields['mag_NB465'] = star.mags['NB465']
+        fields['mag_NB475'] = star.mags['NB475']
+        fields['mag_NB485'] = star.mags['NB485']
+        fields['mag_NB495'] = star.mags['NB495']
+        fields['mag_NB505'] = star.mags['NB505']
+        fields['mag_NB515'] = star.mags['NB515']
+        fields['mag_NB525'] = star.mags['NB525']
+        fields['mag_NB535'] = star.mags['NB535']
+        fields['mag_NB545'] = star.mags['NB545']
+        fields['mag_NB555'] = star.mags['NB555']
+        fields['mag_NB565'] = star.mags['NB565']
+        fields['mag_NB575'] = star.mags['NB575']
+        fields['mag_NB585'] = star.mags['NB585']
+        fields['mag_NB595'] = star.mags['NB595']
+        fields['mag_NB605'] = star.mags['NB605']
+        fields['mag_NB615'] = star.mags['NB615']
+        fields['mag_NB625'] = star.mags['NB625']
+        fields['mag_NB635'] = star.mags['NB635']
+        fields['mag_NB645'] = star.mags['NB645']
+        fields['mag_NB655'] = star.mags['NB655']
+        fields['mag_NB665'] = star.mags['NB665']
+        fields['mag_NB675'] = star.mags['NB675']
+        fields['mag_NB685'] = star.mags['NB685']
+        fields['mag_NB695'] = star.mags['NB695']
+        fields['mag_NB705'] = star.mags['NB705']
+        fields['mag_NB715'] = star.mags['NB715']
+        fields['mag_NB725'] = star.mags['NB725']
+        fields['mag_NB735'] = star.mags['NB735']
+        fields['mag_NB745'] = star.mags['NB745']
+        fields['mag_NB755'] = star.mags['NB755']
+        fields['mag_NB765'] = star.mags['NB765']
+        fields['mag_NB775'] = star.mags['NB775']
+        fields['mag_NB785'] = star.mags['NB785']
+        fields['mag_NB795'] = star.mags['NB795']
+        fields['mag_NB805'] = star.mags['NB805']
+        fields['mag_NB815'] = star.mags['NB815']
+        fields['mag_NB825'] = star.mags['NB825']
+        fields['mag_NB835'] = star.mags['NB835']
+        fields['mag_NB845'] = star.mags['NB845']
+
+        #fields['mag_n41'] = star.mags['n41']
+        #fields['mag_n42'] = star.mags['n42']
         
         #fields['sed_type'] = star.sed
         fields['sed_em_line'] = -1
@@ -1713,22 +1713,29 @@ class Catalogue(object):
             log.info("Loop over the %d objects to plot..."%iterator.count())
             for db_object in iterator.yield_per(100000):
                 value = getattr(db_object, parameter)
-                if parameter == 'flux_auto' and value>0:
-                    parameter_error = 'flux_err_auto'
-                    # phot_cal = Phot_Calibrator(db_object.image.mosaic, use_zp_nightly=False)
-                    # (calibrated_mag, calibrated_mag_error) = phot_cal.flux_to_mag(getattr(db_object, parameter), getattr(db_object, parameter_error), db_object.image.ccd_num)
-                    # value = calibrated_mag
-                    value = 2.5*math.log10(value) - (db_object.image.zp_nightly*db_object.image.mosaic.airmass)
-                x_array = np.append(x_array,value)
-            log.info("...done!")
+                if parameter == 'mag_auto':
+                    image = model.session.query(model.Image).join(model.Detection).filter(model.Detection.id == db_object.id).one()
+                    mosaic = model.session.query(model.Mosaic).join(model.Image).filter(model.Image.id == image.id).one()
+                    zp_nightly = image.zp_nightly
+                    if type(zp_nightly).__name__=='NoneType':
+                        continue
+                    airmass = mosaic.air_mass
+                    value = value + zp_nightly*airmass
 
+                #if parameter == 'flux_auto' and value>0:
+                #    parameter_error = 'flux_err_auto'
+                #    # phot_cal = Phot_Calibrator(db_object.image.mosaic, use_zp_nightly=False)
+                #    # (calibrated_mag, calibrated_mag_error) = phot_cal.flux_to_mag(getattr(db_object, parameter), getattr(db_object, parameter_error), db_object.image.ccd_num)
+                #    # value = calibrated_mag
+                #    value = 2.5*math.log10(value) - (db_object.image.zp_nightly*db_object.image.mosaic.airmass)
+                x_array = np.append(x_array,value)
         else:
             x_array = parameter
             #x_array.append(value)
             ##print >> f,value
         ##f.close()
         
-        # Create Histogram plot
+        # Create Histogram plot 
         ##x_array = np.array([])
         plt.hist(x_array,bins,range=range)
         
@@ -1744,6 +1751,8 @@ class Catalogue(object):
             plt.show()
         else:
             plt.savefig(filename)
+    
+
             
             
 class Phot_Calibrator(object):
