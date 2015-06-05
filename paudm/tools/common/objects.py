@@ -161,39 +161,51 @@ class Mosaic(object):
         fields['ra']         = Angle(header['RA'], unit='hour').degree
         fields['dec']        = Angle(header['DEC'], unit='degree').degree
         fields['equinox']    = header['EQUINOX']
-        fields['date_obs']   = datetime.date(*(time.strptime(header['DATE-OBS'],'%Y-%m-%d')[:3]))
-        fields['time_obs']   = datetime.time(*(time.strptime(header['UTSTART'].split('.')[0],'%H:%M:%S')[3:6]))
-        fields['date_creat'] = datetime.date(*(time.strptime(header['DATE-OBS'],'%Y-%m-%d')[:3]))
-        fields['time_creat'] = datetime.time(*(time.strptime(header['UTSTART'].split('.')[0],'%H:%M:%S')[3:6]))
-        fields['rjd_obs']    = header['RJD-OBS']
+        if 'DATE-OBS' in header:
+            fields['date_obs']   = datetime.date(*(time.strptime(header['DATE-OBS'],'%Y-%m-%d')[:3]))
+            fields['time_obs']   = datetime.time(*(time.strptime(header['UTSTART'].split('.')[0],'%H:%M:%S')[3:6]))
+            fields['date_creat']   = datetime.date(*(time.strptime(header['DATE-OBS'],'%Y-%m-%d')[:3]))
+            fields['time_creat']   = datetime.time(*(time.strptime(header['UTSTART'].split('.')[0],'%H:%M:%S')[3:6]))
+        else:#'2015-05-18T18:22:54.837'
+            fields['date_obs']   = datetime.date(*(time.strptime(header['UTSTART'].split('T')[0],'%Y-%m-%d')[:3]))
+            fields['date_creat']   = datetime.date(*(time.strptime(header['UTSTART'].split('T')[0],'%Y-%m-%d')[:3]))
+            fields['time_obs']   = datetime.time(*(time.strptime(header['UTSTART'].split('T')[1],'%H:%M:%S.%f')[3:6]))
+            fields['time_creat']   = datetime.time(*(time.strptime(header['UTSTART'].split('T')[1],'%H:%M:%S.%f')[3:6]))
+        
+        if 'RJD-OBS' in header:
+            fields['rjd_obs']    = header['RJD-OBS']
+        else:
+            fields['rjd_obs']    = 57161 + (fields['date_obs']-datetime.date(2015,05,18)).days
+        
         fields['exp_time']   = header['EXPTIME']
         fields['airmass']    = header['AIRMASS']
         fields['telfocus']   = header['TELFOCUS']
-        fields['instrument'] = header['INSTRUME']
-        if header['FTRAY'] != 'None':
-            fields['filtertray'] = header['FTRAY']
-        else:
+        fields['instrument'] = header['INSTRUME'] if 'INSTRUME' in header else 'PAUCam'
+        if header['FTRAY'] == 'None' or header['FTRAY']=='':
             fields['filtertray'] = None
-        if header['FTRAYTMP'] != 'None':
+        else:
+            fields['filtertray'] = header['FTRAY']
+            
+        if 'FTRAYTMP' in header and (header['FTRAYTMP'] != 'None' or header['FTRAYTMP'] != ''):
             fields['filtertray_tmp'] = header['FTRAYTMP'] 
         else:
             fields['filtertray_tmp'] = None
-        fields['guide_enabled']  = (header['AGUIDER'] == 'T')
-        fields['guide_fwhm']     = header['GSFWHM']
-        fields['guide_var']      = header['GSVAR']
+        fields['guide_enabled']  = (header['AGUIDER'] == 'T') if 'AGUIDER' in header else None
+        fields['guide_fwhm']     = header['GSFWHM'] if 'GSFWHM' in header else None
+        fields['guide_var']      = header['GSVAR'] if 'GSVAR' in header else None
         
         fields['nextend']  = header['NEXTEND']
-        fields['wind_spd'] = header['WSPEED']
-        fields['wind_dir'] = header['WDIRECT']
-        fields['amb_temp'] = header['TEMPOUT']
-        fields['humidity'] = header['HUMIDITY']
-        fields['pressure'] = header['PRESSURE']
+        fields['wind_spd'] = header['WSPEED'] if 'WSPEED' in header else None
+        fields['wind_dir'] = header['WDIRECT'] if 'WDIRECT' in header else None
+        fields['amb_temp'] = header['TEMPOUT'] if 'TEMPOUT' in header else None
+        fields['humidity'] = header['HUMIDITY'] if 'HUMIDITY' in header else None
+        fields['pressure'] = header['PRESSURE'] if 'PRESSURE' in header else None
         
-        fields['eqa_1'] = header['EQA01']
-        fields['eqa_2'] = header['EQA02']
-        fields['eqa_3'] = header['EQA03']
-        fields['eqa_4'] = header['EQA04']
-        fields['eqa_5'] = header['EQA05']
+        fields['eqa_1'] = header['EQA01'] if 'EQA01' in header else None
+        fields['eqa_2'] = header['EQA02'] if 'EQA02' in header else None
+        fields['eqa_3'] = header['EQA03'] if 'EQA03' in header else None
+        fields['eqa_4'] = header['EQA04'] if 'EQA04' in header else None
+        fields['eqa_5'] = header['EQA05'] if 'EQA05' in header else None
         
         return fields
     
@@ -304,24 +316,24 @@ class Image(object):
     def fields_from_header(self, pixel_scale):
         fields = {}
         #mapping
-        fields['image_num']  = self.header['IMAGEID']
+        fields['image_num']  = self.header['IMAGEID'] if 'IMAGEID' in self.header else (self.header['CCDNUM']-1)*4+int(self.header['AMPID'])
         fields['ccd_num']    = self.header['CCDNUM']
         fields['amp_num']    = self.header['AMPNUM']
-        if self.header['FILTER'] != 'None':
+        if 'FILTER' in self.header and (self.header['FILTER'] != 'None' or self.header['FILTER'] != ''):
             fields['filter'] = self.header['FILTER']
         else:
             fields['filter'] = None
-        fields['wavelength'] = self.header['WAVELEN']
-        fields['waveband']   = self.header['WAVEBAND']
+        fields['wavelength'] = self.header['WAVELEN'] if 'WAVELEN' in self.header else 0.0
+        fields['waveband']   = self.header['WAVEBAND'] if 'WAVEBAND' in self.header else 0.0 
         fields['gain']       = self.header['GAIN']
         fields['rdnoise']    = self.header['RDNOISE']
         fields['naxis1']     = self.header['NAXIS1']
         fields['naxis2']     = self.header['NAXIS2']
-        fields['cqa_1']      = self.header['CQA01']
-        fields['cqa_2']      = self.header['CQA02']
-        fields['cqa_3']      = self.header['CQA03']
-        fields['cqa_4']      = self.header['CQA04']
-        fields['cqa_5']      = self.header['CQA05']
+        fields['cqa_1']      = self.header['CQA01']if 'CQA01' in self.header else 0.0
+        fields['cqa_2']      = self.header['CQA02']if 'CQA02' in self.header else 0.0
+        fields['cqa_3']      = self.header['CQA03']if 'CQA03' in self.header else 0.0
+        fields['cqa_4']      = self.header['CQA04']if 'CQA04' in self.header else 0.0
+        fields['cqa_5']      = self.header['CQA05']if 'CQA05' in self.header else 0.0
         
         # Calculate Sky Corners of the image
         if self.parent_mosaic.header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
@@ -1722,8 +1734,8 @@ class Catalogue(object):
                     airmass = mosaic.air_mass
                     value = value + zp_nightly*airmass
 
-                #if parameter == 'flux_auto' and value>0:
-                #    parameter_error = 'flux_err_auto'
+                if parameter == 'flux_auto' and value>0:
+                    parameter_error = 'flux_err_auto'
                 #    # phot_cal = Phot_Calibrator(db_object.image.mosaic, use_zp_nightly=False)
                 #    # (calibrated_mag, calibrated_mag_error) = phot_cal.flux_to_mag(getattr(db_object, parameter), getattr(db_object, parameter_error), db_object.image.ccd_num)
                 #    # value = calibrated_mag

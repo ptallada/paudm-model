@@ -362,7 +362,7 @@ class Mosaic(Base):
     @classmethod
     def criteria_query(cls, criteria={}):
         """
-        obs_sets a query to retrieve Mosaic instances to be prestaged
+        run a query to retrieve Mosaic instances to be prestaged
         """
         q = session.query(cls).join(cls.production).join(cls.obs_set)
         q = add_criteria(q, criteria)
