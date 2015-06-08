@@ -319,11 +319,11 @@ class Mosaic(Base):
     zp_phot_id = Column(Integer,  nullable=True)     # ZPphot identifier
     filename = Column(String(128),  nullable=False)     #File name
     archivepath = Column(String(128),  nullable=False)             #Path in the archive
-    kind = Column(Enum('ARC', 'BIAS', 'DARK', 'FLASH', 'FLAT', 'FOCUS', 'GLANCE', 'PUPIL',
+    kind = Column(Enum('ARC', 'BIAS', 'DARK', 'FLASH', 'FLAT', 'FOCUS', 'GLANCE', 'PUPIL', 'SCIENCE',
                        'SCRATCH', 'SKY', 'TARGET','MBIAS','MFLAT','RED_SCI','RED_WEIGHT','RED_MASK',
                        name='mosaic_kind'),  nullable=False)             #Mosaic image type
     exp_num = Column(Integer,  nullable=False)     # Exposure number
-    obs_title = Column(String(32),   nullable=False)     #Observation title
+    obs_title = Column(String(128),   nullable=False)     #Observation title
     ra = Column(Float(53),    nullable=False)      #Telescope Right Ascension pointing (deg)
     dec = Column(Float(53),    nullable=False)     # Telescope Declination pointing (deg)
     equinox = Column(String(32),  nullable=False)     #Equinox of telescope coordinates

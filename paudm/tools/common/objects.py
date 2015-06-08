@@ -318,7 +318,7 @@ class Image(object):
         #mapping
         fields['image_num']  = self.header['IMAGEID'] if 'IMAGEID' in self.header else (self.header['CCDNUM']-1)*4+int(self.header['AMPID'])
         fields['ccd_num']    = self.header['CCDNUM']
-        fields['amp_num']    = self.header['AMPNUM']
+        fields['amp_num']    = self.header['AMPID']
         if 'FILTER' in self.header and (self.header['FILTER'] != 'None' or self.header['FILTER'] != ''):
             fields['filter'] = self.header['FILTER']
         else:
