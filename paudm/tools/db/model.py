@@ -433,11 +433,11 @@ class Image(Base):
     zp_nightly = Column(        Float(24),    nullable=True) #Zeropoint magnitude computed at the Nightly pipeline"),
     zp_nightly_err = Column(    Float(24),    nullable=True) #Zeropoint magnitude error computed at the Nightly pipeline"),
     psf_fwhm = Column(          Float(24),    nullable=True) #PSF FWHM measured on image. Available in reduced image only."),
-    cqa_1 = Column(             Float(24),    nullable=False) #Quality Analysis check at observatory 1"),
-    cqa_2 = Column(             Float(24),    nullable=False) #Quality Analysis check at observatory 2"),
-    cqa_3 = Column(             Float(24),    nullable=False) #Quality Analysis check at observatory 3"),
-    cqa_4 = Column(             Float(24),    nullable=False) #Quality Analysis check at observatory 4"),
-    cqa_5 = Column(             Float(24),    nullable=False) #Quality Analysis check at observatory 5"),
+    cqa_1 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 1"),
+    cqa_2 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 2"),
+    cqa_3 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 3"),
+    cqa_4 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 4"),
+    cqa_5 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 5"),
     #Relationships
 
     mosaic          = relationship('Mosaic',           back_populates="images")

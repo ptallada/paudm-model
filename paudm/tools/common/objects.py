@@ -155,9 +155,9 @@ class Mosaic(object):
         if 'KIND' in header:
             fields['kind']       = header['KIND']
         else:
-            fields['kind']       = header['OBSTYPE']
+            fields['kind']   = header['OBSTYPE'] if 'OBSTYPE' in header else "SCRATCH"
         fields['exp_num']    = header['EXPNUM']
-        fields['obs_title']  = header['OBJECT']
+        fields['obs_title']  = header['OBJECT'] if 'OBJECT' in header else "Commissioning"
         fields['ra']         = Angle(header['RA'], unit='hour').degree
         fields['dec']        = Angle(header['DEC'], unit='degree').degree
         fields['equinox']    = header['EQUINOX']
@@ -177,11 +177,12 @@ class Mosaic(object):
         else:
             fields['rjd_obs']    = 57161 + (fields['date_obs']-datetime.date(2015,05,18)).days
         
-        fields['exp_time']   = header['EXPTIME']
+        fields['exp_time']   = header['EXPTIME'] if 'EXPTIME' in header else "0.0"
         fields['airmass']    = header['AIRMASS']
         fields['telfocus']   = header['TELFOCUS']
-        fields['instrument'] = header['INSTRUME'] if 'INSTRUME' in header else 'PAUCam'
-        if header['FTRAY'] == 'None' or header['FTRAY']=='':
+        fields['instrument'] = header['INSTRUME'] if 'INSTRUME' in header else 'PAUCam-SCRATCH'
+        if 'FTRAY' not in header or (header['FTRAY'] == 'None' or header['FTRAY']==''):
+            log.warning("FTRAY not in Header")
             fields['filtertray'] = None
         else:
             fields['filtertray'] = header['FTRAY']
@@ -329,14 +330,14 @@ class Image(object):
         fields['rdnoise']    = self.header['RDNOISE']
         fields['naxis1']     = self.header['NAXIS1']
         fields['naxis2']     = self.header['NAXIS2']
-        fields['cqa_1']      = self.header['CQA01']if 'CQA01' in self.header else 0.0
-        fields['cqa_2']      = self.header['CQA02']if 'CQA02' in self.header else 0.0
-        fields['cqa_3']      = self.header['CQA03']if 'CQA03' in self.header else 0.0
-        fields['cqa_4']      = self.header['CQA04']if 'CQA04' in self.header else 0.0
-        fields['cqa_5']      = self.header['CQA05']if 'CQA05' in self.header else 0.0
+        fields['cqa_1']      = self.header['CQA01']if 'CQA01' in self.header else None
+        fields['cqa_2']      = self.header['CQA02']if 'CQA02' in self.header else None
+        fields['cqa_3']      = self.header['CQA03']if 'CQA03' in self.header else None
+        fields['cqa_4']      = self.header['CQA04']if 'CQA04' in self.header else None
+        fields['cqa_5']      = self.header['CQA05']if 'CQA05' in self.header else None
         
         # Calculate Sky Corners of the image
-        if self.parent_mosaic.header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
+        if 'OBSTYPE' in self.parent_mosaic.header and self.parent_mosaic.header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
             from paudm.pipeline.pixelsim import wcsUtils
             from paudm.pipeline.pixelsim import simUtils
             
