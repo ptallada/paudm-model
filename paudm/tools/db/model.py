@@ -37,7 +37,7 @@ def init(url):
     global session
     
 
-    twophase = True    
+    twophase = False
     if url.startswith('postgresql'):
         engine = create_engine(url, echo = False)
     else:
