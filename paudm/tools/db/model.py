@@ -354,6 +354,7 @@ class Mosaic(Base):
     eqa_3 = Column(Float(24),    nullable=True)      # Quality Analysis check at observatory 3
     eqa_4 = Column(Float(24),    nullable=True)     # Quality Analysis check at observatory 4
     eqa_5 = Column(Float(24),    nullable=True)    # Quality Analysis check at observatory 5
+    merged_mosaics = Column(Integer,  nullable=True) # Number of mosaics merged to form the actual mosaic (for masters)
     # Relationships
 
     production = relationship('Production', back_populates="mosaics")
