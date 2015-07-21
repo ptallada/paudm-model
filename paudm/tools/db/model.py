@@ -419,7 +419,7 @@ class Image(Base):
     image_num = Column(SmallInteger, nullable=False) #Extension number
     ccd_num = Column(          SmallInteger, nullable=False) #CCD Number"
     amp_num = Column(           SmallInteger, nullable=False) #Amplifier number (-1 for full CCD)
-    filter  = Column(      String(4),    nullable=True)  #Filter name"),
+    filter  = Column(      String(8),    nullable=True)  #Filter name"),
     wavelength = Column(Float(24),    nullable=False) #Wavelength at filter center (nm)"),
     waveband = Column(          Float(24),    nullable=False) #
     gain =  Column(              Float(24),    nullable=False) #Detector gain at amplifier (e-/ADU)"),
@@ -465,7 +465,7 @@ class Detection(Base):
     image_id = Column(            BigInteger,   nullable=False) #CCD image number"),
     #Column('global_object_id = Column(    BigInteger,   nullable=True,  comment="Global Object number"),
     insert_date = Column(         DateTime,     nullable=False, default=func.current_timestamp()) #Timestamp of insertion"
-    band = Column(                String(4),    nullable=False) #Band name"),
+    band = Column(                String(8),    nullable=False) #Band name"),
     # Fields
     background = Column(          Float(24),    nullable=False) #Background at centroid position [BACKGROUND] (count)"),
     class_star = Column(          Float(24),    nullable=False) #Star-Galaxy classifier output [CLASS_STAR]"),
