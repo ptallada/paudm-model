@@ -1266,10 +1266,10 @@ class Catalogue(object):
         return mag
         
     
-    def truth_to_sdss(self, sdss_filter_system, pau_filter_system, star_seds):
+    def truth_to_sdss(self, instrument, sdss_filter_system, pau_filter_system, star_seds):
         
         # remove the galactic extinction
-        self.removeExtinction()
+        self.removeExtinction(instrument)
         
         # translate the SEDs from floats into strings
         sed_string_indexing = star_seds.seds.keys()
@@ -1313,10 +1313,10 @@ class Catalogue(object):
         # add extinction to the magnitudes
         self.addExtinction()
     
-    def sdss_to_detection(self, filter, sdss_filter_system, pau_filter_system, star_seds):
+    def sdss_to_detection(self, instrument, filter, sdss_filter_system, pau_filter_system, star_seds):
         
         # remove the galactic extinction
-        self.removeExtinction()
+        self.removeExtinction(instrument)
         
         # estimate which stellar types the stars are
         best_seds = self.sdss_assign_seds(sdss_filter_system, star_seds)
@@ -1350,12 +1350,12 @@ class Catalogue(object):
             star_tmp = model.Detection(**fields)
             detection_objects.append(star_tmp)
             
-            index = index+1
+            index = index + 1
             
         self.objects = detection_objects
         
         # add extinction to the magnitudes
-        self.addExtinction( filter )
+        self.addExtinction(filter)
         
     def truth_to_detection(self, instrument, filter):
         
@@ -1764,10 +1764,8 @@ class Catalogue(object):
             plt.show()
         else:
             plt.savefig(filename)
-    
 
-            
-            
+
 class Phot_Calibrator(object):
     
     def __init__(self, db_mosaic, use_zp_nightly=True):
@@ -1775,26 +1773,26 @@ class Phot_Calibrator(object):
         self.params = {}
         
         # ZP Phot
-        self.params['zp_phot'] = [ 0.0 ] # for fictitious CCD #0
-        self.params['zp_phot_err'] = [ 0.0 ]
+        self.params['zp_phot'] = [0.0]  # for fictitious CCD #0
+        self.params['zp_phot_err'] = [0.0]
         
         db_zp_phots = model.session.query(model.Zp_phot).filter(model.Zp_phot.id == db_mosaic.zp_phot_id).all()
         
         # If we haven't already assigned the correct ZP_phots to this mosaic, then figure it out.
-        if( len(db_zp_phots) == 0 ):
+        if len(db_zp_phots) == 0:
             # First, any ZPs for the right filter tray and the right date
-            db_zp_phot_query = model.session.query(model.Zp_phot).filter(model.Zp_phot.filtertray==db_mosaic.filtertray,
-                                                                         model.Zp_phot.start_date<db_mosaic.date_obs,
+            db_zp_phot_query = model.session.query(model.Zp_phot).filter(model.Zp_phot.filtertray == db_mosaic.filtertray,
+                                                                         model.Zp_phot.start_date < db_mosaic.date_obs,
                                                                          ((model.Zp_phot.end_date == None) | (model.Zp_phot.end_date<db_mosaic.date_obs)) )
             # Now check the production info
             db_production = model.session.query(model.Production).filter(model.Production.id==db_mosaic.production_id).one()
             db_zp_phot_query = db_zp_phot_query.join(model.Production).filter_by(id=db_production.id)
             db_zp_phots = db_zp_phot_query.all()
-            if( len(db_zp_phots) == 0 ):
+            if len(db_zp_phots) == 0:
                 error_msg = "No appropriate ZP_Phot entries found!  Do you need to run the commissioning pipeline?"
                 log.error(error_msg)
                 raise Exception, error_msg
-            if( len(db_zp_phots) > 1 ):
+            if len(db_zp_phots) > 1:
                 error_msg = "More than one appropriate ZP Phot entry found!!"
                 log.error(error_msg)
                 raise Exception, error_msg
@@ -1809,40 +1807,38 @@ class Phot_Calibrator(object):
         for i in range(1,19):
             zpname = "zp_" + "%02d" %i
             zp_err_name = "zp_err_" + "%02d" %i
-            self.params['zp_phot'].append( db_zp_phots[0].__getattribute__(zpname) )
-            self.params['zp_phot_err'].append( db_zp_phots[0].__getattribute__(zp_err_name) )
-            
+            self.params['zp_phot'].append(db_zp_phots[0].__getattribute__(zpname))
+            self.params['zp_phot_err'].append(db_zp_phots[0].__getattribute__(zp_err_name))
             
         # ZP Nightly
-        self.params['zp_nightly'] = [ 0.0 ] # for fictitious CCD #0
-        self.params['zp_nightly_err'] = [ 0.0 ]
+        self.params['zp_nightly'] = [0.0]  # for fictitious CCD #0
+        self.params['zp_nightly_err'] = [0.0]
         for i in range(1,19):
             if use_zp_nightly:
                 db_image = model.session.query(model.Image).filter(model.Image.mosaic==db_mosaic).filter(model.Image.ccd_num==i).one()
-                if( db_image.zp_nightly is None ):
-                    self.params['zp_nightly'].append( 0.0 )
-                    self.params['zp_nightly_err'].append( 0.0 )
+                if db_image.zp_nightly is None:
+                    self.params['zp_nightly'].append(0.0)
+                    self.params['zp_nightly_err'].append(0.0)
                 else:
-                    self.params['zp_nightly'].append( db_image.zp_nightly )
-                    self.params['zp_nightly_err'].append( db_image.zp_nightly_err )
+                    self.params['zp_nightly'].append(db_image.zp_nightly)
+                    self.params['zp_nightly_err'].append(db_image.zp_nightly_err)
             else:
-                self.params['zp_nightly'].append( 0.0 )
-                self.params['zp_nightly_err'].append( 0.0 )
+                self.params['zp_nightly'].append(0.0)
+                self.params['zp_nightly_err'].append(0.0)
                 
         # Airmass
         self.params['airmass'] = db_mosaic.airmass
         
         # Softening parameter b if we do asinh mags.....
     
-    def flux_to_mag( self, flux, flux_err, ccd_num ):
-        (calib_flux, calib_flux_err) = self.calibrate_flux( flux, flux_err, ccd_num )
+    def flux_to_mag(self, flux, flux_err, ccd_num):
+        (calib_flux, calib_flux_err) = self.calibrate_flux(flux, flux_err, ccd_num)
         mag = 99.0
         mag_error = 99.0
-        if( calib_flux > 0.0 ):
+        if calib_flux > 0.0:
             mag = constants.mag_zp-2.5*math.log10(calib_flux)
             mag_error = 1.0857*calib_flux_err/calib_flux
-        return (mag, mag_error)
-
+        return mag, mag_error
 
     def calibrate_flux( self, flux, flux_err, ccd_num ):
         zp_phot = self.params['zp_phot'][ccd_num]
@@ -1853,14 +1849,14 @@ class Phot_Calibrator(object):
         
         calib_flux = flux * 10.0**(0.4*(zp_phot + zp_nightly*airmass))
         calib_flux_err = 0.0
-        if( flux != 0.0 ):
-            calib_flux_err = math.sqrt( (flux_err*flux_err)/(flux*flux) + 0.8483*zp_phot_err*zp_phot_err + 0.8483*zp_nightly_err*zp_nightly_err )*calib_flux
+        if flux != 0.0 :
+            calib_flux_err = math.sqrt((flux_err * flux_err) / (flux * flux) + 0.8483 * zp_phot_err * zp_phot_err + 0.8483 * zp_nightly_err * zp_nightly_err) * calib_flux
         
-        return (calib_flux, calib_flux_err)
+        return calib_flux, calib_flux_err
 
 
 class Spectrum(object):
-    '''
+    """
     Defines a Spectrum object.
     
     Attributes:
@@ -1875,7 +1871,7 @@ class Spectrum(object):
     Built-in Methods:
       - flux = filter_curve_spectrum.sed_to_flux( sed_spectrum, norm_filter, norm_flux, single_dw )
         returns the flux of an object with the given SED in this filter.
-    '''
+    """
     
     def __init__(self, ws=None, fs=None, name=None, file=None):
         self.wavelengths = ws
@@ -1884,12 +1880,11 @@ class Spectrum(object):
         self.norm = None
         
         if file is not None:
-            #file = open(filename)
             ws = []
             fs = []
             for line in file:
                 splitted_line = line.split()
-                if( re.match("#", splitted_line[0]) ):
+                if re.match("#", splitted_line[0]):
                     continue
                 w = float(splitted_line[0])
                 f = float(splitted_line[1])
@@ -1899,43 +1894,39 @@ class Spectrum(object):
             np_fs = np.array(fs)
             
             if self.wavelengths is not None:
-                self.fluxes = np.interp( self.wavelengths, np_ws, np_fs )
+                self.fluxes = np.interp(self.wavelengths, np_ws, np_fs)
             else:
                 self.wavelengths = np_ws
                 self.fluxes = np_fs
-                
-    
-    def rebin( self, wvls ):
-        new_fluxes = np.interp( wvls, self.wavelengths, self.fluxes )
+
+    def rebin(self, wvls):
+        new_fluxes = np.interp(wvls, self.wavelengths, self.fluxes)
         self.wavelengths = wvls.copy()
         self.fluxes = new_fluxes
-    
-    
-    def sed_to_flux( self, sed, norm_filter, norm_mag, single_dw=False ):
+
+    def sed_to_flux(self, sed, norm_filter, norm_mag, single_dw=False):
         
-        norm_result = norm_filter.combine_sed_filter( sed, True )
+        norm_result = norm_filter.combine_sed_filter(sed, True)
         
-        norm_flux = 10**( (constants.mag_zp-norm_mag)/2.5 )
+        norm_flux = 10**((constants.mag_zp-norm_mag)/2.5)
         
         # find the normalization factor to get the correct flux
         normalization = norm_flux/norm_result
                         
         # multiply the desired filter with the SED and add up the "flux"
-        filter_result = self.combine_sed_filter( sed, True )
+        filter_result = self.combine_sed_filter(sed, True)
                                 
         # multiply by the normalization factor
         filter_result *= normalization
                                 
         return filter_result
-        
-        
-    
+
     # was combine_sed_filter_matchedwvls in simUtils
     # should be called by a filter curve.
     # sed is a Spectrum type too.
-    def combine_sed_filter( self, sed, single_dw=False ):
+    def combine_sed_filter(self, sed, single_dw=False):
         
-        if( len(sed.wavelengths) != len(self.wavelengths) ):
+        if len(sed.wavelengths) != len(self.wavelengths) :
             error_msg = "Filter and SED arrays are not the same length! len(sed.wavelengths) = %d, len(self.wavelengths) = %d" %(len(sed.wavelengths),len(self.wavelengths))
             log.error(error_msg) 
             
@@ -1946,7 +1937,7 @@ class Spectrum(object):
             error_msg = "Filter normalization is not set!"
             log.error(error_msg)
 
-        if( single_dw ):
+        if single_dw:
             dlambda = self.wavelengths[1] - self.wavelengths[0]
             mult_array = sed.fluxes*sed.wavelengths*self.fluxes # HERE "should" be *wvl, not /wvl, but the quasar is then not blue....
             flux = np.sum(mult_array)*dlambda/self.norm
@@ -1964,7 +1955,6 @@ class Spectrum(object):
         flux *= 3e18/3631e23
         
         return flux
-    
 
 
 class FilterSystem(object):
@@ -1997,10 +1987,8 @@ class FilterSystem(object):
         #wvl_list = np.arange(95.0,18500.0,2.0) 
         
         self.filters = self.read_filter_curves( self.system, wvl_list, instrument, add_efficiency )
-    
-    
-    
-    def read_filter_curves( self, system, wvl_list, instrument, add_efficiency=True ):
+
+    def read_filter_curves(self, system, wvl_list, instrument, add_efficiency=True):
         
         filter_curves = {}
         filter_curves_matchedwvls = {}
