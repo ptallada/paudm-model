@@ -420,7 +420,7 @@ class Image(Base):
     image_num = Column(SmallInteger, nullable=False) #Extension number
     ccd_num = Column(          SmallInteger, nullable=False) #CCD Number"
     amp_num = Column(           SmallInteger, nullable=False) #Amplifier number (-1 for full CCD)
-    filter  = Column(      String(8),    nullable=True)  #Filter name"),
+    filter  = Column( String(8),    nullable=True)  #Filter name"),
     wavelength = Column(Float(24),    nullable=False) #Wavelength at filter center (nm)"),
     waveband = Column(          Float(24),    nullable=False) #
     gain =  Column(              Float(24),    nullable=False) #Detector gain at amplifier (e-/ADU)"),
