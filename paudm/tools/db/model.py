@@ -761,7 +761,58 @@ class USNO(Base):
     mag_err_b = Column( Float(24),    nullable=False) #Mean error on mag_b"),
 
 Index('ik_usnolocation', USNO.ra, USNO.dec)
-  
+
+class DEEP2(Base):
+    __tablename__ = 'deep2
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint(''),
+            )     
+        
+    # Keys
+    objno = Column(        BigInteger,   nullable=False) #DEEP2 object number"),
+    # Fields
+    ra = Column(        Float(53),    nullable=False) #Right Ascension (in decimal degrees, J2000)"),
+    dec = Column(       Float(53),    nullable=False) #Declination (in decimal degrees, J2000),
+    magb = Column(      Float(24),    nullable=False) #CFHT B-band magnitude (AB) from Coil et al. 2004"),
+    magr = Column(      Float(24),    nullable=False) #CFHT R-band magnitude (AB) from Coil et al. 2004"),
+    magi = Column(      Float(24),    nullable=False) #CFHT I-band magnitude (AB) from Coil et al. 2004"),
+    magb_err = Column(      Float(24),    nullable=False) #B-band magnitude error"),
+    magr_err = Column(      Float(24),    nullable=False) #R-band magnitude error"),
+    magi_err = Column(      Float(24),    nullable=False) #I-band magnitude error"),
+    rg = Column(      Float(24),    nullable=False) #estimated R-band radius of object (sigma of Guassian fit in units of pixels --- 0.207”/pix)"),
+    e2 = Column(      Float(24),    nullable=False) #ellipticity defined as E2 = (1 - b/a)"),
+    pa = Column(      Float(24),    nullable=False) #object PA (degrees E of N)"),
+    pgal = Column(      Float(24),    nullable=False) #the probability (0 - 1) that the sources is a galaxy for unresolved galaxies, 3 if resolved"),
+    sfd_ebv = Column(      Float(24),    nullable=False) #E(B-V) from Schlegel, Finkbeiner, and Davis dust map"),
+    m_b = Column(      Float(24),    nullable=False) #absolute B-band magnitude (AB, h = 1) from Willmer et al. (2006)"),
+    ub = Column(      Float(24),    nullable=False) #rest-frame U-B color (AB) from Willmer et al. (2006)"),
+    objname = Column(      String(8),    nullable=False) #the 8-digit DEEP2 object id (not always the same as OBJNO)"),
+    mask = Column(      BigInteger),    nullable=False) #the DEEP2/DEEP3 slitmask number on which the object was observed"),
+    slit = Column(      BigInteger),    nullable=False) #the slitlet number (on mask MASKNAME) in which the object was placed"),
+    date = Column(      BigInteger),    nullable=False) #Date on which the mask was observed (YYYY-MM-DD)"),
+    mjd = = Column(      Float(24),    nullable=False) #Modified Julian date of observation"),
+    slitra = Column(      Float(24),    nullable=False) #RA of slit center"),
+    slitdec = Column(      Float(24),    nullable=False) #Dec of slit center"),
+    slitpa = Column(      Float(24),    nullable=False) #PA (degrees E of N) of slit"),
+    slitlen = Column(      Float(24),    nullable=False) #length of slit (arcsec)"),
+    z = Column(      Float(24),    nullable=False) #observed best-fitting redshift"),
+    zbest = Column(      Float(24),    nullable=False) #best redshift (corrected for heliocentric motion)"),
+    zerr = Column(      Float(24),    nullable=False) #redshift error (zerr < 0 indicates problematic z fit)"),
+    zquality = Column(      Integer,    nullable=False) #redshift quality code, Q"),
+    obj_type = Column(      String(6),    nullable=True) #type of best-fitting template (e.g., GALAXY or STAR)"),
+    star_type = Column(      String(6),    nullable=True) #coarse classification for stellar templates"),
+    rchi2 = Column(      Float(24),    nullable=False) #reduced chi-squared value for the redshift fit"),
+    dof = Column(      BigInteger,    nullable=False) #degrees of freedom for redshift fit"),
+    vdisp = Column(      Float(24),    nullable=False) #velocity dispersion in km/s"),
+    vdisperr = Column(      Float(24),    nullable=False) #error in velocity dispersion"),
+    comment = Column(      String(47),    nullable=True) #comment field"),
+    # Constraints
+    PrimaryKeyConstraint('objno'),
+    # Documentation
+    #comment="DEEP2",
+
+Index('ik_deeep2location', DEEP2.ra, DEEP2.dec)
     
     ###########    EXTERNAL Tables    ###########
     
