@@ -763,10 +763,10 @@ class USNO(Base):
 Index('ik_usnolocation', USNO.ra, USNO.dec)
 
 class DEEP2(Base):
-    __tablename__ = 'deep2
+    __tablename__ = 'deep2'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint(''),
+        PrimaryKeyConstraint('objno'),
             )     
         
     # Keys
@@ -788,10 +788,10 @@ class DEEP2(Base):
     m_b = Column(      Float(24),    nullable=False) #absolute B-band magnitude (AB, h = 1) from Willmer et al. (2006)"),
     ub = Column(      Float(24),    nullable=False) #rest-frame U-B color (AB) from Willmer et al. (2006)"),
     objname = Column(      String(8),    nullable=False) #the 8-digit DEEP2 object id (not always the same as OBJNO)"),
-    mask = Column(      BigInteger),    nullable=False) #the DEEP2/DEEP3 slitmask number on which the object was observed"),
-    slit = Column(      BigInteger),    nullable=False) #the slitlet number (on mask MASKNAME) in which the object was placed"),
-    date = Column(      BigInteger),    nullable=False) #Date on which the mask was observed (YYYY-MM-DD)"),
-    mjd = = Column(      Float(24),    nullable=False) #Modified Julian date of observation"),
+    mask = Column(      BigInteger,    nullable=False) #the DEEP2/DEEP3 slitmask number on which the object was observed"),
+    slit = Column(      BigInteger,    nullable=False) #the slitlet number (on mask MASKNAME) in which the object was placed"),
+    date = Column(      Date,    nullable=False) #Date on which the mask was observed (YYYY-MM-DD)"),
+    mjd = Column(      Float(24),    nullable=False) #Modified Julian date of observation"),
     slitra = Column(      Float(24),    nullable=False) #RA of slit center"),
     slitdec = Column(      Float(24),    nullable=False) #Dec of slit center"),
     slitpa = Column(      Float(24),    nullable=False) #PA (degrees E of N) of slit"),
