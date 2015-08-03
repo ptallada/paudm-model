@@ -508,12 +508,13 @@ class ForcedAperture(Base):
     id = Column(BigInteger, nullable=False)  # Unique identifier
     production_id = Column(Integer, nullable=False) #Production number"),
     ref_id = Column(BigInteger, nullable=True)  # Unique identifier for the reference object
+    ref_cat = Column(String(16), nullable=True)  # Reference catalogue name
     image_id = Column(BigInteger, nullable=False)  # CCD image number
     insert_date = Column(DateTime, nullable=False, default=func.current_timestamp())  # Timestamp of insertion
     band = Column(String(8), nullable=False)  # Band name
     # Fields
-    ApertureRA = Column(Float(24), nullable=False)  # Sky coordinates of aperture center
-    ApertureDec = Column(Float(24), nullable=False)  # Sky coordinates of aperture center
+    ApertureRA = Column(Float(53), nullable=False)  # Sky coordinates of aperture center
+    ApertureDec = Column(Float(53), nullable=False)  # Sky coordinates of aperture center
     ApertureX = Column(Float(24), nullable=False)  # Image coordinates of aperture center
     ApertureY = Column(Float(24), nullable=False)  # Image coordinates of aperture center
     SourceIntensity = Column(Float(24), nullable=False)  # Integrated intensity of the source (in the aperture)
