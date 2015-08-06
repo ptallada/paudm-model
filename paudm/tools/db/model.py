@@ -160,8 +160,8 @@ class Production(Base):
     zp_phots       = relationship('Zp_phot',        back_populates="production")
     global_objects = relationship('Global_object',  back_populates="production")
     coadd_objects  = relationship('Coadd_object',   back_populates="production")
-    foced_aperture_coadds = relationship('ForcedApertureCoadd',  back_populates="production")
-    foced_apertures = relationship('ForcedAperture',  back_populates="production")
+    forced_aperture_coadds = relationship('ForcedApertureCoadd',  back_populates="production")
+    forced_apertures = relationship('ForcedAperture',  back_populates="production")
     photo_zs       = relationship('Photo_z',        back_populates="production")
     truth_objects  = relationship('Truth_Object',   back_populates="production")
     targets        = relationship('Target',         back_populates="production")
@@ -447,7 +447,7 @@ class Image(Base):
     mosaic          = relationship('Mosaic',           back_populates="images")
     detections     = relationship('Detection',        back_populates="image")
     detections_by_id = relationship('Detection',       collection_class=attribute_mapped_collection('id'))
-    forcedApertures  = relationship('ForcedAperture',        back_populates="image")
+    forced_apertures  = relationship('ForcedAperture',        back_populates="image")
 
 
     #Contains detailed header information for a single CCD image
@@ -497,7 +497,7 @@ class Detection(Base):
 Index('ik_detlocation', Detection.ra, Detection.dec)
 
 class ForcedAperture(Base):
-    __tablename__ = 'ForcedAperture'
+    __tablename__ = 'forced_aperture'
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
@@ -514,31 +514,31 @@ class ForcedAperture(Base):
     insert_date = Column(DateTime, nullable=False, default=func.current_timestamp())  # Timestamp of insertion
     band = Column(String(8), nullable=False)  # Band name
     # Fields
-    ApertureRA = Column(Float(53), nullable=False)  # Sky coordinates of aperture center
-    ApertureDec = Column(Float(53), nullable=False)  # Sky coordinates of aperture center
-    ApertureX = Column(Float(24), nullable=False)  # Image coordinates of aperture center
-    ApertureY = Column(Float(24), nullable=False)  # Image coordinates of aperture center
-    SourceIntensity = Column(Float(24), nullable=False)  # Integrated intensity of the source (in the aperture)
-    SourceUncertainty = Column(Float(24), nullable=False)  # Uncertainty associated with the source intensity
-    Magnitude = Column(Float(24), nullable=False)  # Magnitude representation of “SourceIntensity”.
-    MagUncertainty = Column(Float(24), nullable=False)  # Magnitude uncertainty, given by 1.0857 times
+    aperture_ra = Column(Float(53), nullable=False)  # Sky coordinates of aperture center
+    aperture_dec = Column(Float(53), nullable=False)  # Sky coordinates of aperture center
+    aperture_x = Column(Float(24), nullable=False)  # Image coordinates of aperture center
+    aperture_y = Column(Float(24), nullable=False)  # Image coordinates of aperture center
+    source_intensity = Column(Float(24), nullable=False)  # Integrated intensity of the source (in the aperture)
+    source_uncertainty = Column(Float(24), nullable=False)  # Uncertainty associated with the source intensity
+    magnitude = Column(Float(24), nullable=False)  # Magnitude representation of “SourceIntensity”.
+    mag_uncertainty = Column(Float(24), nullable=False)  # Magnitude uncertainty, given by 1.0857 times
                                                         # “SourceUncertainty” divided by “SourceIntensity”.
-    SkyMedian = Column(Float(24), nullable=False)  # The per-pixel median of samples in the sky annulus after the sky outliers have been rejected
-    SkySigma = Column(Float(24), nullable=False)  # The standard deviation of samples in the sky annulus after the sky outliers have been rejected
-    RadialProfileFWHM = Column(Float(24), nullable=False)  # Full width at half maximum (FWHM) of the radial profile of the source (pixels).
+    sky_median = Column(Float(24), nullable=False)  # The per-pixel median of samples in the sky annulus after the sky outliers have been rejected
+    sky_sigma = Column(Float(24), nullable=False)  # The standard deviation of samples in the sky annulus after the sky outliers have been rejected
+    radial_profile_fwhm = Column(Float(24), nullable=False)  # Full width at half maximum (FWHM) of the radial profile of the source (pixels).
     # Relationships
-    image = relationship('Image', back_populates="forcedApertures")
-    production = relationship('Production', back_populates="foced_apertures")
+    image = relationship('Image', back_populates="forced_apertures")
+    production = relationship('Production', back_populates="forced_apertures")
     # Documentation
 
-Index('ik_falocation', ForcedAperture.ApertureRA, ForcedAperture.ApertureDec)
+Index('ik_falocation', ForcedAperture.aperture_ra, ForcedAperture.aperture_dec)
 Index('ik_fapixels', ForcedAperture.pixel_id)
 Index('ik_faband', ForcedAperture.band)
 
 
 # Forced Aperture Coadd Object Table
 class ForcedApertureCoadd(Base):
-    __tablename__ = 'ForcedApertureCoadd'
+    __tablename__ = 'forced_aperture_coadd'
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
@@ -742,7 +742,7 @@ class ForcedApertureCoadd(Base):
     star_flag = Column(     Boolean,    nullable=True)
 
     #Reletionships
-    production    = relationship('Production',       back_populates="foced_aperture_coadds")
+    production    = relationship('Production',       back_populates="forced_aperture_coadds")
 
 # Documentation
 #comment="Contains unique aperture photometry coadd objects extracted from coadd image tiles.",
