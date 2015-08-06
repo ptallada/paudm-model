@@ -548,7 +548,7 @@ class ForcedApertureCoadd(Base):
     # Keys
     id = Column(                    BigInteger,   nullable=False) #Unique identifier"),
     production_id = Column(         Integer,      nullable=False) #Production number"),
-    insert_date = Column(           DateTime,     nullable=False) #Timestamp of insertion", default=func.current_timestamp()),
+    insert_date = Column(           DateTime,     nullable=True) #Timestamp of insertion", default=func.current_timestamp()),
     # Fields
     ra = Column(                    Float(53),    nullable=False) #Windowed right ascension of barycenter (J2000) [ALPHAWIN_J2000] (deg)"),
     dec = Column(                   Float(53),    nullable=False) #Windowed declination of barycenter (J2000) [DELTAWIN_J2000] (deg)"),
