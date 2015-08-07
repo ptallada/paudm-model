@@ -1067,15 +1067,53 @@ class DEEP2(Base):
     #comment="DEEP2",
 
 Index('ik_deeep2location', DEEP2.ra, DEEP2.dec)
-    
-    ###########    EXTERNAL Tables    ###########
-    
-    # SDSS External Table
 
+
+class CFHTLenS(Base):
+    __tablename__ = 'cfhtlens'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('paudm_id'),
+            )     
+        
+    # Keys
+    paudm_id = Column(        BigInteger,   nullable=False) #PAUdm numeric id for reference table"),
+    # Fields
+    id = Column(        String(16),   nullable=False) #object id"),
+    alpha_j2000 = Column(        Float(53),    nullable=False) #Right Ascension (in decimal degrees, J2000),
+    delta_j2000 = Column(       Float(53),    nullable=False) #Declination (in decimal degrees, J2000),
+    flag = Column(      Integer,    nullable=False) #whether the object has flags or not, 0: no flags, 1: some flags,
+    class_star = Column(      Float(24),    nullable=False) #CLASS_STAR usually gives a cleaner star sample than star_flag, but can lead to serious incompleteness in a galaxy sample,
+    e1 = Column(      Float(24),    nullable=False) #expectation values of galaxy ellipticity, from the marginalised galaxy ellipticity likelihood surface, to be used for shear measurement,
+    e2 = Column(      Float(24),    nullable=False) #expectation values of galaxy ellipticity, from the marginalised galaxy ellipticity likelihood surface, to be used for shear measurement,
+    scalelength = Column(      Float(24),    nullable=False) #lensfit galaxy model scalelength, marginalised over other parameters, as defined by Miller et al (2012),
+    bulge_fraction = Column(      Float(24),    nullable=False) #ratio of the ﬂux in the bulge component to the total ﬂux (often written B/T)),
+    snratio = Column(      Float(24),    nullable=False) #signal-to-noise ratio of the object, measured on a stack of the supplied exposures within a limiting isophote 2sigma above the noise,
+    z_b = Column(      Float(24),    nullable=False) #most likely redshift from BPZ,
+    z_b_min = Column(      Float(24),    nullable=False) #z_min 95% confidence interval from BPZ,
+    z_b_max = Column(      Float(24),    nullable=False) #z_max 95% confidence interval from BPZ,
+    t_b = Column(      Float(24),    nullable=False) #BPZ spectral type. 1=CWW-Ell, 2=CWW-Sbc, 3=CWW-Scd, 4=CWW-Im, 5=KIN-SB3, 6=KIN-SB2. Note that we use a recalibrated template set described in Capak et al. (2004) and that the templates are interpolated, hence fractional types occur,
+    odds = Column(      Float(24),    nullable=False) #likelihood that z_b is correct from BPZ,
+    z_ml = Column(      Float(24),    nullable=False) #maximum likelihood result (with "flat" unphysical prior) from BPZ,
+    t_ml = Column(      Float(24),    nullable=False) #maximum likelihood result from BPZ,
+    chi_squared_bpz = Column(      Float(24),    nullable=False) #"modified" chi square,
+    star_flag = Column(      Integer,    nullable=False) #star_flag is optimized for galaxy studies, to keep an almost 100% complete galaxy sample with low (but not vanishing) stellar contamination,
+    mag_u = Column(      Float(24),    nullable=False) #observed magnitude in the u-band,
+    magerr_u = Column(      Float(24),    nullable=False) #error in the observed magnitude in the u-band,
+    mag_g = Column(      Float(24),    nullable=False) #observed magnitude in the g-band,
+    magerr_g = Column(      Float(24),    nullable=False) #error in the observed magnitude in the g-band,
+    mag_r = Column(      Float(24),    nullable=False) #observed magnitude in the r-band,
+    magerr_r = Column(      Float(24),    nullable=False) #error in the observed magnitude in the r-band,
+    mag_i = Column(      Float(24),    nullable=False) #observed magnitude in the i-band,
+    magerr_i = Column(      Float(24),    nullable=False) #error in the observed magnitude in the i-band,
+    mag_y = Column(      Float(24),    nullable=False) #observed magnitude in the y-band,
+    magerr_y = Column(      Float(24),    nullable=False) #error in the observed magnitude in the y-band,
+    mag_z = Column(      Float(24),    nullable=False) #observed magnitude in the z-band,
+    magerr_z = Column(      Float(24),    nullable=False) #error in the observed magnitude in the z-band,
     
-    ###########    SIMULATION Tables    ###########
-    
-    # Truth Objects table
+Index('ik_cfhtlenslocation', CFHTLenS.alpha_j2000, CFHTLenS.delta_j2000)
+
+# Truth Objects table
 class Truth_Object(Base):
     __tablename__ = 'truth_object'
     __table_args__ = (
