@@ -243,126 +243,77 @@ Index('uk_production_zp_phot', Zp_phot.production_id, Zp_phot.id)
 
 #        "Contains information for the photometric calibration.\n"
 #        "Holds a filter tray set (18 CCDs) of ZPphot for an interval of time."
+
 class Mosaic(Base): 
     """
     Defines a standard Mosaic object.
-    
-    Keys:
-     - id
-     - production_id
-     - obs_set_id
-     - zp_phot_id
-     
-     Fields:
-     - filename
-     - archivepath
-     - kind
-     - exp_num
-     - obs_title
-     - ra
-     - dec
-     - equinox
-     - date_obs
-     - time_obs
-     - rjd_obs
-     - date_creat
-     - time_creat
-     - exp_time
-     - air_mass
-     - telfocus
-     - instrument
-     - filtertray
-     - filtertray_tmp
-     - nextend
-     - guide_enabled
-     - guide_fwhm
-     - guide_var
-     - extinction
-     - extinction_err
-     - wind_spd
-     - wind_dir
-     - amb_temp
-     - humidity
-     - pressure
-     - eqa_1
-     - eqa_2
-     - eqa_3
-     - eqa_4
-     - eqa_5
-    
-    Relationships:
-     - production
-     - obs_set
-     - images
     """
-    #TODO: evaluate and remove maybe?
-#    @ensure_criteria({
-#        'mosaic' : ['kind'],
-#    })
 
     __tablename__ = 'mosaic'
     __table_args__ = (
         # Primary key
         PrimaryKeyConstraint('id'),
-        # Unique key
-
 
         # Foreign key
-        ForeignKeyConstraint(['production_id'], ['production.id'],                                     onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['obs_set_id'],        ['obs_set.id'],                                            onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['production_id', 'zp_phot_id'], ['zp_phot.production_id', 'zp_phot.id'], onupdate='CASCADE', ondelete='RESTRICT'),
+        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['obs_set_id'],        ['obs_set.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['production_id', 'zp_phot_id'], ['zp_phot.production_id', 'zp_phot.id'],
+                             onupdate='CASCADE',
+                             ondelete='RESTRICT'),
         UniqueConstraint('archivepath', 'filename'),
         UniqueConstraint('production_id', 'obs_set_id', 'kind', 'exp_num'),
 
     )
     # Columns
-    id        = Column(BigInteger,     nullable=False )   # 
-    production_id = Column(Integer,  nullable=False)    # Production identifier
-    obs_set_id =  Column(Integer,  nullable=False)        # obs_set number
-    zp_phot_id = Column(Integer,  nullable=True)     # ZPphot identifier
-    filename = Column(String(128),  nullable=False)     #File name
-    archivepath = Column(String(128),  nullable=False)             #Path in the archive
+    id = Column(BigInteger, nullable=False)  # Identifier
+    production_id = Column(Integer, nullable=False)  # Production identifier
+    obs_set_id = Column(Integer, nullable=False)  # obs_set number
+    zp_phot_id = Column(Integer, nullable=True)  # ZPphot identifier
+    filename = Column(String(128), nullable=False)  # File name
+    archivepath = Column(String(128), nullable=False)  # Path in the archive
     kind = Column(Enum('ARC', 'BIAS', 'DARK', 'FLASH', 'FLAT', 'FOCUS', 'GLANCE', 'PUPIL', 'SCIENCE',
                        'SCRATCH', 'SKY', 'TARGET','MBIAS','MFLAT','RED_SCI','RED_WEIGHT','RED_MASK',
-                       name='mosaic_kind'),  nullable=False)             #Mosaic image type
-    exp_num = Column(Integer,  nullable=False)     # Exposure number
-    obs_title = Column(String(128),   nullable=False)     #Observation title
-    ra = Column(Float(53),    nullable=False)      #Telescope Right Ascension pointing (deg)
-    dec = Column(Float(53),    nullable=False)     # Telescope Declination pointing (deg)
-    equinox = Column(String(32),  nullable=False)     #Equinox of telescope coordinates
-    date_obs = Column(Date,  nullable=False)  #Observation date
-    time_obs = Column(Time,  nullable=False)     # Observation time (Universal time)
-    rjd_obs = Column(Float(53),  nullable=False)     #Observation Reduced Modified Julian Day
-    date_creat = Column(Date,  nullable=False)      # File creation date
-    time_creat = Column(Time,  nullable=False)     #File creation time
-    exp_time = Column(Float(24),  nullable=False)     #Exposure time (s)
-    airmass = Column(Float(24),  nullable=True)      #airmass
-    telfocus = Column(Float(24),  nullable=True)     # Telescope Focus
-    instrument = Column(String(32),  nullable=False)     #Instrument name
-    filtertray = Column(String(16),  nullable=True)      #Filter Tray name
-    filtertray_tmp = Column(Float(24),  nullable=True)     # Filter Tray temperature (deg C)
-    nextend = Column(SmallInteger,  nullable=False)     #Filter Tray name
-    guide_enabled = Column(Boolean,  nullable=True)   #Number of extensions
-    guide_fwhm = Column(Float(24),    nullable=True )     # Seeing FWHM measured at guiding star (arcsec)
-    guide_var = Column(Float(24),    nullable=True )     #Flux variance measured at guiding star (counts)
-    extinction = Column(Float(24),    nullable=True )      #Extinction value measured in reduction for photometric calibration. Available in reduced image only.
-    extinction_err = Column(Float(24),    nullable=True )     # Extinction error value. Available in reduced image only.
-    wind_spd = Column(Float(24),    nullable=True )     #Wind speed (kph)
-    wind_dir = Column(Float(24),    nullable=True )   #Wind direction (deg)
-    amb_temp = Column(Float(24),    nullable=True)     # Ambient temperature (deg C)
-    humidity = Column(Float(24),    nullable=True)     #Ambient relative humidity (percent)
-    pressure = Column(Float(24),    nullable=True)  #Barometic pressure (mbar)
-    eqa_1 = Column(Float(24),    nullable=True)     # Quality Analysis check at observatory 1
-    eqa_2 = Column(Float(24),    nullable=True)     # Quality Analysis check at observatory 2
-    eqa_3 = Column(Float(24),    nullable=True)      # Quality Analysis check at observatory 3
-    eqa_4 = Column(Float(24),    nullable=True)     # Quality Analysis check at observatory 4
-    eqa_5 = Column(Float(24),    nullable=True)    # Quality Analysis check at observatory 5
-    merged_mosaics = Column(Integer,  nullable=True) # Number of mosaics merged to form the actual mosaic (for masters)
-    # Relationships
+                       name='mosaic_kind'), nullable=False)  # Mosaic image type
+    exp_num = Column(Integer, nullable=False)  # Exposure number
+    obs_title = Column(String(128), nullable=False)  # Observation title
+    ra = Column(Float(53), nullable=False)  # Telescope Right Ascension pointing (deg)
+    dec = Column(Float(53), nullable=False)  # Telescope Declination pointing (deg)
+    equinox = Column(String(32), nullable=False)  # Equinox of telescope coordinates
+    date_obs = Column(Date, nullable=False)  # Observation date
+    time_obs = Column(Time, nullable=False)  # Observation time (Universal time)
+    rjd_obs = Column(Float(53), nullable=False)  # Observation Reduced Modified Julian Day
+    date_creat = Column(Date, nullable=False)  # File creation date
+    time_creat = Column(Time, nullable=False)  # File creation time
+    exp_time = Column(Float(24), nullable=False)  # Exposure time (s)
+    airmass = Column(Float(24), nullable=True)  # airmass
+    telfocus = Column(Float(24), nullable=True)  # Telescope Focus
+    instrument = Column(String(32), nullable=False)  # Instrument name
+    filtertray = Column(String(16), nullable=True)  # Filter Tray name
+    filtertray_tmp = Column(Float(24), nullable=True)  # Filter Tray temperature (deg C)
+    nextend = Column(SmallInteger, nullable=False)  # Filter Tray name
+    guide_enabled = Column(Boolean, nullable=True)  # Number of extensions
+    guide_fwhm = Column(Float(24), nullable=True)  # Seeing FWHM measured at guiding star (arcsec)
+    guide_var = Column(Float(24), nullable=True)  # Flux variance measured at guiding star (counts)
+    extinction = Column(Float(24), nullable=True)  # Extinction value measured in reduction for photometric calibration. Available in reduced image only.
+    extinction_err = Column(Float(24), nullable=True)  # Extinction error value. Available in reduced image only.
+    wind_spd = Column(Float(24), nullable=True)  # Wind speed (kph)
+    wind_dir = Column(Float(24), nullable=True)  # Wind direction (deg)
+    amb_temp = Column(Float(24), nullable=True)  # Ambient temperature (deg C)
+    humidity = Column(Float(24), nullable=True)  # Ambient relative humidity (percent)
+    pressure = Column(Float(24), nullable=True)  # Barometic pressure (mbar)
+    eqa_1 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 1
+    eqa_2 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 2
+    eqa_3 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 3
+    eqa_4 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 4
+    eqa_5 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 5
+    merged_mosaics = Column(Integer, nullable=True)  # Number of mosaics merged to form the actual mosaic (for masters)
+    mean_psf_fwhm = Column(Float(24), nullable=True)  # Mean PSF FWHM measured. Available in reduced image only,
 
+    # Relationships
     production = relationship('Production', back_populates="mosaics")
-    obs_set        = relationship('Obs_set',        back_populates="mosaics")
-    images = relationship('Image',      back_populates="mosaic")
+    obs_set = relationship('Obs_set', back_populates="mosaics")
+    images = relationship('Image', back_populates="mosaic")
+
     @classmethod
     def criteria_query(cls, criteria={}):
         """
@@ -373,41 +324,12 @@ class Mosaic(Base):
         return q
 Index('ik_location', Mosaic.production_id, Mosaic.ra, Mosaic.dec)
 Index('ik_rjdobs', Mosaic.production_id, Mosaic.rjd_obs)
-#   "Contains detailed header information for each mosaic.\n"
-#        "Each mosaic entry will have several ccd images associated (18 in the case of PAU full focal plane)."
 
 
 class Image(Base):
     """
     Defines a standard Image object.
-    
-    Keys:
-     - id
-     - mosaic_id
-    
-    Fields:
-     - image_num
-     - ccd_num
-     - amp_num
-     - filter
-     - wavelength
-     - waveband
-     - gain
-     - rdnoise
-     - naxis1
-     - naxis2
-     - zp_nightly
-     - zp_nightly_sigma
-     - psf_fwhm
-     - cqa_1
-     - cqa_2
-     - cqa_3
-     - cqa_4
-     - cqa_5
-    
-    Relationships:
-     - mosaic
-     - detections
+
     """
     __tablename__ = 'image'
     __table_args__ = (
@@ -417,40 +339,38 @@ class Image(Base):
         UniqueConstraint('mosaic_id', 'image_num'),
         )
     # Keys
-    id = Column(BigInteger,   nullable=False)
-    mosaic_id  = Column( BigInteger,   nullable=False)
+    id = Column(BigInteger, nullable=False)
+    mosaic_id = Column(BigInteger, nullable=False)
     # Fields
-    image_num = Column(SmallInteger, nullable=False) #Extension number
-    ccd_num = Column(          SmallInteger, nullable=False) #CCD Number"
-    amp_num = Column(           SmallInteger, nullable=False) #Amplifier number (-1 for full CCD)
-    filter  = Column( String(8),    nullable=True)  #Filter name"),
-    wavelength = Column(Float(24),    nullable=False) #Wavelength at filter center (nm)"),
-    waveband = Column(          Float(24),    nullable=False) #
-    gain =  Column(              Float(24),    nullable=False) #Detector gain at amplifier (e-/ADU)"),
-    rdnoise = Column(           Float(24),    nullable=False) #Amplifier Readout Noise"),
-    naxis1 = Column(            SmallInteger, nullable=False) #Axis 1 size (pix)"),
-    naxis2= Column(           SmallInteger, nullable=False)  #Axis 2 size (pix)"),
-    ra_min = Column(            Float(53),    nullable=True) #Image corner ra min (deg)"),
-    ra_max = Column(            Float(53),    nullable=True) #Image corner ra max (deg)"),
-    dec_min = Column(           Float(53),    nullable=True) #Image corner dec min (deg)"),
-    dec_max = Column(           Float(53),    nullable=True) #Image corner dec min (deg)"),
-    zp_nightly = Column(        Float(24),    nullable=True) #Zeropoint magnitude computed at the Nightly pipeline"),
-    zp_nightly_err = Column(    Float(24),    nullable=True) #Zeropoint magnitude error computed at the Nightly pipeline"),
-    psf_fwhm = Column(          Float(24),    nullable=True) #PSF FWHM measured on image. Available in reduced image only."),
-    cqa_1 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 1"),
-    cqa_2 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 2"),
-    cqa_3 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 3"),
-    cqa_4 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 4"),
-    cqa_5 = Column(             Float(24),    nullable=True) #Quality Analysis check at observatory 5"),
-    #Relationships
+    image_num = Column(SmallInteger, nullable=False)  # Extension number
+    ccd_num = Column(SmallInteger, nullable=False)  # CCD Number"
+    amp_num = Column(SmallInteger, nullable=False)  # Amplifier number (-1 for full CCD)
+    filter = Column(String(8), nullable=True)   # Filter name"),
+    wavelength = Column(Float(24), nullable=False)  # Wavelength at filter center (nm)
+    waveband = Column(Float(24), nullable=False)  # Filter's Waveband
+    gain = Column(Float(24), nullable=False)  # Detector gain at amplifier (e-/ADU)
+    rdnoise = Column(Float(24), nullable=False)  # Amplifier Readout Noise
+    naxis1 = Column(SmallInteger, nullable=False)  # Axis 1 size (pix)
+    naxis2 = Column(SmallInteger, nullable=False)  # Axis 2 size (pix)
+    ra_min = Column(Float(53), nullable=True)  # Image corner ra min (deg)
+    ra_max = Column(Float(53), nullable=True)  # Image corner ra max (deg)
+    dec_min = Column(Float(53), nullable=True)  # Image corner dec min (deg)
+    dec_max = Column(Float(53), nullable=True)  # Image corner dec min (deg)
+    zp_nightly = Column(Float(24), nullable=True)  # Zeropoint magnitude computed at the Nightly pipeline
+    zp_nightly_err = Column(Float(24), nullable=True)  # Zeropoint magnitude error computed at the Nightly pipeline
+    psf_fwhm = Column(Float(24), nullable=True)  # PSF FWHM measured on image. Available in reduced image only.
+    cqa_1 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 1
+    cqa_2 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 2
+    cqa_3 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 3
+    cqa_4 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 4
+    cqa_5 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 5
 
-    mosaic          = relationship('Mosaic',           back_populates="images")
-    detections     = relationship('Detection',        back_populates="image")
-    detections_by_id = relationship('Detection',       collection_class=attribute_mapped_collection('id'))
-    forced_apertures  = relationship('ForcedAperture',        back_populates="image")
+    # Relationships
+    mosaic = relationship('Mosaic', back_populates="images")
+    detections = relationship('Detection', back_populates="image")
+    detections_by_id = relationship('Detection', collection_class=attribute_mapped_collection('id'))
+    forced_apertures = relationship('ForcedAperture', back_populates="image")
 
-
-    #Contains detailed header information for a single CCD image
 Index('ik_imagelocation', Image.ra_min, Image.ra_max, Image.dec_min, Image.dec_max)
 
 
@@ -459,40 +379,36 @@ class Detection(Base):
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
-        ForeignKeyConstraint(['image_id'],          ['image.id'],      onupdate='CASCADE', ondelete='RESTRICT'),
-        #ForeignKeyConstraint(['global_object_id'],  ['global_object.id'],      onupdate='CASCADE', ondelete='RESTRICT'),
-        #ForeignKeyConstraint(['production_id'],     ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        #UniqueConstraint('production_id', 'image_id', 'band', 'x', 'y'),
+        ForeignKeyConstraint(['image_id'],          ['image.id'],      onupdate='CASCADE', ondelete='CASCADE'),
         )
     # Keys
-    id = Column(                 BigInteger,   nullable=False) #Unique identifier"),
-    #production_id = Column(       Integer,      nullable=False) #Production number"),
-    image_id = Column(            BigInteger,   nullable=False) #CCD image number"),
-    #Column('global_object_id = Column(    BigInteger,   nullable=True,  comment="Global Object number"),
-    insert_date = Column(         DateTime,     nullable=False, default=func.current_timestamp()) #Timestamp of insertion"
-    band = Column(                String(8),    nullable=False) #Band name"),
+    id = Column(BigInteger, nullable=False)  # Unique identifier
+    image_id = Column(BigInteger, nullable=False)  # CCD image number
+    insert_date = Column(DateTime, nullable=False, default=func.current_timestamp())  # Timestamp of insertion
+    band = Column(String(8), nullable=False)  # Band name
     # Fields
-    background = Column(          Float(24),    nullable=False) #Background at centroid position [BACKGROUND] (count)"),
-    class_star = Column(          Float(24),    nullable=False) #Star-Galaxy classifier output [CLASS_STAR]"),
-    spread_model = Column(        Float(24),    nullable=True) #Spread parameter from model-fitting [SPREAD_MODEL]"),
-    spreaderr_model = Column(     Float(24),    nullable=True) #Spread parameter error from model-fitting [SPREADERR_MODEL]"),
-    flux_auto = Column(           Float(24),    nullable=False) #Flux within a Kron-like elliptical aperture [FLUX_AUTO] (count)"),
-    flux_err_auto = Column(       Float(24),    nullable=False) #RMS error for AUTO flux  [FLUXERR_AUTO] (count)"),
-    flux_psf = Column(            Float(24),    nullable=False) #Flux fitted using the PSF model (count)"),
-    flux_err_psf = Column(        Float(24),    nullable=False) #RMS error for PSF flux"),
-    flux_model = Column(          Float(24),    nullable=False) #Flux fitted using a galaxy model (count)"),
-    flux_err_model = Column(      Float(24),    nullable=False) #RMS error for the model flux"),
-    flags = Column(               SmallInteger, nullable=False) #Extraction flags [FLAGS]"),
-    elongation = Column(          Float(24),    nullable=False) #A_IMAGE/B_IMAGE  [ELONGATION]"),
-    dec = Column(                 Float(53),    nullable=False) #Windowed declination of barycenter (J2000) [DELTAWIN_J2000] (deg)"),
-    ra = Column(                  Float(53),    nullable=False) #Windowed right ascension of barycenter (J2000) [ALPHAWIN_J2000] (deg)"),
-    x = Column(                   Float(24),    nullable=False) #Windowed position estimate along x [XWIN_IMAGE] (pix)"),
-    y = Column(                   Float(24),    nullable=False) #Windowed position estimate along y [YWIN_IMAGE] (pix)"),
-    zp_offset = Column(           Float(24),    nullable=False) #Offset zeropoint magnitude for unexpected corrections"),
-    #relationships
-    image       = relationship('Image',            back_populates="detections")
-    global_objects =  relationship('Global_object',    back_populates="detections", secondary=lambda:Global_object_detections.__table__)
-    # Documentation
+    background = Column(Float(24), nullable=False)  # Background at centroid position [BACKGROUND] (count)
+    class_star = Column(Float(24), nullable=False)  # Star-Galaxy classifier output [CLASS_STAR]
+    spread_model = Column(Float(24), nullable=True)  # Spread parameter from model-fitting [SPREAD_MODEL]
+    spreaderr_model = Column(Float(24), nullable=True)  # Spread parameter error from model-fitting [SPREADERR_MODEL]
+    flux_auto = Column(Float(24), nullable=False)  # Flux within a Kron-like elliptical aperture [FLUX_AUTO] (count)
+    flux_err_auto = Column(Float(24), nullable=False)  # RMS error for AUTO flux  [FLUXERR_AUTO] (count)
+    flux_psf = Column(Float(24), nullable=False)  # Flux fitted using the PSF model (count)
+    flux_err_psf = Column(Float(24), nullable=False)  # RMS error for PSF flux
+    flux_model = Column(Float(24), nullable=False)  # Flux fitted using a galaxy model (count)
+    flux_err_model = Column(Float(24), nullable=False)  # RMS error for the model flux
+    flags = Column(SmallInteger, nullable=False)  # Extraction flags [FLAGS]
+    elongation = Column(Float(24), nullable=False)  # A_IMAGE/B_IMAGE  [ELONGATION]
+    dec = Column(Float(53), nullable=False)  # Windowed declination of barycenter (J2000) [DELTAWIN_J2000] (deg)
+    ra = Column(Float(53), nullable=False)  # Windowed right ascension of barycenter (J2000) [ALPHAWIN_J2000] (deg)
+    x = Column(Float(24), nullable=False)  # Windowed position estimate along x [XWIN_IMAGE] (pix)
+    y = Column(Float(24), nullable=False)  # Windowed position estimate along y [YWIN_IMAGE] (pix)
+    zp_offset = Column(Float(24), nullable=False)  # Offset zeropoint magnitude for unexpected corrections
+    # Relationships
+    image = relationship('Image', back_populates="detections")
+    global_objects = relationship('Global_object',
+                                  back_populates="detections",
+                                  secondary=lambda: Global_object_detections.__table__)
 
 Index('ik_detlocation', Detection.ra, Detection.dec)
 
@@ -502,7 +418,7 @@ class ForcedAperture(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['image_id'], ['image.id'], onupdate='CASCADE', ondelete='RESTRICT'),
+        ForeignKeyConstraint(['image_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
         )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
@@ -522,7 +438,7 @@ class ForcedAperture(Base):
     source_uncertainty = Column(Float(24), nullable=False)  # Uncertainty associated with the source intensity
     magnitude = Column(Float(24), nullable=False)  # Magnitude representation of “SourceIntensity”.
     mag_uncertainty = Column(Float(24), nullable=False)  # Magnitude uncertainty, given by 1.0857 times
-                                                        # “SourceUncertainty” divided by “SourceIntensity”.
+                                                         # “SourceUncertainty” divided by “SourceIntensity”.
     sky_median = Column(Float(24), nullable=False)  # The per-pixel median of samples in the sky annulus after the sky outliers have been rejected
     sky_sigma = Column(Float(24), nullable=False)  # The standard deviation of samples in the sky annulus after the sky outliers have been rejected
     radial_profile_fwhm = Column(Float(24), nullable=False)  # Full width at half maximum (FWHM) of the radial profile of the source (pixels).
