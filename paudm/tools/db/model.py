@@ -911,7 +911,36 @@ class SDSS(Base):
     #comment="SDSS",
 
 Index('ik_sdsslocation', SDSS.ra, SDSS.dec)
-    
+
+
+class SDSS_Spec(Base):
+    __tablename__ = 'sdss_spec'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('id'),
+            )
+
+    # Keys
+    id = Column(BigInteger, nullable=False)
+    survey = Column(String(24), nullable=False)
+    plate_id = Column(Integer, nullable=False)
+    mjd = Column(Integer, nullable=False)
+    fiber = Column(Integer, nullable=False)
+    # Fields
+    ra = Column(Float(53), nullable=False)  # Right Ascension of the object
+    dec = Column(Float(53), nullable=False)  # Declination of the object
+    redshift = Column(Float(24), nullable=False)
+    zwarning = Column(Integer, nullable=False)
+    sn = Column(Float(24), nullable=False)
+    type_class = Column(Enum('STAR', 'GALAXY', 'QSO', name='type_class'), nullable=False)
+
+    # Constraints
+    PrimaryKeyConstraint('id'),
+    # Documentation
+    # comment="SDSS_Spec",
+
+Index('ik_sdss_speclocation', SDSS_Spec.ra, SDSS_Spec.dec)
+
     # USNO External Table
 class USNO(Base):
     __tablename__ = 'usno'
