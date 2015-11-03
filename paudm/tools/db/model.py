@@ -153,6 +153,7 @@ class Production(Base):
     pipeline            = Column(String(16), nullable=True)   # Pipeline Name [pixelsim, nightly, memba, analysis]
     release             = Column(String(16), nullable=False)  # Major release name [TESTX, DRX]
     software_version    = Column(String(16), nullable=False)  # Package version [DCX, vX.X]
+    description         = Column(Text,       nullable=True)
     job_id              = Column(Integer,    nullable=False)  # id of the job that generates the current production
 
     #Relationships
