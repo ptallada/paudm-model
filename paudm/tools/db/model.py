@@ -271,6 +271,7 @@ class Mosaic(Base):
     obs_set_id = Column(Integer, nullable=False)  # obs_set number
     zp_phot_id = Column(Integer, nullable=True)  # ZPphot identifier
     filename = Column(String(128), nullable=False)  # File name
+    comment = Column(Text, nullable=True)
     archivepath = Column(String(128), nullable=False)  # Path in the archive
     kind = Column(Enum('ARC', 'BIAS', 'DARK', 'FLASH', 'FLAT', 'FOCUS', 'GLANCE', 'PUPIL', 'SCIENCE',
                        'SCRATCH', 'SKY', 'TARGET','MBIAS','MFLAT','RED_SCI','RED_WEIGHT','RED_MASK',
