@@ -26,10 +26,13 @@ import re
 import math
 import yaml
 import numpy as np
+import matplotlib.pyplot as plt
 from astropy.io import fits
 from scipy.interpolate import interp1d
 from astropy.coordinates import Angle
 from paudm.tools.common import constants
+from paudm.tools.common import qc_tools
+from paudm.pipeline.nightly.config import qc_constants
 from pkg_resources import resource_listdir, resource_string, resource_filename
 config = {}
 from paudm.tools.db import model
@@ -71,6 +74,7 @@ class Mosaic(object):
         self.assoc_db = None
         self.badcols = {}
         self.telfocus = None
+        self.overscan_noise = {}
         
         if mode.lower() == 'open':
             # Load global header
@@ -236,8 +240,33 @@ class Mosaic(object):
     def infer_pixel_rectangle(self, instrument):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.infer_pixel_rectangle(self, instrument)
-    
+        
+    def overscan_noise_check(self, EXPNUM):
+        overscan_noise = self.overscan_noise.values() 
+        max_overscan_noise = np.max(overscan_noise)
+        
+        ## OVERSCAN_NOISE PLOT
+        # Order by ccds 
+        labels = self.overscan_noise.keys()     
+        ind = np.argsort(labels)
+        labels = np.array(labels)[ind]
+        overscan_noise = np.array(overscan_noise)[ind]
+        
+        interval = np.arange(1, len(overscan_noise) + 1)
+        plt.bar(interval, overscan_noise, align='center')    
+        plt.title('QC_OVERSCAN_NOISE') 
+        plt.ylabel('overscan noise')  
+         
+        plot_name = qc_constants.qc['QC_OVERSCAN_NOISE']['filename'] % EXPNUM
+        plt.savefig(plot_name)
 
+        # QUALITY CONTROL - QC_OVERSCAN_NOISE - overscan noise
+        qc_tools.quality_control_entry(job_id=config['job_id'],
+                                       qc_ref='QC_OVERSCAN_NOISE',
+                                       value=max_overscan_noise,
+                                       qc_constants=qc_constants,
+                                       plot_name=plot_name)
+    
 
 class Image(object):
     '''
