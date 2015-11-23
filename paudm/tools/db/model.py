@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import datetime
 import hashlib
 import optparse
-
+import yaml
+ 
 from sqlalchemy import ForeignKeyConstraint, Index, PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy import create_engine
 from sqlalchemy.types import BigInteger, Boolean, Date, Enum, Float, Integer, SmallInteger, String, Text, Time, DateTime
@@ -153,7 +154,7 @@ class Production(Base):
     pipeline            = Column(String(16), nullable=True)   # Pipeline Name [pixelsim, nightly, memba, analysis]
     release             = Column(String(16), nullable=False)  # Major release name [TESTX, DRX]
     software_version    = Column(String(16), nullable=False)  # Package version [DCX, vX.X]
-    description         = Column(Text,       nullable=True)
+    _comments           = Column('comments',  Text,       nullable=True)
     job_id              = Column(Integer,    nullable=False)  # id of the job that generates the current production
 
     #Relationships
@@ -178,8 +179,27 @@ class Production(Base):
                           remote_side = '[ Job.id ]',
                           uselist = False,
                           backref = backref("production", uselist = False))
-
-
+    
+    @hybrid_property
+    def comments(self):
+        return self._comments
+    
+    def get_comments(self):
+        c = self.comments
+        if c is None:
+            return []
+        else:
+            return yaml.safe_load(c)
+    
+    def add_comment(self, value):
+        c = self.get_comments()
+        
+        tnow = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
+        c.append({
+            'timestamp' : tnow,
+            'comment' : value
+        })
+        self._comments = yaml.safe_dump(c, default_flow_style=False)
     
     #The production table holds information about the hardware and software used to process the data.\n"
     #"Each time the software is updated, configuration changes or computing system has been modified, a new production entry is stored.   
