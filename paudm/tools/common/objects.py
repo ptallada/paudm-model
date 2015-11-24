@@ -1818,26 +1818,29 @@ class Phot_Calibrator(object):
             db_zp_phot_query = db_zp_phot_query.join(model.Production).filter_by(id=db_production.id)
             db_zp_phots = db_zp_phot_query.all()
             if len(db_zp_phots) == 0:
-                error_msg = "No appropriate ZP_Phot entries found!  Do you need to run the commissioning pipeline?"
-                log.error(error_msg)
-                raise Exception, error_msg
+                log.warn("No ZP phots in the db for this filtertray... Nevermid, I will use all zeros.")
+                for i in range(1,19):
+                    self.params['zp_phot'].append(0.0)
+                    self.params['zp_phot_err'].append(0.0)
             if len(db_zp_phots) > 1:
                 error_msg = "More than one appropriate ZP Phot entry found!!"
                 log.error(error_msg)
                 raise Exception, error_msg
             # Set the ZP_Phot ID in the Mosaic
             db_mosaic.zp_phot_id = db_zp_phots[0].id
-            
-        if len(db_zp_phots) > 1:
-            error_msg = "More than one ZP Phot entry has our zp_phot_id of %d !!" %db_mosaic.zp_phot_id
-            log.error(error_msg)
-            raise Exception, error_msg
-            
-        for i in range(1,19):
-            zpname = "zp_" + "%02d" %i
-            zp_err_name = "zp_err_" + "%02d" %i
-            self.params['zp_phot'].append(db_zp_phots[0].__getattribute__(zpname))
-            self.params['zp_phot_err'].append(db_zp_phots[0].__getattribute__(zp_err_name))
+
+        else:
+            # The mosaic has an ZP id. Perfect.
+            if len(db_zp_phots) > 1:
+                error_msg = "More than one ZP Phot entry has our zp_phot_id of %d !!" %db_mosaic.zp_phot_id
+                log.error(error_msg)
+                raise Exception, error_msg
+
+            for i in range(1,19):
+                zpname = "zp_" + "%02d" %i
+                zp_err_name = "zp_err_" + "%02d" %i
+                self.params['zp_phot'].append(db_zp_phots[0].__getattribute__(zpname))
+                self.params['zp_phot_err'].append(db_zp_phots[0].__getattribute__(zp_err_name))
             
         # ZP Nightly
         self.params['zp_nightly'] = [0.0]  # for fictitious CCD #0
