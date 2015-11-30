@@ -1824,12 +1824,13 @@ class Phot_Calibrator(object):
                 for i in range(1,19):
                     self.params['zp_phot'].append(0.0)
                     self.params['zp_phot_err'].append(0.0)
-            if len(db_zp_phots) > 1:
+            elif len(db_zp_phots) > 1:
                 error_msg = "More than one appropriate ZP Phot entry found!!"
                 log.error(error_msg)
-                raise Exception, error_msg
-            # Set the ZP_Phot ID in the Mosaic
-            db_mosaic.zp_phot_id = db_zp_phots[0].id
+                raise Exception(error_msg)
+            else:
+                # Set the ZP_Phot ID in the Mosaic
+                db_mosaic.zp_phot_id = db_zp_phots[0].id
 
         else:
             # The mosaic has an ZP id. Perfect.
