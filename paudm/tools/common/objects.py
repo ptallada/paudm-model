@@ -2,7 +2,7 @@
 """
 PAUdm objects definition
 
-@author: s.serrano_
+@author: s.serrano, n.tonello, a.bauer
 
 To constrain the use of memory to one CCD (Image), process mosaics using the following structure:
 

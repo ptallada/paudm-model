@@ -151,9 +151,9 @@ class Production(Base):
     # Columns
     id                  = Column(Integer,    nullable=False ) #
     input_production_id = Column(Integer,    nullable=True )  # input release id (from configuration)
-    pipeline            = Column(String(16), nullable=True)   # Pipeline Name [pixelsim, nightly, memba, analysis]
-    release             = Column(String(16), nullable=False)  # Major release name [TESTX, DRX]
-    software_version    = Column(String(16), nullable=False)  # Package version [DCX, vX.X]
+    pipeline            = Column(String(32), nullable=True)   # Pipeline Name [pixelsim, nightly, memba, analysis]
+    release             = Column(String(32), nullable=False)  # Major release name [TESTX, DRX]
+    software_version    = Column(String(32), nullable=False)  # Package version [DCX, vX.X]
     _comments           = Column('comments',  Text,       nullable=True)
     job_id              = Column(Integer,    nullable=False)  # id of the job that generates the current production
 
