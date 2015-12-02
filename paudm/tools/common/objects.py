@@ -241,7 +241,7 @@ class Mosaic(object):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.infer_pixel_rectangle(self, instrument)
         
-    def overscan_noise_check(self, EXPNUM):
+    def overscan_noise_check(self, EXPNUM, job_id):
         overscan_noise = self.overscan_noise.values()
         if len(overscan_noise) > 0:
             max_overscan_noise = np.max(overscan_noise)
@@ -263,7 +263,7 @@ class Mosaic(object):
         plt.savefig(plot_name)
 
         # QUALITY CONTROL - QC_OVERSCAN_NOISE - overscan noise
-        qc_tools.quality_control_entry(job_id=config['job_id'],
+        qc_tools.quality_control_entry(job_id=job_id,
                                        qc_ref='QC_OVERSCAN_NOISE',
                                        value=max_overscan_noise,
                                        qc_constants=qc_constants,
