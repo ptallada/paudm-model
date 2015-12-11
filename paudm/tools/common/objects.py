@@ -988,7 +988,7 @@ class Catalogue(object):
         log.debug( "Loaded %d SDSS objects from the local DB" %len(self.objects) )
         
     
-    def removeExtinction(self, instrument):
+    def removeExtinction(self, instrument=None):
         
         log.debug( "Removing extinction!" )
         
@@ -1078,7 +1078,7 @@ class Catalogue(object):
             
     
     # extinct the ideal objects to make realistic observations
-    def addExtinction(self, instrument, detection_filter=None):
+    def addExtinction(self, instrument=None, detection_filter=None):
         
         log.debug( "Adding extinction!" )
         
@@ -1344,10 +1344,10 @@ class Catalogue(object):
         # add extinction to the magnitudes
         self.addExtinction()
     
-    def sdss_to_detection(self, instrument, filter, sdss_filter_system, pau_filter_system, star_seds):
+    def sdss_to_detection(self, filter, sdss_filter_system, pau_filter_system, star_seds):
         
         # remove the galactic extinction
-        self.removeExtinction(instrument)
+        self.removeExtinction()
         
         # estimate which stellar types the stars are
         best_seds = self.sdss_assign_seds(sdss_filter_system, star_seds)
@@ -1386,7 +1386,7 @@ class Catalogue(object):
         self.objects = detection_objects
         
         # add extinction to the magnitudes
-        self.addExtinction(filter)
+        self.addExtinction()
         
     def truth_to_detection(self, instrument, filter):
         
