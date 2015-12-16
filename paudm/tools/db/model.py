@@ -159,7 +159,6 @@ class Production(Base):
 
     #Relationships
     mosaics        = relationship('Mosaic',         back_populates="production")
-    zp_phots       = relationship('Zp_phot',        back_populates="production")
     global_objects = relationship('Global_object',  back_populates="production")
     coadd_objects  = relationship('Coadd_object',   back_populates="production")
     forced_aperture_coadds = relationship('ForcedApertureCoadd',  back_populates="production")
@@ -204,66 +203,6 @@ class Production(Base):
     #The production table holds information about the hardware and software used to process the data.\n"
     #"Each time the software is updated, configuration changes or computing system has been modified, a new production entry is stored.   
     
-    
-class Zp_phot(Base): 
-    __tablename__ = 'zp_phot'
-    __table_args__ = (
-        # Primary key
-        PrimaryKeyConstraint('id'),
-        # Unique key
-        UniqueConstraint('production_id', 'id'),
-        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-    )
-    # Columns
-    id        = Column(BigInteger,     nullable=False )   # 
-    production_id = Column(Integer,  nullable=False)    # Production number
-    start_date =  Column(Date,  nullable=False)        # Valid start date
-    end_date = Column(Date,  nullable=True)     # Valid end date
-    filtertray = Column(String(16),  nullable=True)     #Filter Tray name
-    zp_01 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 01
-    zp_02 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 02
-    zp_03 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 03
-    zp_04 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 04
-    zp_05 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 05
-    zp_06 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 06
-    zp_07 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 07
-    zp_08 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 08
-    zp_09 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 09
-    zp_10 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 10
-    zp_11 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 11
-    zp_12 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 12
-    zp_13 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 13
-    zp_14 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 14
-    zp_15 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 15
-    zp_16 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 16
-    zp_17 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 17
-    zp_18 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude (ZPphot) for CCD 18
-    zp_err_01 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 01
-    zp_err_02 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 02
-    zp_err_03 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 03
-    zp_err_04 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 04
-    zp_err_05 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 05
-    zp_err_06 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 06
-    zp_err_07 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 07
-    zp_err_08 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 08
-    zp_err_09 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 09
-    zp_err_10 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 10
-    zp_err_11 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 11
-    zp_err_12 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 12
-    zp_err_13 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 13
-    zp_err_14 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 14
-    zp_err_15 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 15
-    zp_err_16 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 16
-    zp_err_17 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 17
-    zp_err_18 = Column(Float(24),  nullable=False)             #Photometric Zeropoint magnitude error (σZPphot)  for CCD 18  
-    
-    #Relationships
-
-    production    = relationship('Production',       back_populates="zp_phots")
-Index('uk_production_zp_phot', Zp_phot.production_id, Zp_phot.id)
-
-#        "Contains information for the photometric calibration.\n"
-#        "Holds a filter tray set (18 CCDs) of ZPphot for an interval of time."
 
 class Mosaic(Base): 
     """
@@ -278,9 +217,6 @@ class Mosaic(Base):
         # Foreign key
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['obs_set_id'],        ['obs_set.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['production_id', 'zp_phot_id'], ['zp_phot.production_id', 'zp_phot.id'],
-                             onupdate='CASCADE',
-                             ondelete='RESTRICT'),
         UniqueConstraint('archivepath', 'filename'),
         UniqueConstraint('production_id', 'obs_set_id', 'kind', 'exp_num'),
 
@@ -289,7 +225,6 @@ class Mosaic(Base):
     id = Column(BigInteger, nullable=False)  # Identifier
     production_id = Column(Integer, nullable=False)  # Production identifier
     obs_set_id = Column(Integer, nullable=False)  # obs_set number
-    zp_phot_id = Column(Integer, nullable=True)  # ZPphot identifier
     filename = Column(String(128), nullable=False)  # File name
     comment = Column(Text, nullable=True)
     archivepath = Column(String(128), nullable=False)  # Path in the archive

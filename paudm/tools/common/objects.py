@@ -1675,18 +1675,12 @@ class Catalogue(object):
                     image = model.session.query(model.Image).join(model.Detection).filter(model.Detection.id == db_object.id).one()
                     mosaic = model.session.query(model.Mosaic).join(model.Image).filter(model.Image.id == image.id).one()
                     zp_nightly = image.zp_nightly
-                    ##if type(zp_nightly).__name__=='NoneType':
-                        ##continue
-                    airmass = mosaic.air_mass
-                    valuex = valuex + zp_nightly*airmass
+                    valuex = valuex + zp_nightly
                 if parameter_y == 'mag_auto':
                     image = model.session.query(model.Image).join(model.Detection).filter(model.Detection.id == db_object.id).one()
                     mosaic = model.session.query(model.Mosaic).join(model.Image).filter(model.Image.id == image.id).one()
                     zp_nightly = image.zp_nightly
-                    ##if type(zp_nightly).__name__=='NoneType':
-                        ##continue
-                    airmass = mosaic.air_mass
-                    valuey = valuey + zp_nightly*airmass
+                    valuey = valuey + zp_nightly
                 
                 x_array.append(valuex)
                 y_array.append(valuey)
@@ -1763,24 +1757,14 @@ class Catalogue(object):
                     zp_nightly = image.zp_nightly
                     if type(zp_nightly).__name__=='NoneType':
                         continue
-                    airmass = mosaic.air_mass
-                    value = value + zp_nightly*airmass
+                    value = value + zp_nightly
 
-                if parameter == 'flux_auto' and value>0:
-                    parameter_error = 'flux_err_auto'
-                #    # phot_cal = Phot_Calibrator(db_object.image.mosaic, use_zp_nightly=False)
-                #    # (calibrated_mag, calibrated_mag_error) = phot_cal.flux_to_mag(getattr(db_object, parameter), getattr(db_object, parameter_error), db_object.image.ccd_num)
-                #    # value = calibrated_mag
-                #    value = 2.5*math.log10(value) - (db_object.image.zp_nightly*db_object.image.mosaic.airmass)
                 x_array = np.append(x_array,value)
         else:
             x_array = parameter
-            #x_array.append(value)
-            ##print >> f,value
-        ##f.close()
+
         
         # Create Histogram plot 
-        ##x_array = np.array([])
         plt.hist(x_array,bins,range=range)
         
         # Configure plot
@@ -1802,48 +1786,6 @@ class Phot_Calibrator(object):
     def __init__(self, db_mosaic, use_zp_nightly=True):
         """ Load all the zeropoint information from the DB, keep it here for easy access. """
         self.params = {}
-        
-        # ZP Phot
-        self.params['zp_phot'] = [0.0]  # for fictitious CCD #0
-        self.params['zp_phot_err'] = [0.0]
-        
-        db_zp_phots = model.session.query(model.Zp_phot).filter(model.Zp_phot.id == db_mosaic.zp_phot_id).all()
-        
-        # If we haven't already assigned the correct ZP_phots to this mosaic, then figure it out.
-        if len(db_zp_phots) == 0:
-            # First, any ZPs for the right filter tray and the right date
-            db_zp_phot_query = model.session.query(model.Zp_phot).filter(model.Zp_phot.filtertray == db_mosaic.filtertray,
-                                                                         model.Zp_phot.start_date < db_mosaic.date_obs,
-                                                                         ((model.Zp_phot.end_date == None) | (model.Zp_phot.end_date<db_mosaic.date_obs)) )
-            # Now check the production info
-            db_production = model.session.query(model.Production).filter(model.Production.id==db_mosaic.production_id).one()
-            db_zp_phot_query = db_zp_phot_query.join(model.Production).filter_by(id=db_production.id)
-            db_zp_phots = db_zp_phot_query.all()
-            if len(db_zp_phots) == 0:
-                log.warn("No ZP phots in the db for this filtertray... Nevermid, I will use all zeros.")
-                for i in range(1,19):
-                    self.params['zp_phot'].append(0.0)
-                    self.params['zp_phot_err'].append(0.0)
-            elif len(db_zp_phots) > 1:
-                error_msg = "More than one appropriate ZP Phot entry found!!"
-                log.error(error_msg)
-                raise Exception(error_msg)
-            else:
-                # Set the ZP_Phot ID in the Mosaic
-                db_mosaic.zp_phot_id = db_zp_phots[0].id
-
-        else:
-            # The mosaic has an ZP id. Perfect.
-            if len(db_zp_phots) > 1:
-                error_msg = "More than one ZP Phot entry has our zp_phot_id of %d !!" %db_mosaic.zp_phot_id
-                log.error(error_msg)
-                raise Exception, error_msg
-
-            for i in range(1,19):
-                zpname = "zp_" + "%02d" %i
-                zp_err_name = "zp_err_" + "%02d" %i
-                self.params['zp_phot'].append(db_zp_phots[0].__getattribute__(zpname))
-                self.params['zp_phot_err'].append(db_zp_phots[0].__getattribute__(zp_err_name))
             
         # ZP Nightly
         self.params['zp_nightly'] = [0.0]  # for fictitious CCD #0
@@ -1860,12 +1802,7 @@ class Phot_Calibrator(object):
             else:
                 self.params['zp_nightly'].append(0.0)
                 self.params['zp_nightly_err'].append(0.0)
-                
-        # Airmass
-        self.params['airmass'] = db_mosaic.airmass
-        
-        # Softening parameter b if we do asinh mags.....
-    
+
     def flux_to_mag(self, flux, flux_err, ccd_num):
         (calib_flux, calib_flux_err) = self.calibrate_flux(flux, flux_err, ccd_num)
         mag = 99.0
@@ -1875,17 +1812,14 @@ class Phot_Calibrator(object):
             mag_error = 1.0857*calib_flux_err/calib_flux
         return mag, mag_error
 
-    def calibrate_flux( self, flux, flux_err, ccd_num ):
-        zp_phot = self.params['zp_phot'][ccd_num]
-        zp_phot_err = self.params['zp_phot_err'][ccd_num]
+    def calibrate_flux(self, flux, flux_err, ccd_num):
         zp_nightly = self.params['zp_nightly'][ccd_num]
         zp_nightly_err = self.params['zp_nightly_err'][ccd_num]
-        airmass = self.params['airmass']
-        
-        calib_flux = flux * 10.0**(0.4*(zp_phot + zp_nightly*airmass))
+
+        calib_flux = flux * 10.0**(0.4*zp_nightly)
         calib_flux_err = 0.0
-        if flux != 0.0 :
-            calib_flux_err = math.sqrt((flux_err * flux_err) / (flux * flux) + 0.8483 * zp_phot_err * zp_phot_err + 0.8483 * zp_nightly_err * zp_nightly_err) * calib_flux
+        if flux != 0.0:
+            calib_flux_err = math.sqrt((flux_err * flux_err) / (flux * flux) + 0.8483 * zp_nightly_err * zp_nightly_err) * calib_flux
         
         return calib_flux, calib_flux_err
 
