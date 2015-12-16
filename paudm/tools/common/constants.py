@@ -40,6 +40,3 @@ mag_zp = 26.0
 # Match radius for global_objects
 match_radius = 1.0/3600.0 # degrees
 
-# Normalized Gain for amplifiers after reduction
-norm_gain = 0.8
-
