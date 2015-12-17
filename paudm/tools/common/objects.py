@@ -1819,7 +1819,7 @@ class Phot_Calibrator(object):
         calib_flux = flux * 10.0**(0.4*zp_nightly)
         calib_flux_err = 0.0
         if flux != 0.0:
-            calib_flux_err = math.sqrt((flux_err * flux_err) / (flux * flux) + 0.8483 * zp_nightly_err * zp_nightly_err) * calib_flux
+            calib_flux_err = abs(math.sqrt((flux_err * flux_err) / (flux * flux) + 0.8483 * zp_nightly_err * zp_nightly_err) * calib_flux)
         
         return calib_flux, calib_flux_err
 
