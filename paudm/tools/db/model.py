@@ -399,6 +399,7 @@ class ForcedAperture(Base):
     sky_median = Column(Float(24), nullable=False)  # The per-pixel median of samples in the sky annulus after the sky outliers have been rejected
     sky_sigma = Column(Float(24), nullable=False)  # The standard deviation of samples in the sky annulus after the sky outliers have been rejected
     radial_profile_fwhm = Column(Float(24), nullable=False)  # Full width at half maximum (FWHM) of the radial profile of the source (pixels).
+    flag = Column(Boolean, nullable=False)  # Flag from pixel mask (False = Aperture OK, True = Aperture KO)
     # Relationships
     image = relationship('Image', back_populates="forced_apertures")
     production = relationship('Production', back_populates="forced_apertures")
