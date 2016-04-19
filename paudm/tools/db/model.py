@@ -978,8 +978,8 @@ class CFHTLenS(Base):
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('paudm_id'),
-            )     
-        
+            )
+
     # Keys
     paudm_id = Column(        BigInteger,   nullable=False) #PAUdm numeric id for reference table"),
     # Fields
@@ -1014,8 +1014,55 @@ class CFHTLenS(Base):
     magerr_y = Column(      Float(24),    nullable=False) #error in the observed magnitude in the y-band,
     mag_z = Column(      Float(24),    nullable=False) #observed magnitude in the z-band,
     magerr_z = Column(      Float(24),    nullable=False) #error in the observed magnitude in the z-band,
-    
+
 Index('ik_cfhtlenslocation', CFHTLenS.alpha_j2000, CFHTLenS.delta_j2000)
+
+
+
+class COSMOS(Base):
+    __tablename__ = 'cosmos'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('paudm_id'),
+            )
+
+    # Keys
+    paudm_id = Column(BigInteger, nullable=False)  # PAUdm numeric id for reference table"),
+    # Fields
+    ra = Column(Float(53), nullable=False)  # (deg) Right Ascension in decimal degrees (J2000.0)
+    dec = Column(Float(53), nullable=False)  # (deg) Declination in decimal degrees (J2000.0)
+    zp_gal = Column(Float(24), nullable=False)  # photo-z using the galaxy templates (every source has a redshift)
+    zl68_gal = Column(Float(24), nullable=False)  # lower limit, 68% confidence level
+    zu68_gal = Column(Float(24), nullable=False)  # upper limit, 68% confidence level
+    zl99_gal = Column(Float(24), nullable=False)  # lower li,mit, 99% confidence level
+    zu99_gal = Column(Float(24), nullable=False)  # upper limit, 99% confidence level
+    zp_sec = Column(Float(24), nullable=False)  # second photo-z solution
+    dchi = Column(Float(24), nullable=False)  # chi_sec- chi_gal   reduced chi2  (-99 if less than 3 filters)
+    Imag = Column(Float(24), nullable=False)  # Subaru i+   aperture magnitude (3" aperture)      7629.1 +- 1489.4/2
+    eI = Column(Float(24), nullable=False)  # error on Imag  magnitudes
+    I_auto = Column(Float(24), nullable=False)  # Auto magnitude  in the i band
+    NbFilt = Column(Integer, nullable=False)  # Number of filters used in the photo-z fitting
+    mod_gal = Column(Integer, nullable=False)  # best fit template  (1->8 Ell-S0, 9->15 Sa-Sc, 16->19 Sd-Sdm from Polletta et al., >=20 from BC03).
+    type = Column(Integer, nullable=False)  # 0 if gal, 1 if star, 2 if Xray, 3 if IA>25.5, -99 if masked
+    Umag = Column(Float(24), nullable=False)  # CFHT u*   aperture magnitude (3" aperture)        3911-0 +- 538/2
+    Bmag = Column(Float(24), nullable=False)  # Subaru B   aperture magnitude (3" aperture)       4439.6 +-806.7/2
+    Vmag = Column(Float(24), nullable=False)  # Subaru V   aperture magnitude (3" aperture)       5448.9 +- 934.8 /2
+    Gmag = Column(Float(24), nullable=False)  # Subaru g+   aperture magnitude (3" aperture)      4728.3 +- 1162.9/2
+    Rmag = Column(Float(24), nullable=False)  # Subaru r+   aperture magnitude (3" aperture)      6231.8 +- 1348.8/2
+    Zmag = Column(Float(24), nullable=False)  # Subaru z+   aperture magnitude (3" aperture)      9021.6 +- 955.3/2
+    ICmag = Column(Float(24), nullable=False)  # CFHT i'   aperture magnitude (3" aperture)       7628.9 +- 1460.0/2
+    Jmag = Column(Float(24), nullable=False)  # UKIRT J   aperture magnitude (3" aperture)       12444.1 +- 1558.0/2
+    Kmag = Column(Float(24), nullable=False)  # CFHT  K   aperture magnitude (3" aperture)       21480.2 +- 3250.0 /2
+    MV = Column(Float(24), nullable=False)  # absolute magnitude in the V(Subaru) band
+    ebv_gal = Column(Float(24), nullable=False)  # galactic extinction  E(B-V)
+    ebv_int = Column(Float(24), nullable=False)  # additional extinction  E(B-V)
+    zspec = Column(Float(24), nullable=False)  # spectroscopic redshift from ADP.2015-10-15T12_55_10.777_t2.txt
+    conf = Column(Float(24), nullable=False)  # confidence class from ADP.2015-10-15T12_55_10.777_t2.txt
+    F814W = Column(Float(24), nullable=False)  # HST  target magnitude from ADP.2015-10-15T12_55_10.777_t2.txt
+    zfits = Column(String(60), nullable=True)  # filename of associated 1-d spectra ADP.2015-10-15T12_55_10.777_t2.txt
+
+Index('ik_cosmoslocation', COSMOS.ra, COSMOS.dec)
+
 
 # Truth Objects table
 class Truth_Object(Base):
