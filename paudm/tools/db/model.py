@@ -963,7 +963,7 @@ class SDSS_SpecPhoto(Base):
     __tablename__ = 'sdss_spec_photo'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('objID'),
+        PrimaryKeyConstraint('specObjID'),
             )
 
     # Keys
@@ -982,7 +982,7 @@ class SDSS_SpecPhoto(Base):
     zErr = Column(Float(24), nullable=False)
     zWarning = Column(Integer, nullable=False)
     _class = Column(String(32), nullable=False)  # GALAXY, STAR or QSO
-    subClass = Column(String(32), nullable=False)  # GALAXY, STAR or QSO
+    subClass = Column(String(32), nullable=False)
     fiberMag_u = Column(Float(24), nullable=False)
     fiberMag_g = Column(Float(24), nullable=False)
     fiberMag_r = Column(Float(24), nullable=False)
@@ -1010,7 +1010,7 @@ class SDSS_SpecPhoto(Base):
     extinction_z = Column(Float(24), nullable=False)
 
     # Constraints
-    PrimaryKeyConstraint('objID'),
+    PrimaryKeyConstraint('specObjID'),
     # Documentation
     # comment="SDSS_Spec",
 
