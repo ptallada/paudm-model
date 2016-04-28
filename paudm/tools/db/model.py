@@ -613,6 +613,100 @@ class ForcedApertureCoadd(Base):
     flux_err_NB835 = Column(     Float(24),    nullable=True) #RMS error for the model fluxnitude"),
     flux_NB845 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
     flux_err_NB845 = Column(     Float(24),    nullable=True) #RMS error for the model fluxnitude"),
+    # Chi2
+    chi2_u = Column(           Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_g = Column(           Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_r = Column(           Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_i = Column(           Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_z = Column(           Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_Y = Column(           Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB455 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB465 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB475 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB485 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB495 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB505 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB515 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB525 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB535 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB545 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB555 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB565 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB575 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB585 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB595 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB605 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB615 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB625 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB635 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB645 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB655 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB665 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB675 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB685 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB695 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB705 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB715 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB725 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB735 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB745 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB755 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB765 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB775 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB785 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB795 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB805 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB815 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB825 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB835 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    chi2_NB845 = Column(         Float(24),    nullable=True) #chi2nitude fitted using a galaxy model"),
+    # N
+    n_u = Column(           Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_g = Column(           Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_r = Column(           Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_i = Column(           Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_z = Column(           Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_Y = Column(           Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB455 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB465 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB475 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB485 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB495 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB505 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB515 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB525 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB535 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB545 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB555 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB565 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB575 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB585 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB595 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB605 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB615 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB625 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB635 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB645 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB655 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB665 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB675 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB685 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB695 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB705 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB715 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB725 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB735 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB745 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB755 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB765 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB775 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB785 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB795 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB805 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB815 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB825 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB835 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_NB845 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
     flags = Column(SmallInteger, nullable=True) #Extraction flags [FLAGS]"),
     star_flag = Column(     Boolean,    nullable=True)
 
@@ -832,72 +926,95 @@ class Photo_z(Base):
 Index('ik_photozredshift', Photo_z.production_id, Photo_z.z)
     
 
-class SDSS(Base):
-    __tablename__ = 'sdss'
+class SDSS_Star(Base):
+    __tablename__ = 'sdss_star'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('id'),
+        PrimaryKeyConstraint('objID'),
             )     
         
     # Keys
-    id = Column(        BigInteger,   nullable=False) #Unique identifier. Same as Unique SDSS identifier composed from [skyVersion,rerun,run,camcol,field,obj]"),
+    objID = Column(BigInteger,   nullable=False) #Unique identifier. Same as Unique SDSS identifier composed from [skyVersion,rerun,run,camcol,field,obj]"),
+    thingId = Column(Integer,   nullable=False) #Unique identifier. Same as Unique SDSS identifier composed from [skyVersion,rerun,run,camcol,field,obj]"),
     # Fields
-    ra = Column(        Float(53),    nullable=False) #Right Ascension of the object [RAJ2000] (deg)"),
-    dec = Column(       Float(53),    nullable=False) #Declination of the object [DEJ2000] (deg)"),
-    ra_err = Column(    Float(24),    nullable=False) #Error in RA (arcsec)"),
-    dec_err = Column(   Float(24),    nullable=False) #Error in DEC (arcsec)"),
-    mag_u = Column(     Float(24),    nullable=False) #Model magnitude in u filter"),
-    mag_g = Column(     Float(24),    nullable=False) #Model magnitude in g filter"),
-    mag_r = Column(     Float(24),    nullable=False) #Model magnitude in r filter"),
-    mag_i = Column(     Float(24),    nullable=False) #Model magnitude in i filter"),
-    mag_z = Column(     Float(24),    nullable=False) #Model magnitude in z filter"),
-    mag_err_u = Column( Float(24),    nullable=False) #Mean error on umag"),
-    mag_err_g = Column( Float(24),    nullable=False) #Mean error on gmag"),
-    mag_err_r = Column( Float(24),    nullable=False) #Mean error on rmag"),
-    mag_err_i = Column( Float(24),    nullable=False) #Mean error on imag"),
-    mag_err_z = Column( Float(24),    nullable=False) #Mean error on zmag"),
-    type = Column(      SmallInteger, nullable=False) #Morphological type classification of the object. 0 UNKOWN, 1 COSMIC_RAY, 2 DEFECT, 3 GALAXY, 4 GHOST, 5 KNOWNOBJ, 6 STAR, 7 TRAIL, 8 SKY, 9 NOTATYPE"),
-    prob_psf = Column(  Float(24),    nullable=False) #Probability that the object is a star. Currently 0 if type == 3 (galaxy), 1 if type == 6 (star)."),
-    u_s = Column(       Float(24),    nullable=False) #[0,1] 0=notStar, 1=Star in u band (probPSF_u)"),
-    g_s = Column(       Float(24),    nullable=False) #[0,1] 0=notStar, 1=Star in g band (probPSF_g)"),
-    r_s = Column(       Float(24),    nullable=False) #[0,1] 0=notStar, 1=Star in r band (probPSF_r)"),
-    i_s = Column(       Float(24),    nullable=False) #[0,1] 0=notStar, 1=Star in i band (probPSF_i)"),
-    z_s = Column(       Float(24),    nullable=False) #[0,1] 0=notStar, 1=Star in z band (probPSF_z)"),
+    ra = Column(Float(53),    nullable=False) #Right Ascension of the object [RAJ2000] (deg)"),
+    dec = Column(Float(53),    nullable=False) #Declination of the object [DEJ2000] (deg)"),
+    raErr = Column(Float(24),    nullable=False) #Error in RA (arcsec)"),
+    decErr = Column(Float(24),    nullable=False) #Error in DEC (arcsec)"),
+    clean = Column(Float(24),    nullable=False) #Error in DEC (arcsec)"),
+    psfMag_u = Column(Float(24),    nullable=False) #Model magnitude in u filter"),
+    psfMag_g = Column(Float(24),    nullable=False) #Model magnitude in g filter"),
+    psfMag_r = Column(Float(24),    nullable=False) #Model magnitude in r filter"),
+    psfMag_i = Column(Float(24),    nullable=False) #Model magnitude in i filter"),
+    psfMag_z = Column(Float(24),    nullable=False) #Model magnitude in z filter"),
+    psfMagErr_u = Column(Float(24),    nullable=False) #Mean error on umag"),
+    psfMagErr_g = Column(Float(24),    nullable=False) #Mean error on gmag"),
+    psfMagErr_r = Column(Float(24),    nullable=False) #Mean error on rmag"),
+    psfMagErr_i = Column(Float(24),    nullable=False) #Mean error on imag"),
+    psfMagErr_z = Column(Float(24),    nullable=False) #Mean error on zmag"),
     # Constraints
-    PrimaryKeyConstraint('id'),
+    PrimaryKeyConstraint('objID'),
     # Documentation
     #comment="SDSS",
 
-Index('ik_sdsslocation', SDSS.ra, SDSS.dec)
+Index('ik_sdsslocation', SDSS_Star.ra, SDSS_Star.dec)
 
-
-class SDSS_Spec(Base):
-    __tablename__ = 'sdss_spec'
+class SDSS_SpecPhoto(Base):
+    __tablename__ = 'sdss_spec_photo'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('id'),
+        PrimaryKeyConstraint('objID'),
             )
 
     # Keys
-    id = Column(BigInteger, nullable=False)
-    survey = Column(String(24), nullable=False)
-    plate_id = Column(Integer, nullable=False)
+    objID = Column(BigInteger, nullable=False)
+    specObjID = Column(BigInteger, nullable=False)
     mjd = Column(Integer, nullable=False)
-    fiber = Column(Integer, nullable=False)
+    plate = Column(Integer, nullable=False)
+    tile = Column(String(24), nullable=False)
+    fiberID = Column(Integer, nullable=False)
+    survey = Column(String(24), nullable=False)
+    mode = Column(Integer, nullable=False)
     # Fields
     ra = Column(Float(53), nullable=False)  # Right Ascension of the object
     dec = Column(Float(53), nullable=False)  # Declination of the object
-    redshift = Column(Float(24), nullable=False)
-    zwarning = Column(Integer, nullable=False)
-    sn = Column(Float(24), nullable=False)
-    type_class = Column(Enum('STAR', 'GALAXY', 'QSO', name='type_class'), nullable=False)
+    z = Column(Float(24), nullable=False)
+    zErr = Column(Float(24), nullable=False)
+    zWarning = Column(Integer, nullable=False)
+    _class = Column(String(32), nullable=False)  # GALAXY, STAR or QSO
+    subClass = Column(String(32), nullable=False)  # GALAXY, STAR or QSO
+    fiberMag_u = Column(Float(24), nullable=False)
+    fiberMag_g = Column(Float(24), nullable=False)
+    fiberMag_r = Column(Float(24), nullable=False)
+    fiberMag_i = Column(Float(24), nullable=False)
+    fiberMag_z = Column(Float(24), nullable=False)
+    fiberMagErr_u = Column(Float(24), nullable=False)
+    fiberMagErr_g = Column(Float(24), nullable=False)
+    fiberMagErr_r = Column(Float(24), nullable=False)
+    fiberMagErr_i = Column(Float(24), nullable=False)
+    fiberMagErr_z = Column(Float(24), nullable=False)
+    modelMag_u = Column(Float(24), nullable=False)
+    modelMag_g = Column(Float(24), nullable=False)
+    modelMag_r = Column(Float(24), nullable=False)
+    modelMag_i = Column(Float(24), nullable=False)
+    modelMag_z = Column(Float(24), nullable=False)
+    modelMagErr_u = Column(Float(24), nullable=False)
+    modelMagErr_g = Column(Float(24), nullable=False)
+    modelMagErr_r = Column(Float(24), nullable=False)
+    modelMagErr_i = Column(Float(24), nullable=False)
+    modelMagErr_z = Column(Float(24), nullable=False)
+    extinction_u = Column(Float(24), nullable=False)
+    extinction_g = Column(Float(24), nullable=False)
+    extinction_r = Column(Float(24), nullable=False)
+    extinction_i = Column(Float(24), nullable=False)
+    extinction_z = Column(Float(24), nullable=False)
 
     # Constraints
-    PrimaryKeyConstraint('id'),
+    PrimaryKeyConstraint('objID'),
     # Documentation
     # comment="SDSS_Spec",
 
-Index('ik_sdss_speclocation', SDSS_Spec.ra, SDSS_Spec.dec)
+Index('ik_sdss_speclocation', SDSS_SpecPhoto.ra, SDSS_SpecPhoto.dec)
 
     # USNO External Table
 class USNO(Base):
