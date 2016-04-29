@@ -12,7 +12,7 @@ log = logging.getLogger('paudm.tools.common.qc_tools')
 
 
 def quality_control_entry(job_id, qc_ref, value, qc_constants, plot_name=''):
-    qc_pass = bool(qc_constants.qc[qc_ref]['Min_value'] < value < qc_constants.qc[qc_ref]['Max_value'])
+    qc_pass = bool(qc_constants.qc[qc_ref]['Min_value'] <= value <= qc_constants.qc[qc_ref]['Max_value'])
     qc_entry = model.Quality_control(job_id=job_id,
                                      ref=qc_ref,
                                      check_name=qc_constants.qc[qc_ref]['Name'],
