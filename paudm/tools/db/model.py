@@ -52,68 +52,7 @@ def init(url):
        ))()
     
     return session
-'''
-class User(Base):
-    __tablename__ = 'user'
-    __table_args__ = (
-        # Primary key
-        PrimaryKeyConstraint('id'),
-        # Unique key
-        UniqueConstraint('email'),
-    )
-    # Columns
-    id        = Column(Integer,     nullable=False )
-    email     = Column(String(32),  nullable=False,  index=True)
-    name      = Column(String(64),  nullable=True)
-    surname   = Column(String(64),  nullable=False  )
-    _password = Column(String(128), nullable=False, name='password')
-    permissions   = Column(Integer,     nullable=False)
-    validated  = Column(Boolean,     nullable=False)
-    password = synonym('_password', map_column=True)
-    #'password' : synonym('_password', map_column=True),     
-#    @synonym_for("_password")
-#    def name(self):
-#        return "password: %s" % _password    
-    def __init__(self, email, name, surname, password, permissions):
-        self.email = email
-        self.name = name
-        self.surname = surname 
-        self._password = hashlib.sha512(password + _salt).hexdigest()
-        self.validated = False
-        self.permissions = permissions
-        
-    def _get_password(self):
-        return self._password
 
-    def _set_password(self, password):
-        self._password = hashlib.sha512(password + _salt).hexdigest()
-    
-    password = property(_get_password, _set_password)
-    
-    @classmethod
-    def get_by_username(cls, username):
-        return session.query(cls).filter(cls.email == username).first()
-    
-    @classmethod
-    def check_password(cls, username, password):
-        user = cls.get_by_username(username)
-        if not user:
-            return False 
-        hash_password = hashlib.sha512(password + _salt).hexdigest()
-        return  hash_password == user.password
-    
-    @classmethod
-    def check_validation(cls, username):
-        user = cls.get_by_username(username)
-        if not user:
-            return False
-        if user.validated == 1:
-            return True 
-        return False
-    @hybrid_property
-    def password(self):
-        return self._password
-'''
 class Obs_set(Base):
     __tablename__ = 'obs_set'
     __table_args__ = (

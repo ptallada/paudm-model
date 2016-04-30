@@ -6,15 +6,18 @@ Created on Wed Apr 24 08:05:25 2013
 """
 import datetime
 from paudm.tools.db import model
+from sqlalchemy import or_
+from sqlalchemy import func
+
 
 import logging
 log = logging.getLogger('paudm.tools.common.qc_tools')
 
 
-def quality_control_entry(job_id, qc_ref, value, qc_constants, plot_name=''):
+def quality_control_entry(job_id, qc_ref, value, qc_constants, plot_name='', label=''):
     qc_pass = bool(qc_constants.qc[qc_ref]['Min_value'] <= value <= qc_constants.qc[qc_ref]['Max_value'])
     qc_entry = model.Quality_control(job_id=job_id,
-                                     ref=qc_ref,
+                                     ref=qc_ref + label,
                                      check_name=qc_constants.qc[qc_ref]['Name'],
                                      min_value=qc_constants.qc[qc_ref]['Min_value'],
                                      max_value=qc_constants.qc[qc_ref]['Max_value'],
@@ -87,4 +90,26 @@ def update_tree(session, job, qc_pass):
 
         if job.superjob:
             update_tree(session, job.superjob, qc_pass)
+
+
+def update_parent_qc(session, job):
+    combined_qc_pass = session.query(func.bool_and(model.Quality_control.qc_pass)).join(model.Job)\
+        .filter(or_(model.Quality_control.job_id == job.id, model.Quality_control.job_id == job.id)).one()
+
+    qc = model.Quality_control(
+        job_id=job.id,
+        ref="general",
+        check_name="general",
+        min_value=0,
+        max_value=0,
+        value=0,
+        units=0,
+        qc_pass=combined_qc_pass[0],
+        time=datetime.datetime.now(),
+        plot_file="",
+    )
+    session.add(qc)
+
+
+
 

@@ -219,10 +219,10 @@ class Mosaic(object):
         import paudm.pipeline.nightly.delegates
         return paudm.pipeline.nightly.delegates.mosaic_create_overscanned_mosaic(self)
     
-    def load_ccd_raw(self, instrument, ccd_num, correct_overscan=True, correct_gain=True, correct_exptime=True, check_rdnoise=True):
+    def load_ccd_raw(self, instrument, ccd_num, correct_overscan=True, correct_gain=True, correct_exptime=True, check_rdnoise=True, job_id=None):
         # Load amps and build overscan-corrected CCD
         import paudm.pipeline.nightly.delegates
-        return paudm.pipeline.nightly.delegates.load_ccd_raw(self, instrument, ccd_num, correct_overscan, correct_gain, correct_exptime, check_rdnoise)
+        return paudm.pipeline.nightly.delegates.load_ccd_raw(self, instrument, ccd_num, correct_overscan, correct_gain, correct_exptime, check_rdnoise, job_id)
     
     # PIXELSIM Delegates
     def initialize_sim_params(self, exposure, environment, config, instrument):
@@ -240,34 +240,6 @@ class Mosaic(object):
     def infer_pixel_rectangle(self, instrument):
         import paudm.pipeline.pixelsim.delegates
         return paudm.pipeline.pixelsim.delegates.infer_pixel_rectangle(self, instrument)
-        
-    def overscan_noise_check(self, EXPNUM, job_id):
-        overscan_noise = self.overscan_noise.values()
-        if len(overscan_noise) > 0:
-            max_overscan_noise = np.max(overscan_noise)
-        else:
-             max_overscan_noise = 0
-        ## OVERSCAN_NOISE PLOT
-        # Order by ccds 
-        labels = self.overscan_noise.keys()     
-        ind = np.argsort(labels)
-        labels = np.array(labels)[ind]
-        overscan_noise = np.array(overscan_noise)[ind]
-        
-        interval = np.arange(1, len(overscan_noise) + 1)
-        plt.bar(interval, overscan_noise, align='center')    
-        plt.title('QC_OVERSCAN_NOISE') 
-        plt.ylabel('overscan noise')  
-         
-        plot_name = qc_constants.qc['QC_OVERSCAN_NOISE']['filename'] % EXPNUM
-        plt.savefig(plot_name)
-
-        # QUALITY CONTROL - QC_OVERSCAN_NOISE - overscan noise
-        qc_tools.quality_control_entry(job_id=job_id,
-                                       qc_ref='QC_OVERSCAN_NOISE',
-                                       value=max_overscan_noise,
-                                       qc_constants=qc_constants,
-                                       plot_name=plot_name)
     
 
 class Image(object):
