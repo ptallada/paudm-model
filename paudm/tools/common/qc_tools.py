@@ -94,7 +94,7 @@ def update_tree(session, job, qc_pass):
 
 def update_parent_qc(session, job):
     combined_qc_pass = session.query(func.bool_and(model.Quality_control.qc_pass))\
-        .filter(or_(model.Quality_control.job_id == job.id, model.Quality_control.job_id == job.superjob)).one()
+        .filter(or_(model.Quality_control.job_id == job.id, model.Quality_control.job_id == job.superjob.id)).one()
 
     qc = model.Quality_control(
         job_id=job.id,
