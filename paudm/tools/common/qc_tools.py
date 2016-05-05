@@ -6,9 +6,6 @@ Created on Wed Apr 24 08:05:25 2013
 """
 import datetime
 from paudm.tools.db import model
-from sqlalchemy import or_
-from sqlalchemy import func
-
 
 import logging
 log = logging.getLogger('paudm.tools.common.qc_tools')
@@ -93,26 +90,25 @@ def update_tree(session, job, qc_pass):
 
 
 def update_parent_qc(session, job):
-    if not job.superjob:
-        combined_qc_pass = session.query(func.bool_and(model.Quality_control.qc_pass))\
-            .filter(model.Quality_control.job_id == job.id).one()
-    else:
-        combined_qc_pass = session.query(func.bool_and(model.Quality_control.qc_pass))\
-            .filter(or_(model.Quality_control.job_id == job.id, model.Quality_control.job_id == job.superjob.id)).one()
 
-    qc = model.Quality_control(
-        job_id=job.id,
-        ref="general",
-        check_name="general",
-        min_value=0,
-        max_value=0,
-        value=0,
-        units=0,
-        qc_pass=combined_qc_pass[0],
-        time=datetime.datetime.now(),
-        plot_file="",
-    )
-    session.add(qc)
+    combined_qc_pass = session.execute('select bool_and(qc.qc_pass) from quality_control as qc '
+                                       'join job on job.id=qc.job_id '
+                                       'where job.id =%d or job.super_id=%d' % (job.id, job.id)).fetchall()[0][0]
+
+    if combined_qc_pass != None:
+        qc = model.Quality_control(
+            job_id=job.id,
+            ref="general",
+            check_name="general",
+            min_value=0,
+            max_value=0,
+            value=0,
+            units=0,
+            qc_pass=combined_qc_pass,
+            time=datetime.datetime.now(),
+            plot_file="",
+        )
+        session.add(qc)
 
 
 
