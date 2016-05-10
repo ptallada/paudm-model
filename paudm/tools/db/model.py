@@ -96,14 +96,16 @@ class Production(Base):
     software_version    = Column(String(32), nullable=False)  # Package version [DCX, vX.X]
     _comments           = Column('comments',  Text,       nullable=True)
     job_id              = Column(Integer,    nullable=False)  # id of the job that generates the current production
+    created = Column(DateTime, nullable=False, default=func.current_timestamp())  # Timestamp of insertion
+
 
     #Relationships
     mosaics        = relationship('Mosaic',         back_populates="production")
     global_objects = relationship('Global_object',  back_populates="production")
     coadd_objects  = relationship('Coadd_object',   back_populates="production")
     forced_aperture_coadds = relationship('ForcedApertureCoadd',  back_populates="production")
-    forced_apertures = relationship('ForcedAperture',  back_populates="production")
-    photo_zs       = relationship('Photo_z',        back_populates="production")
+    forced_apertures = relationship('ForcedAperture', back_populates="production")
+    photo_zs       = relationship('Photoz_BCNz',    back_populates="production")
     truth_objects  = relationship('Truth_Object',   back_populates="production")
     targets        = relationship('Target',         back_populates="production")
     parent         = relationship('Production',     back_populates = 'children',
@@ -847,43 +849,42 @@ class Coadd_object(Base):
     #Reletionships
     production    = relationship('Production',       back_populates="coadd_objects")
     global_object = relationship('Global_object',    back_populates="coadd_objects")
-    photo_zs      = relationship('Photo_z'     ,     back_populates="coadd_object")
     
     # Comment:
     # Contains unique coadd objects extracted from coadd image tiles. (Currently unused)
 
 Index('ik_coaddlocation', Coadd_object.production_id, Coadd_object.ra, Coadd_object.dec)
 
-class Photo_z(Base):
-    __tablename__ = 'photo_z'
+class Photoz_BCNz(Base):
+    __tablename__ = 'photoz_bcnz'
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['coadd_object_id'], ['coadd_object.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('production_id', 'coadd_object_id', 'code'),
-            )     
+            )
     # Keys
     id = Column(                    BigInteger,   nullable=False) #Unique identifier"),
     production_id = Column(         Integer,      nullable=False) #Production number"),
-    coadd_object_id = Column(       BigInteger,   nullable=False) #Production number"),
+    object_id = Column(       BigInteger,   nullable=False) #WTF"),
     # Fields
-    z = Column(                     Float(24),    nullable=False) #Photometric Redshift"),
-    z_err = Column(                 Float(24),    nullable=False) #Photometric Redshift Error"),
+    zb = Column(                     Float(24),    nullable=False) #Photometric Redshift"),
+    zb_min = Column(                 Float(24),    nullable=False) #Photometric Redshift Error"),
+    zb_max = Column(                 Float(24),    nullable=False) #Photometric Redshift Error"),
+    t_b = Column(                 Float(24),    nullable=False) #Photometric Redshift Error"),
     odds = Column(                  Float(24),    nullable=False) #Redshift odds"),
-    pdf = Column(                   String(2000), nullable=False) #Redshift Probability Density Function"),
-    sed_type = Column(              Integer,      nullable=False) #Spectral Energy Distribution type"),
-    code = Column(                  Integer,      nullable=False) #Code used to determine redshift"),
-    # Relationships
+    z_ml = Column(                  Float(24),    nullable=False) #Redshift odds"),
+    t_ml = Column(                  Float(24),    nullable=False) #Redshift odds"),
+    chi2 = Column(                  Float(24),    nullable=False) #Redshift odds"),
+    m0 = Column(                  Float(24),    nullable=False) #Redshift odds"),
 
+    # Relationships
     production    = relationship('Production',       back_populates="photo_zs")
-    coadd_object = relationship('Coadd_object',     back_populates="photo_zs")
 
     # Comment:
     # Contains photometric redshift measurements from Coadd Forced Aperture measurements using the BCNz code.
 
 
-Index('ik_photozredshift', Photo_z.production_id, Photo_z.z)
+Index('ik_photozredshift', Photoz_BCNz.production_id, Photoz_BCNz.zb)
     
 
 class SDSS_Star(Base):
