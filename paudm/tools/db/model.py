@@ -76,7 +76,8 @@ class Obs_set(Base):
 
     mosaics      = relationship('Mosaic',           back_populates="obs_set")
    
-    #The obs_set table tracks observation nights. Each entry corresponds to a night of observation
+    # Comment:
+    # Contains the list of Observation Sets registered in the database.
 
 class Production(Base): 
     __tablename__ = 'production'
@@ -91,7 +92,7 @@ class Production(Base):
     id                  = Column(Integer,    nullable=False ) #
     input_production_id = Column(Integer,    nullable=True )  # input release id (from configuration)
     pipeline            = Column(String(32), nullable=True)   # Pipeline Name [pixelsim, nightly, memba, analysis]
-    release             = Column(String(32), nullable=False)  # Major release name [TESTX, DRX]
+    release             = Column(String(64), nullable=False)  # Major release name [TESTX, DRX]
     software_version    = Column(String(32), nullable=False)  # Package version [DCX, vX.X]
     _comments           = Column('comments',  Text,       nullable=True)
     job_id              = Column(Integer,    nullable=False)  # id of the job that generates the current production
@@ -138,10 +139,10 @@ class Production(Base):
             'comment' : value
         })
         self._comments = yaml.safe_dump(c, default_flow_style=False)
-    
-    #The production table holds information about the hardware and software used to process the data.\n"
-    #"Each time the software is updated, configuration changes or computing system has been modified, a new production entry is stored.   
-    
+
+    # Comment:
+    # Tracks the different processing production runs for all pipelines.
+
 
 class Mosaic(Base): 
     """
@@ -218,8 +219,12 @@ class Mosaic(Base):
         q = session.query(cls).join(cls.production).join(cls.obs_set)
         q = add_criteria(q, criteria)
         return q
+
 Index('ik_location', Mosaic.production_id, Mosaic.ra, Mosaic.dec)
 Index('ik_rjdobs', Mosaic.production_id, Mosaic.rjd_obs)
+
+    # Comment:
+    # Contains the list of mosaic exposure images (raw and reduced).
 
 
 class Image(Base):
@@ -269,6 +274,9 @@ class Image(Base):
 
 Index('ik_imagelocation', Image.ra_min, Image.ra_max, Image.dec_min, Image.dec_max)
 
+    # Comment:
+    # Contains the list of images associated to the mosaics (CCD and single amplifier images).
+
 
 class Detection(Base):
     __tablename__ = 'detection'
@@ -307,6 +315,9 @@ class Detection(Base):
                                   secondary=lambda: Global_object_detections.__table__)
 
 Index('ik_detlocation', Detection.ra, Detection.dec)
+
+    # Comment:
+    # Contains the detections measured directly on the image after the nightly data reduction.
 
 class ForcedAperture(Base):
     __tablename__ = 'forced_aperture'
@@ -347,6 +358,9 @@ class ForcedAperture(Base):
 Index('ik_falocation', ForcedAperture.aperture_ra, ForcedAperture.aperture_dec)
 Index('ik_fapixels', ForcedAperture.pixel_id)
 Index('ik_faband', ForcedAperture.band)
+
+    # Comment:
+    # Contains the individual image measurements using force photometry in MEMBA.
 
 
 # Forced Aperture Coadd Object Table
@@ -652,10 +666,10 @@ class ForcedApertureCoadd(Base):
     #Reletionships
     production    = relationship('Production',       back_populates="forced_aperture_coadds")
 
-# Documentation
-#comment="Contains unique aperture photometry coadd objects extracted from coadd image tiles.",
-
 Index('ik_forcedcoaddlocation', ForcedApertureCoadd.production_id, ForcedApertureCoadd.ra, ForcedApertureCoadd.dec)
+
+    # Comment:
+    # Contains the combined measurements using force photometry in MEMBA for all bands and passes for each reference source.
 
 
     # Global Object Table
@@ -680,11 +694,12 @@ class Global_object(Base):
     production = relationship('Production',       back_populates="global_objects")
     detections = relationship('Detection',        back_populates="global_objects", secondary=lambda: Global_object_detections.__table__)
     coadd_objects = relationship('Coadd_object',     back_populates="global_object")
-    
-        # Documentation 
-        #Links multiple detections to unique global objects.",
 
 Index('ik_globallocation', Global_object.ra, Global_object.dec)
+
+    # Comment:
+    # Contains the list of unique objects from the multiple Detections table. (Currently unused)
+
 
     # Global Object Detections Table
 class Global_object_detections(Base):
@@ -703,6 +718,11 @@ class Global_object_detections(Base):
 
         # Documentation
         #Links multiple detections to unique global objects.",
+
+    # Comment:
+    # Many to Many intermediate table between Detection and Global_Object. (Currently unused)
+
+
     # Coadd Object Table
 class Coadd_object(Base):
     __tablename__ = 'coadd_object'
@@ -829,8 +849,8 @@ class Coadd_object(Base):
     global_object = relationship('Global_object',    back_populates="coadd_objects")
     photo_zs      = relationship('Photo_z'     ,     back_populates="coadd_object")
     
-# Documentation
-#comment="Contains unique coadd objects extracted from coadd image tiles.",
+    # Comment:
+    # Contains unique coadd objects extracted from coadd image tiles. (Currently unused)
 
 Index('ik_coaddlocation', Coadd_object.production_id, Coadd_object.ra, Coadd_object.dec)
 
@@ -859,8 +879,9 @@ class Photo_z(Base):
     production    = relationship('Production',       back_populates="photo_zs")
     coadd_object = relationship('Coadd_object',     back_populates="photo_zs")
 
-    # Documentation
-    #comment="Links multiple detections to unique global objects.",
+    # Comment:
+    # Contains photometric redshift measurements from Coadd Forced Aperture measurements using the BCNz code.
+
 
 Index('ik_photozredshift', Photo_z.production_id, Photo_z.z)
     
@@ -893,10 +914,11 @@ class SDSS_Star(Base):
     psfMagErr_z = Column(Float(24),    nullable=False) #Mean error on zmag"),
     # Constraints
     PrimaryKeyConstraint('objID'),
-    # Documentation
-    #comment="SDSS",
 
 Index('ik_sdsslocation', SDSS_Star.ra, SDSS_Star.dec)
+
+    # Comment:
+    # External table from SDSS DR12 (Star view). Stars for simulation and calibration.
 
 class SDSS_SpecPhoto(Base):
     __tablename__ = 'sdss_spec_photo'
@@ -950,8 +972,9 @@ class SDSS_SpecPhoto(Base):
 
     # Constraints
     PrimaryKeyConstraint('specObjID'),
-    # Documentation
-    # comment="SDSS_Spec",
+
+    # Comment:
+    # External table from SDSS DR12 (Spec_Photo view). Sources with spectra for forced photometry and validation.
 
 Index('ik_sdss_speclocation', SDSS_SpecPhoto.ra, SDSS_SpecPhoto.dec)
 
@@ -975,6 +998,9 @@ class USNO(Base):
     mag_err_b = Column( Float(24),    nullable=False) #Mean error on mag_b"),
 
 Index('ik_usnolocation', USNO.ra, USNO.dec)
+
+    # Comment:
+    # External table from USNO. Bright stars for simulation and masking.
 
 class DEEP2(Base):
     __tablename__ = 'deep2'
@@ -1023,11 +1049,11 @@ class DEEP2(Base):
     comment = Column(      String(47),    nullable=True) #comment field"),
     # Constraints
     PrimaryKeyConstraint('objno'),
-    # Documentation
-    #comment="DEEP2",
 
 Index('ik_deeep2location', DEEP2.ra, DEEP2.dec)
 
+    # Comment:
+    # External table from DEEP2 Redshift Survey (DR4). Sources with spectra for forced photometry and validation.
 
 class CFHTLenS(Base):
     __tablename__ = 'cfhtlens'
@@ -1073,6 +1099,8 @@ class CFHTLenS(Base):
 
 Index('ik_cfhtlenslocation', CFHTLenS.alpha_j2000, CFHTLenS.delta_j2000)
 
+    # Comment:
+    # External table from CFHTLenS. Sources for forced photometry.
 
 
 class COSMOS(Base):
@@ -1119,6 +1147,8 @@ class COSMOS(Base):
 
 Index('ik_cosmoslocation', COSMOS.ra, COSMOS.dec)
 
+    # Comment:
+    # External table from zCOSMOS (DR3). Sources with accurate redshifts for forced photometry and validation.
 
 # Truth Objects table
 class Truth_Object(Base):
@@ -1195,10 +1225,10 @@ class Truth_Object(Base):
     redshift = Column(         Float(24),    nullable=True) #Galaxy only - Truth redshift"),
     # Constraints
     production    = relationship('Production',       back_populates="truth_objects")
-    # Documentation
-    #comment="The truth object table contains all objects used in the simulated images for all PAU data challenges.\n"
-    #"Each row corresponds to a truth object and for this reason all parameters do not have associated errors.",
 Index('ik_truthlocation', Truth_Object.ra, Truth_Object.dec)
+
+    # Comment:
+    # (Simulation) Contains error-free simulated sources (stars and galaxies) for the pixel simulation pipeline.
     
     # Target
 class Target(Base):
@@ -1234,10 +1264,11 @@ class Target(Base):
     # Relationships
     bkg_mags   = relationship('Bkg_mag',    back_populates="target")
     production = relationship('Production', back_populates="targets")
-    # Documentation
-    #comment="target",
 
 Index('ik_targetlocation', Target.ra, Target.dec)
+
+    # Comment:
+    # (Simulation) Contains simulated exposure targets for the pixel simulation pipeline.
 
 class Bkg_mag(Base):
     __tablename__ = 'bkg_mag'
@@ -1256,6 +1287,9 @@ class Bkg_mag(Base):
     
     # Relationships
     target = relationship('Target', back_populates="bkg_mags")
+
+    # Comment:
+    # (Simulation) Contains simulated background magnitude measurements for each target for the simulation pipeline.
     
     ###########    OPERATION Tables    ###########
     
@@ -1267,6 +1301,18 @@ class Bkg_mag(Base):
 #     
 #     # Documentation
 #     #comment="Job",
+
+# Job Comment:
+# Tracks the list of Brownthrower computing jobs (Operation table).
+
+# Dependency Comment:
+# Tracks the dependency between Brownthrower jobs (Operation table).
+
+# Tag Comment:
+# Contains tags for Brownthrower jobs (Operation table).
+
+
+
 #     
 #     # Quality Control Table
 class Quality_control(Base):
@@ -1280,7 +1326,7 @@ class Quality_control(Base):
     id = Column(                Integer,      nullable=False) #Unique identifier"),
     # Fields
     job_id = Column(            Integer,      nullable=False) #Job identifier"),
-    ref = Column(               String(24),   nullable=False) #QC Reference code"),
+    ref = Column(               String(32),   nullable=False) #QC Reference code"),
     check_name = Column(        String(64),   nullable=False) #QC check name"),
     min_value = Column(         Float(24),    nullable=False) #Minimum Range value"),
     max_value = Column(         Float(24),    nullable=False) #Maximum Range value"),
@@ -1293,7 +1339,8 @@ class Quality_control(Base):
     # Relationships
 #     job           = relationship('Job_pau',              back_populates="quality_controls")
     
-    #comment="Quality Control",
+    # Comment:
+    # Contains quality control entries measured during the data reduction process.
 
     
 @compiles(BigInteger, "sqlite")
