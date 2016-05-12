@@ -662,6 +662,7 @@ class ForcedApertureCoadd(Base):
     n_NB825 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
     n_NB835 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
     n_NB845 = Column(         Float(24),    nullable=True) #fluxnitude fitted using a galaxy model"),
+    n_bands = Column(         Integer,    nullable=True) # number of bands available,
     flags = Column(SmallInteger, nullable=True) #Extraction flags [FLAGS]"),
     star_flag = Column(     Boolean,    nullable=True)
 
