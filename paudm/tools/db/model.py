@@ -1142,6 +1142,11 @@ class COSMOS(Base):
     MV = Column(Float(24), nullable=False)  # absolute magnitude in the V(Subaru) band
     ebv_gal = Column(Float(24), nullable=False)  # galactic extinction  E(B-V)
     ebv_int = Column(Float(24), nullable=False)  # additional extinction  E(B-V)
+    acs_a_image = Column(Float(24), nullable=False)  # additional extinction  E(B-V)
+    acs_b_image = Column(Float(24), nullable=False)  # additional extinction  E(B-V)
+    acs_theta_image = Column(Float(24), nullable=False)  # additional extinction  E(B-V)
+    acs_mag_auto = Column(Float(24), nullable=False)  # additional extinction  E(B-V)
+    acs_magerr_auto = Column(Float(24), nullable=False)  # additional extinction  E(B-V)
     zspec = Column(Float(24), nullable=False)  # spectroscopic redshift from ADP.2015-10-15T12_55_10.777_t2.txt
     conf = Column(Float(24), nullable=False)  # confidence class from ADP.2015-10-15T12_55_10.777_t2.txt
     F814W = Column(Float(24), nullable=False)  # HST  target magnitude from ADP.2015-10-15T12_55_10.777_t2.txt
