@@ -1935,7 +1935,7 @@ class FilterSystem(object):
         filter_curves_matchedwvls = {}
         
         atmosphere_file = open(resource_filename('paudm.resources','atmosphere/transmission.sdss.stdunits.dat'))
-        qe_file = open(resource_filename('paudm.resources','detector/HPK.real.stdunits.dat'))
+        qe_file = open(resource_filename('paudm.resources','detector/CCD_QE_Hamamatsu_20130829.dat'))
         wht_throughput_file = open(resource_filename('paudm.resources','telescope/WHT_throughput_stdunits.dat'))
         
         if( system == "pau" ):
