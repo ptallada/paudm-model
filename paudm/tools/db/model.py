@@ -372,7 +372,7 @@ class ForcedApertureCoadd(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('production_id', 'ra', 'dec'),
+        UniqueConstraint('production_id', 'ref_id', 'ref_cat'),
             )
     # Keys
     id = Column(                    BigInteger,   nullable=False) #Unique identifier"),
