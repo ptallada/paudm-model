@@ -28,67 +28,6 @@ def quality_control_entry(job_id, qc_ref, value, qc_constants, plot_name='', lab
         log.warn("Quality Control %s not passed: %f %s" % (qc_ref, value, qc_constants.qc[qc_ref]['Units']))
 
 
-def update_tree(session, job, qc_pass):
-    if qc_pass == "":
-        quality_control_value = session.query(model.Quality_control).filter(
-            model.Quality_control.job_id == job.id,
-            model.Quality_control.check_name != "general",
-            model.Quality_control.qc_pass == False,
-        ).first() is not None
-
-        qc = model.session.query(model.Quality_control).filter(
-            model.Quality_control.check_name == "general",
-            model.Quality_control.job_id == job.id,
-        ).first()
-
-        if qc:
-            # Should it be deleted, or there can be some case where it exits and it is correct??
-            session.delete(qc)
-
-        else:
-            qc = model.Quality_control(
-                job_id=job.id,
-                ref="general",
-                check_name="general",
-                min_value=0,
-                max_value=0,
-                value=0,
-                units=0,
-                qc_pass=quality_control_value,
-                time=datetime.datetime.now(),
-                plot_file="",
-            )
-            session.add(qc)
-            update_tree(session, job, quality_control_value)
-    else:
-        qc = session.query(model.Quality_control).filter(
-            model.Quality_control.check_name == "general",
-            model.Quality_control.job_id == job.id
-        ).first()
-
-        if qc:
-            qc.qc_pass = (qc.qc_pass and qc_pass)
-
-        else:
-            qc = model.Quality_control(
-                job_id=job.id,
-                ref="general",
-                check_name="general",
-                min_value=0,
-                max_value=0,
-                value=0,
-                units=0,
-                qc_pass=qc_pass,
-                time=datetime.datetime.now(),
-                plot_file=""
-            )
-
-            session.add(qc)
-
-        if job.superjob:
-            update_tree(session, job.superjob, qc_pass)
-
-
 def update_parent_qc(session, job):
 
     combined_qc_pass = session.execute('select bool_and(qc.qc_pass) from quality_control as qc '
