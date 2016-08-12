@@ -1151,6 +1151,8 @@ class COSMOS(Base):
     conf = Column(Float(24), nullable=False)  # confidence class from ADP.2015-10-15T12_55_10.777_t2.txt
     F814W = Column(Float(24), nullable=False)  # HST  target magnitude from ADP.2015-10-15T12_55_10.777_t2.txt
     zfits = Column(String(60), nullable=True)  # filename of associated 1-d spectra ADP.2015-10-15T12_55_10.777_t2.txt
+    r50 = Column(Float(24), nullable=False)  # ZEST semi-major axis length of ellipse encompassing 50% of total light
+    sersic_n_gim2d = Column(Float(24), nullable=False)  # GIM2D Sersic index
 
 Index('ik_cosmoslocation', COSMOS.ra, COSMOS.dec)
 
