@@ -68,11 +68,6 @@ def bench_insert(count = 100, *args):
         amb_temp = randf,
         humidity = randf,
         pressure = randf,
-        eqa_1 = randf,
-        eqa_2 = randf,
-        eqa_3 = randf,
-        eqa_4 = randf,
-        eqa_5 = randf,
     )
     
     image = model.Image(
@@ -90,11 +85,6 @@ def bench_insert(count = 100, *args):
         zp_nightly = randf,
         zp_nightly_sigma = randf,
         psf_fwhm = randf,
-        cqa_1 = randf,
-        cqa_2 = randf,
-        cqa_3 = randf,
-        cqa_4 = randf,
-        cqa_5 = randf
     )
     
     for i in range(count):

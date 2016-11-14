@@ -206,12 +206,6 @@ class Mosaic(object):
         fields['humidity'] = header['HUMIDITY'] if 'HUMIDITY' in header else None
         fields['pressure'] = header['PRESSURE'] if 'PRESSURE' in header else None
         
-        fields['eqa_1'] = header['EQA01'] if 'EQA01' in header else None
-        fields['eqa_2'] = header['EQA02'] if 'EQA02' in header else None
-        fields['eqa_3'] = header['EQA03'] if 'EQA03' in header else None
-        fields['eqa_4'] = header['EQA04'] if 'EQA04' in header else None
-        fields['eqa_5'] = header['EQA05'] if 'EQA05' in header else None
-        
         return fields
     
     # NIGHTLY Delegates
@@ -333,11 +327,6 @@ class Image(object):
         fields['rdnoise']    = self.header['RDNOISE']
         fields['naxis1']     = self.header['NAXIS1']
         fields['naxis2']     = self.header['NAXIS2']
-        fields['cqa_1']      = self.header['CQA01']if 'CQA01' in self.header else None
-        fields['cqa_2']      = self.header['CQA02']if 'CQA02' in self.header else None
-        fields['cqa_3']      = self.header['CQA03']if 'CQA03' in self.header else None
-        fields['cqa_4']      = self.header['CQA04']if 'CQA04' in self.header else None
-        fields['cqa_5']      = self.header['CQA05']if 'CQA05' in self.header else None
         
         # Calculate Sky Corners of the image
         if 'OBSTYPE' in self.parent_mosaic.header and self.parent_mosaic.header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
