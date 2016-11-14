@@ -200,8 +200,8 @@ class Mosaic(Base):
     amb_temp = Column(Float(24), nullable=True)  # Ambient temperature (deg C)
     humidity = Column(Float(24), nullable=True)  # Ambient relative humidity (percent)
     pressure = Column(Float(24), nullable=True)  # Barometic pressure (mbar)
-    eqa_1 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 1
-    eqa_2 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 2
+    astro_contrast = Column(Float(24), nullable=True)  #
+    astro_chi2 = Column(Float(24), nullable=True)  #
     eqa_3 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 3
     eqa_4 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 4
     eqa_5 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 5
@@ -262,11 +262,12 @@ class Image(Base):
     zp_nightly = Column(Float(24), nullable=True)  # Zeropoint magnitude computed at the Nightly pipeline
     zp_nightly_err = Column(Float(24), nullable=True)  # Zeropoint magnitude error computed at the Nightly pipeline
     psf_fwhm = Column(Float(24), nullable=True)  # PSF FWHM measured on image. Available in reduced image only.
-    cqa_1 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 1
-    cqa_2 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 2
-    cqa_3 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 3
-    cqa_4 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 4
-    cqa_5 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 5
+    bkg_mean = Column(Float(24), nullable=True)  # Mean background level (e-/s)
+    bkg_std = Column(Float(24), nullable=True)  # STD background
+    zp_nightly_stars = Column(Float(24), nullable=True)  # Number of stars in calibration
+    max_readnoise = Column(Float(24), nullable=True)  # Maximum readout noise from 4 amplifiers
+    cosmic_ratio = Column(Float(24), nullable=True)  # Ratio of pixels flagged as cosmic rays
+    saturate_ratio = Column(Float(24), nullable=True)  # Ratio of pixels flagged as saturated
 
     # Relationships
     mosaic = relationship('Mosaic', back_populates="images")
