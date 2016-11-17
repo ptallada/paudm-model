@@ -53,6 +53,48 @@ def init(url):
     
     return session
 
+class Project(Base):
+    __tablename__ = 'project'
+    __table_args__ = (
+        # Primary key
+        PrimaryKeyConstraint('id'),
+        # Unique key
+        UniqueConstraint('name'),
+    )
+    # Columns
+    id = Column(Integer, nullable=False)
+    name = Column(String(16), nullable=False)
+    description = Column(String(128), nullable=True)
+    contact_name = Column(String(64), nullable=False)
+    contact_email = Column(String(64), nullable=False)
+    created_at = Column(Date, nullable=False)
+    
+    #Relationships
+    obs_sets = relationship('Obs_set', secondary='obs_set__project', back_populates='projects')
+
+
+class Obs_set__Project(Base):
+    __tablename__ = 'obs_set__project'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('project_id', 'obs_set_id'),
+        #ForeignKeyConstraint(['red_img_id'] ,['red_image.id'],onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(
+            ['project_id'],
+            ['project.id'],
+            onupdate='CASCADE', ondelete='CASCADE'
+        ),
+        ForeignKeyConstraint(
+            ['obs_set_id'],
+            ['obs_set.id'],
+            onupdate='CASCADE', ondelete='CASCADE'
+        ),
+    )
+    
+    # Columns
+    project_id = Column(BigInteger, nullable=False)
+    obs_set_id = Column(BigInteger, nullable=False)
+
 class Obs_set(Base):
     __tablename__ = 'obs_set'
     __table_args__ = (
@@ -73,8 +115,8 @@ class Obs_set(Base):
     obs_set = Column(String(128),  nullable=False)      # Observation Set identifier, from header
     
     #Relationships
-
-    mosaics      = relationship('Mosaic',           back_populates="obs_set")
+    mosaics = relationship('Mosaic', back_populates="obs_set")
+    projects = relationship('Project', secondary='obs_set__project', back_populates='obs_sets')
    
     # Comment:
     # Contains the list of Observation Sets registered in the database.
@@ -173,7 +215,7 @@ class Mosaic(Base):
     kind = Column(
         Enum(
             'ARC', 'BIAS', 'DARK', 'FLASH', 'FLAT', 'FOCUS', 'GLANCE', 'PUPIL', 'SCIENCE',
-            'SCRATCH', 'SKY', 'TARGET','MBIAS','MFLAT','RED_SCI','RED_WEIGHT','RED_MASK', 'TEST',
+            'SCRATCH', 'SKY', 'TARGET','MBIAS','MFLAT','RED_SCI','RED_WEIGHT','RED_MASK', 'STACKEDFOCUS', 'TEST',
             name='mosaic_kind'
         ), 
     nullable=False)  # Mosaic image type
