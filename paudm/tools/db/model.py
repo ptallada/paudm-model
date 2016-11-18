@@ -202,7 +202,7 @@ class Mosaic(Base):
     pressure = Column(Float(24), nullable=True)  # Barometic pressure (mbar)
     astro_contrast = Column(Float(24), nullable=True)  #
     astro_chi2 = Column(Float(24), nullable=True)  #
-    eqa_3 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 3
+    astro_nstars = Column(Float(24), nullable=True)  #
     eqa_4 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 4
     eqa_5 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 5
     merged_mosaics = Column(Integer, nullable=True)  # Number of mosaics merged to form the actual mosaic (for masters)
