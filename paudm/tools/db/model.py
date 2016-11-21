@@ -203,10 +203,30 @@ class Mosaic(Base):
     astro_contrast = Column(Float(24), nullable=True)  #
     astro_chi2 = Column(Float(24), nullable=True)  #
     astro_nstars = Column(Float(24), nullable=True)  #
+    astro_ref_cat = Column(String(32), nullable=False)  # Astrometry reference catalogue used
     eqa_4 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 4
     eqa_5 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 5
     merged_mosaics = Column(Integer, nullable=True)  # Number of mosaics merged to form the actual mosaic (for masters)
     mean_psf_fwhm = Column(Float(24), nullable=True)  # Mean PSF FWHM measured. Available in reduced image only,
+    # astrometry_status
+    # 0: ok
+    # 1: used alternative reference (2MASS)
+    # 2: low number of astro stars
+    # 3: bad fit or low contrast
+    # 4: no astrometry
+    astro_status = Column(SmallInteger, nullable=True)
+    # psf_model_status:
+    # 0: ok
+    # 1: low number of model stars
+    # 2: no model for some detectors
+    # 3: no model for any detector
+    psf_model_status = Column(SmallInteger, nullable=True)
+    # photo_status:
+    # 0: ok
+    # 1: very low extinction
+    # 2: no zeropoint for some detectors
+    # 3: no zeropoint for any detector
+    photo_status = Column(SmallInteger, nullable=True)
 
     # Relationships
     production = relationship('Production', back_populates="mosaics")
@@ -261,13 +281,15 @@ class Image(Base):
     dec_max = Column(Float(53), nullable=True)  # Image corner dec min (deg)
     zp_nightly = Column(Float(24), nullable=True)  # Zeropoint magnitude computed at the Nightly pipeline
     zp_nightly_err = Column(Float(24), nullable=True)  # Zeropoint magnitude error computed at the Nightly pipeline
+    zp_nightly_stars = Column(Float(24), nullable=True)  # Number of stars in calibration
     psf_fwhm = Column(Float(24), nullable=True)  # PSF FWHM measured on image. Available in reduced image only.
     bkg_mean = Column(Float(24), nullable=True)  # Mean background level (e-/s)
     bkg_std = Column(Float(24), nullable=True)  # STD background
-    zp_nightly_stars = Column(Float(24), nullable=True)  # Number of stars in calibration
     max_readnoise = Column(Float(24), nullable=True)  # Maximum readout noise from 4 amplifiers
     cosmic_ratio = Column(Float(24), nullable=True)  # Ratio of pixels flagged as cosmic rays
     saturate_ratio = Column(Float(24), nullable=True)  # Ratio of pixels flagged as saturated
+    psf_stars = Column(Integer, nullable=True)  # Number of stars used to model the PSF
+    psf_fit = Column(Float(24), nullable=True)  # Chi2 Fit of the PSF model
 
     # Relationships
     mosaic = relationship('Mosaic', back_populates="images")
