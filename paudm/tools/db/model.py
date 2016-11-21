@@ -226,6 +226,7 @@ class Mosaic(Base):
     # 1: very high extinction
     # 2: detector photometry failure
     # 3: focal plane photometry failure
+    # 4: no overlap with sdss
     photo_status = Column(SmallInteger, nullable=True)
 
     # Relationships
