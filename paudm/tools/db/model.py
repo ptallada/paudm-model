@@ -208,24 +208,24 @@ class Mosaic(Base):
     eqa_5 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 5
     merged_mosaics = Column(Integer, nullable=True)  # Number of mosaics merged to form the actual mosaic (for masters)
     mean_psf_fwhm = Column(Float(24), nullable=True)  # Mean PSF FWHM measured. Available in reduced image only,
-    # astrometry_status
+    # astro_status
     # 0: ok
-    # 1: used alternative reference (2MASS)
+    # 1: all-sky reference
     # 2: low number of astro stars
     # 3: bad fit or low contrast
     # 4: no astrometry
     astro_status = Column(SmallInteger, nullable=True)
     # psf_model_status:
     # 0: ok
-    # 1: low number of model stars
-    # 2: no model for some detectors
-    # 3: no model for any detector
+    # 1: low model stars
+    # 2: detector PSF model failure
+    # 3: focal plane PSF model failure
     psf_model_status = Column(SmallInteger, nullable=True)
     # photo_status:
     # 0: ok
-    # 1: very low extinction
-    # 2: no zeropoint for some detectors
-    # 3: no zeropoint for any detector
+    # 1: very high extinction
+    # 2: detector photometry failure
+    # 3: focal plane photometry failure
     photo_status = Column(SmallInteger, nullable=True)
 
     # Relationships
