@@ -488,24 +488,29 @@ class Catalogue(object):
             while n_extensions < total_extensions:
                 catalog.extension = extension #First CCD to compute
                 log.debug("CCD n. %d" % extension)
-                detections = fits.getdata(os.path.join(catalog.path, catalog.filename), ext = 2 * catalog.extension)
+                detections = fits.getdata(os.path.join(catalog.path, catalog.filename), ext=2 * catalog.extension)
                 catalog._names = detections.dtype.names
-                extension +=1
-                n_extensions +=1
-                db_image = model.session.query(model.Image).filter_by(mosaic = mosaic.assoc_db, image_num = catalog.extension).one()
-                
+                extension += 1
+                n_extensions += 1
+                db_image = model.session.query(model.Image).filter_by(mosaic=mosaic.assoc_db, image_num=catalog.extension).one()
+
+                n_extracted = 0
                 for detection in detections:
                     dict_tmp = {}
                     for property_id in range(0, len(catalog._names)):
                         property = catalog._names[property_id]
                         dict_tmp[property] = detection[property_id]
-                    fields = catalog.detections_mapping(dict = dict_tmp)
-                    det_tmp = model.Detection(band = db_image.filter,
-                                              #production = mosaic.assoc_db.production,
-                                              image = db_image,
-                                              zp_offset = 0.0,
+                    fields = catalog.detections_mapping(dict=dict_tmp)
+                    det_tmp = model.Detection(band=db_image.filter,
+                                              #production=mosaic.assoc_db.production,
+                                              image=db_image,
+                                              zp_offset=0.0,
                                               **fields)
                     catalog.objects.append(det_tmp)
+                    n_extracted += 1
+
+                db_image.n_extracted = n_extracted
+
         else:
             error_msg = "Invalid input_type: %s" %input_type
             log.error(error_msg)

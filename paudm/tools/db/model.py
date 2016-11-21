@@ -203,8 +203,8 @@ class Mosaic(Base):
     astro_contrast = Column(Float(24), nullable=True)  #
     astro_chi2 = Column(Float(24), nullable=True)  #
     astro_nstars = Column(Float(24), nullable=True)  #
+    astro_nstars_highsn = Column(Float(24), nullable=True)  #
     astro_ref_cat = Column(String(32), nullable=False)  # Astrometry reference catalogue used
-    eqa_4 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 4
     eqa_5 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 5
     merged_mosaics = Column(Integer, nullable=True)  # Number of mosaics merged to form the actual mosaic (for masters)
     mean_psf_fwhm = Column(Float(24), nullable=True)  # Mean PSF FWHM measured. Available in reduced image only,
@@ -290,6 +290,7 @@ class Image(Base):
     saturate_ratio = Column(Float(24), nullable=True)  # Ratio of pixels flagged as saturated
     psf_stars = Column(Integer, nullable=True)  # Number of stars used to model the PSF
     psf_fit = Column(Float(24), nullable=True)  # Chi2 Fit of the PSF model
+    n_extracted = Column(Integer, nullable=True)  # Number of sources extracted
 
     # Relationships
     mosaic = relationship('Mosaic', back_populates="images")
