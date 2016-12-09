@@ -201,7 +201,7 @@ class Mosaic(Base):
         # Foreign key
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['obs_set_id'],        ['obs_set.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('archivepath', 'filename'),
+        #UniqueConstraint('archivepath', 'filename'),
         UniqueConstraint('production_id', 'obs_set_id', 'kind', 'exp_num'),
 
     )
