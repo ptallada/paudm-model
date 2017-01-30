@@ -801,10 +801,11 @@ class ForcedApertureReport(Base):
     #  209: edge effect
     #  210: bad pixel
     #  211: blended
-    #  212: missing galaxy length
+    #  212: cosmic ray
     #  213: star halo/spikes
-    #  214: Zeropoint issue
-    #  215: other
+    #  214: zeropoint issue
+    #  215: missing r50
+    #  216: other
 
     report_status = Column(Integer, nullable=False)  # Report id
     user = Column(Text, nullable=False)  # username
