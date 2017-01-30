@@ -751,13 +751,69 @@ class ForcedApertureCoadd(Base):
     flags = Column(SmallInteger, nullable=True) #Extraction flags [FLAGS]"),
     star_flag = Column(     Boolean,    nullable=True)
 
-    #Reletionships
-    production    = relationship('Production',       back_populates="forced_aperture_coadds")
+    # Relationships
+    production = relationship('Production',       back_populates="forced_aperture_coadds")
+    forced_aperture_reports = relationship('ForcedApertureReport', back_populates="facs")
 
 Index('ik_forcedcoaddlocation', ForcedApertureCoadd.production_id, ForcedApertureCoadd.ra, ForcedApertureCoadd.dec)
 
     # Comment:
     # Contains the combined measurements using force photometry in MEMBA for all bands and passes for each reference source.
+
+
+# Forced Aperture Report table
+class ForcedApertureReport(Base):
+    __tablename__ = 'forced_aperture_report'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('id'),
+        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        UniqueConstraint('production_id', 'ref_id', 'ref_cat'),
+            )
+    # Keys
+    id = Column(Integer, nullable=False)  # Unique identifier"),
+    fac_id = Column(BigInteger, nullable=False)  # Forced aperture coadd id"),
+    # Fields
+    fa_id = Column(BigInteger,   nullable=True)  # Forced aperture id (optional)
+    band = Column(String(16), nullable=True)  # Reference catalogue name
+    # REPORT status:
+    # FAC global issues
+    #  0: everything seems ok
+    #  1: major global problem
+
+    # FAC band issues
+    #  100: flux underestimated
+    #  101: flux overestimated
+    #  102: noise underestimated
+    #  103: noise overestimated
+    #  104: discordant measurements
+
+    # FA issues
+    #  200: flag wrong
+    #  201: flux underestimated
+    #  202: flux overestimated
+    #  203: noise underestimated
+    #  204: noise overestimated
+    #  205: missing bright source
+    #  206: noisy image
+    #  207: astrometry issue
+    #  208: scatterlight
+    #  209: edge effect
+    #  210: bad pixel
+    #  211: blended
+    #  212: missing galaxy length
+    #  213: star halo/spikes
+    #  214: Zeropoint issue
+    #  215: other
+
+    report_status = Column(Integer, nullable=False)  # Report id
+    user = Column(Text, nullable=False)  # username
+    insert_date = Column(DateTime, nullable=False, default=func.current_timestamp())  # Timestamp of insertion
+
+    # Relationships
+    fac = relationship('ForcedApertureCoadd', back_populates="forced_aperture_reports")
+
+Index('ik_forcedreport', ForcedApertureReport.fac_id, ForcedApertureReport.band)
 
 
     # Global Object Table
@@ -778,7 +834,7 @@ class Global_object(Base):
     sigma_offset_ra = Column(     Float(24),    nullable=False) #Sigma offset at RA"),
     sigma_offset_dec = Column(    Float(24),    nullable=False) #Sigma offset at DEC"),
         # Relationships
-        
+
     production = relationship('Production',       back_populates="global_objects")
     detections = relationship('Detection',        back_populates="global_objects", secondary=lambda: Global_object_detections.__table__)
     coadd_objects = relationship('Coadd_object',     back_populates="global_object")
