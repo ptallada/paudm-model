@@ -251,6 +251,7 @@ class Mosaic(Base):
     astro_nstars = Column(Float(24), nullable=True)  # Astrometry number of stars matched
     astro_nstars_highsn = Column(Float(24), nullable=True)  # Astrometry number of high SN stars matched
     astro_ref_sigma = Column(Float(24), nullable=True)  # Astrometry sigma offsets to reference
+    astro_href_sigma = Column(Float(24), nullable=True)  # Astrometry sigma offsets to high SN reference
     astro_ref_cat = Column(String(32), nullable=False)  # Astrometry reference catalogue used
     merged_mosaics = Column(Integer, nullable=True)  # Number of mosaics merged to form the actual mosaic (for masters)
     mean_psf_fwhm = Column(Float(24), nullable=True)  # Mean PSF FWHM measured. Available in reduced image only,
