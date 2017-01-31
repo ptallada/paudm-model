@@ -246,12 +246,12 @@ class Mosaic(Base):
     amb_temp = Column(Float(24), nullable=True)  # Ambient temperature (deg C)
     humidity = Column(Float(24), nullable=True)  # Ambient relative humidity (percent)
     pressure = Column(Float(24), nullable=True)  # Barometic pressure (mbar)
-    astro_contrast = Column(Float(24), nullable=True)  #
-    astro_chi2 = Column(Float(24), nullable=True)  #
-    astro_nstars = Column(Float(24), nullable=True)  #
-    astro_nstars_highsn = Column(Float(24), nullable=True)  #
+    astro_contrast = Column(Float(24), nullable=True)  # Astrometry contrast
+    astro_chi2 = Column(Float(24), nullable=True)  # Astrometry chi2 fit to reference
+    astro_nstars = Column(Float(24), nullable=True)  # Astrometry number of stars matched
+    astro_nstars_highsn = Column(Float(24), nullable=True)  # Astrometry number of high SN stars matched
+    astro_ref_sigma = Column(Float(24), nullable=True)  # Astrometry sigma offsets to reference
     astro_ref_cat = Column(String(32), nullable=False)  # Astrometry reference catalogue used
-    eqa_5 = Column(Float(24), nullable=True)  # Quality Analysis check at observatory 5
     merged_mosaics = Column(Integer, nullable=True)  # Number of mosaics merged to form the actual mosaic (for masters)
     mean_psf_fwhm = Column(Float(24), nullable=True)  # Mean PSF FWHM measured. Available in reduced image only,
 
