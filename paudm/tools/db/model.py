@@ -806,7 +806,8 @@ class ForcedApertureReport(Base):
     #  213: star halo/spikes
     #  214: zeropoint issue
     #  215: missing r50
-    #  216: other
+    #  216: crosstalk
+    #  217: other
 
     report_status = Column(Integer, nullable=False)  # Report id
     user = Column(Text, nullable=False)  # username
