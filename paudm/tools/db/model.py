@@ -800,7 +800,6 @@ class ForcedApertureReport(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['fac_id'], ['forced_aperture_coadd.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('production_id', 'ref_id', 'ref_cat'),
             )
     # Keys
     id = Column(Integer, nullable=False)  # Unique identifier"),
