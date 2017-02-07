@@ -354,6 +354,7 @@ class Image(Base):
     # Relationships
     mosaic = relationship('Mosaic', back_populates="images")
     detections = relationship('Detection', back_populates="image")
+    star_zps = relationship('StarZP', back_populates="image")
     detections_by_id = relationship('Detection', collection_class=attribute_mapped_collection('id'))
     forced_apertures = relationship('ForcedAperture', back_populates="image")
 
@@ -403,6 +404,36 @@ Index('ik_detlocation', Detection.ra, Detection.dec)
 
     # Comment:
     # Contains the detections measured directly on the image after the nightly data reduction.
+
+
+class StarZP(Base):
+    __tablename__ = 'star_zp'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('id'),
+        ForeignKeyConstraint(['image_id'],          ['image.id'],      onupdate='CASCADE', ondelete='CASCADE'),
+        )
+    # Keys
+    id = Column(BigInteger, nullable=False)  # Unique identifier
+    image_id = Column(BigInteger, nullable=False)  # CCD image number
+    sdss_star_id = Column(BigInteger, nullable=True)  # SDSS Star id
+    # Fields
+    x_image = Column(Float(24), nullable=False)  # x position in the image
+    y_image = Column(Float(24), nullable=False)  # y position in the image
+    measured_mag = Column(Float(24), nullable=False)  # measured magnitude
+    measured_mag_err = Column(Float(24), nullable=False)  # measured magnitude error
+    expected_mag = Column(Float(24), nullable=False)  # expected magnitude
+    expected_mag_err = Column(Float(24), nullable=False)  # expected magnitude error
+    best_chi2 = Column(Float(24), nullable=False)  # best chi2 fit from sdss star to templates
+    zp_value = Column(Float(24), nullable=False)  # individual star zeropoint value
+    zp_error = Column(Float(24), nullable=False)  # individual star zeropoint error
+
+    # Relationships
+    image = relationship('Image', back_populates="star_zps")
+
+    # Comment:
+    # Contains the individual zeropoint measurements for each star matched with sdss during the nightly photometry
+
 
 class ForcedAperture(Base):
     __tablename__ = 'forced_aperture'
