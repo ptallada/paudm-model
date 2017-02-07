@@ -799,7 +799,7 @@ class ForcedApertureReport(Base):
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
-        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['fac_id'], ['forced_aperture_coadd.id'], onupdate='CASCADE', ondelete='CASCADE'),
         UniqueConstraint('production_id', 'ref_id', 'ref_cat'),
             )
     # Keys
