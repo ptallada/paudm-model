@@ -785,7 +785,7 @@ class ForcedApertureCoadd(Base):
 
     # Relationships
     production = relationship('Production',       back_populates="forced_aperture_coadds")
-    forced_aperture_reports = relationship('ForcedApertureReport', back_populates="facs")
+    forced_aperture_reports = relationship('ForcedApertureReport', back_populates="fac")
 
 Index('ik_forcedcoaddlocation', ForcedApertureCoadd.production_id, ForcedApertureCoadd.ra, ForcedApertureCoadd.dec)
 
@@ -801,6 +801,7 @@ class ForcedApertureReport(Base):
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['fac_id'], ['forced_aperture_coadd.id'], onupdate='CASCADE', ondelete='CASCADE'),
             )
+
     # Keys
     id = Column(Integer, nullable=False)  # Unique identifier"),
     fac_id = Column(BigInteger, nullable=False)  # Forced aperture coadd id"),
