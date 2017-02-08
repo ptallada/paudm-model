@@ -330,31 +330,16 @@ class Image(object):
         
         # Calculate Sky Corners of the image
         if 'OBSTYPE' in self.parent_mosaic.header and self.parent_mosaic.header['OBSTYPE'] in ['TARGET', 'RED_SCI', 'RED_MASK', 'RED_WEIGHT']:
-            from paudm.pipeline.pixelsim import wcsUtils
-            from paudm.pipeline.pixelsim import simUtils
+            from astropy.wcs import WCS
             
-            # Load CRVAL
-            image_wcs = wcsUtils.wcsType(sky_ref=simUtils.skyPoint(ra=self.header['CRVAL1'], dec=self.header['CRVAL2']),
-                                         pix_ref=simUtils.pixelPoint(0, 0), # Dummy Value
-                                         rot_degrees=0,
-                                         instrument_PIXEL_SCALE = pixel_scale) # Dummy Value
-            # Override WCS
-            image_wcs.CRPIX1 = self.header['CRPIX1']
-            image_wcs.CRPIX2 = self.header['CRPIX2']
-            image_wcs.CD1_1 = self.header['CD1_1']
-            image_wcs.CD1_2 = self.header['CD1_2']
-            image_wcs.CD2_1 = self.header['CD2_1']
-            image_wcs.CD2_2 = self.header['CD2_2']
+            image_wcs = WCS(self.header)
+
+            ccd_corners = image_wcs.calc_footprint()
             
-            ccd_corners = [image_wcs.pix2sky(simUtils.pixelPoint(0, 0)),
-                           image_wcs.pix2sky(simUtils.pixelPoint(self.header['NAXIS1'], 0)),
-                           image_wcs.pix2sky(simUtils.pixelPoint(0, self.header['NAXIS2'])),
-                           image_wcs.pix2sky(simUtils.pixelPoint(self.header['NAXIS1'], self.header['NAXIS2']))]
-            
-            fields['ra_min']    = min([element.ra for element in ccd_corners])
-            fields['ra_max']    = max([element.ra for element in ccd_corners])
-            fields['dec_min']   = min([element.dec for element in ccd_corners])
-            fields['dec_max']   = max([element.dec for element in ccd_corners])
+            fields['ra_min'] = min([element[0] for element in ccd_corners])
+            fields['ra_max'] = max([element[0] for element in ccd_corners])
+            fields['dec_min'] = min([element[1] for element in ccd_corners])
+            fields['dec_max'] = max([element[1] for element in ccd_corners])
             
         return fields
     
