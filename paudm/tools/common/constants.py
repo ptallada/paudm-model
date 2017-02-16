@@ -2,28 +2,31 @@
 """
 PAUdm constants definition
 
-@author: anne bauer
+@author: anne bauer, santi serrano
 
 Defines constant such as flag bit meanings.
 
 """
 
 # Mask flags
-flag_sex_crowded = 1
-flag_sex_merged = 2
-flag_sex_saturated = 4
-flag_sex_truncated = 8
-flag_sex_aperture_bad = 16
-flag_sex_isophote_bad = 32
-flag_sex_deblend_overflow = 64
-flag_sex_extract_overflow = 128
-flag_cosmetics_noninterp = 256 # Cosmetic non-interpolated
-flag_cosmetics_interp = 512 # Cosmetic interpolated
-flag_cosmetics_saturated = 1024 # Saturated pixel
-flag_cosmics = 2048 # Cosmic Ray
-flag_vignetted = 4096
-flag_max = 8191 # Not an actual flag, but the maximum possible flag integer given the above flags.
-
+flag_crowded = 1
+flag_merged = 2
+flag_halo = 4
+flag_truncated = 8
+flag_deblended = 16
+flag_crosstalk = 32
+flag_scatterlight = 64
+flag_extinction = 128
+flag_photo_zp = 256
+flag_cosmetics = 512  # (image mask)
+flag_saturated = 1024  # (image mask)
+flag_cosmics = 2048  # (image mask)
+flag_vignetted = 4096  # (image mask)
+flag_discordant = 8192
+flag_edge = 16384
+flag_distortion = 32768
+flag_noise = 65536
+flag_astrometry = 131072
 
 
 # Operation - Job states
@@ -38,5 +41,5 @@ CLOSED_STATES = ('CLEARED_CLOSED',) + CLOSED_FAILED_STATES
 mag_zp = 26.0
 
 # Match radius for global_objects
-match_radius = 1.0/3600.0 # degrees
+match_radius = 1.0/3600.0  # degrees
 
