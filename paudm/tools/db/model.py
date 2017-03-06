@@ -1307,7 +1307,7 @@ class COSMOS(Base):
     mod_gal = Column(Integer, nullable=False)  # best fit template  (1->8 Ell-S0, 9->15 Sa-Sc, 16->19 Sd-Sdm from Polletta et al., >=20 from BC03).
     type = Column(Integer, nullable=False)  # 0 if gal, 1 if star, 2 if Xray, 3 if IA>25.5, -99 if masked
     Umag = Column(Float(24), nullable=False)  # CFHT u*   aperture magnitude (3" aperture)        3911-0 +- 538/2
-    Bmag = Column(Float(24), nullable=False)  # Subaru B   aperture magnitude (3" aperture)       4439.6 +-806.7/2
+    Bmag = Column(Float(24), nullable=False)  # Subaru B   aperture magnitude (3" aperture)       4439.6 +- 806.7/2
     Vmag = Column(Float(24), nullable=False)  # Subaru V   aperture magnitude (3" aperture)       5448.9 +- 934.8 /2
     Gmag = Column(Float(24), nullable=False)  # Subaru g+   aperture magnitude (3" aperture)      4728.3 +- 1162.9/2
     Rmag = Column(Float(24), nullable=False)  # Subaru r+   aperture magnitude (3" aperture)      6231.8 +- 1348.8/2
