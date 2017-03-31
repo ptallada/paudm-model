@@ -1550,16 +1550,13 @@ class MatchToSpec(Base):
     __tablename__ = 'match_to_spec'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('id'),
-        UniqueConstraint('ref_id', 'ref_cat', 'spec_ref_id', 'spec_ref_cat'),
+        PrimaryKeyConstraint('ref_id', 'ref_cat', 'spec_ref_id', 'spec_ref_cat'),
             )
     # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier
-    # Fields
     ref_id = Column(BigInteger, nullable=False)  # Unique identifier for reference catalogue
     ref_cat = Column(String(16), nullable=False)  # Reference catalogue name
-    spec_ref_id = Column(BigInteger, nullable=False)  # Unique identifier for spectra reference catalogue
-    spec_ref_cat = Column(String(16), nullable=False)  # Reference spectra catalogue name
+    spec_id = Column(BigInteger, nullable=False)  # Unique identifier for spectra reference catalogue
+    spec_cat = Column(String(16), nullable=False)  # Reference spectra catalogue name
 
 Index('ik_matchtospec_ref', MatchToSpec.ref_cat, MatchToSpec.ref_id)
 
