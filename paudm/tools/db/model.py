@@ -1550,7 +1550,7 @@ class MatchToSpec(Base):
     __tablename__ = 'match_to_spec'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('ref_id', 'ref_cat', 'spec_ref_id', 'spec_ref_cat'),
+        PrimaryKeyConstraint('ref_id', 'ref_cat', 'spec_id', 'spec_cat'),
             )
     # Keys
     ref_id = Column(BigInteger, nullable=False)  # Unique identifier for reference catalogue
