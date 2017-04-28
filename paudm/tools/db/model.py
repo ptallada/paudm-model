@@ -150,6 +150,7 @@ class Production(Base):
     photo_zs       = relationship('Photoz_BCNz',    back_populates="production")
     truth_objects  = relationship('Truth_Object',   back_populates="production")
     targets        = relationship('Target',         back_populates="production")
+    phot_zps       = relationship('PhotZP',         back_populates="production")
     parent         = relationship('Production',     back_populates = 'children',
                          primaryjoin = 'Production.input_production_id == Production.id',
                          remote_side = 'Production.id')
@@ -350,6 +351,7 @@ class Image(Base):
     psf_stars = Column(Integer, nullable=True)  # Number of stars used to model the PSF
     psf_fit = Column(Float(24), nullable=True)  # Chi2 Fit of the PSF model
     n_extracted = Column(Integer, nullable=True)  # Number of sources extracted
+    transparency = Column(Float(24), nullable=True)  # Transparency from photo_zp
 
     # Relationships
     mosaic = relationship('Mosaic', back_populates="images")
@@ -433,6 +435,31 @@ class StarZP(Base):
 
     # Comment:
     # Contains the individual zeropoint measurements for each star matched with sdss during the nightly photometry
+
+
+class PhotoZP(Base):
+    __tablename__ = 'photo_zp'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('id'),
+        UniqueConstraint('production_id', 'band', 'release'),
+
+    )
+    # Keys
+    id = Column(BigInteger, nullable=False)  # Unique identifier
+    production_id = Column(Integer, nullable=False)  # Production identifier
+
+    # Fields
+    zp = Column(Float(24), nullable=False)  # x position in the image
+    band = Column(String(8), nullable=False)  # Band name
+    date = Column(DateTime, nullable=False, default=func.current_timestamp())  # Timestamp of insertion
+    release = Column(String(64), nullable=False)  # release name
+
+    # Relationships
+    production = relationship('Production', back_populates="phot_zps")
+
+    # Comment:
+    # Contains the photometric zeropoints for a given production
 
 
 class ForcedAperture(Base):
