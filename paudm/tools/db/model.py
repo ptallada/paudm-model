@@ -437,11 +437,12 @@ class StarZP(Base):
     # Contains the individual zeropoint measurements for each star matched with sdss during the nightly photometry
 
 
-class PhotoZP(Base):
-    __tablename__ = 'photo_zp'
+class PhotZP(Base):
+    __tablename__ = 'phot_zp'
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
+        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
         UniqueConstraint('production_id', 'band', 'release'),
 
     )
