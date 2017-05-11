@@ -443,7 +443,7 @@ class PhotZP(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('production_id', 'band', 'release'),
+        UniqueConstraint('production_id', 'band'),
 
     )
     # Keys
@@ -454,7 +454,6 @@ class PhotZP(Base):
     zp = Column(Float(24), nullable=False)  # x position in the image
     band = Column(String(8), nullable=False)  # Band name
     date = Column(DateTime, nullable=False, default=func.current_timestamp())  # Timestamp of insertion
-    release = Column(String(64), nullable=False)  # release name
 
     # Relationships
     production = relationship('Production', back_populates="phot_zps")
