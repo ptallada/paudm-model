@@ -25,6 +25,7 @@ import time
 import re
 import math
 import yaml
+import textwrap
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
@@ -444,17 +445,85 @@ class Catalogue(object):
             log.warning("No objects in the catalogue list. Try load_all_query?")
         for db_element in self.objects:
             session.add(db_element)
-            session.flush()
+        session.flush()
+        
         log.debug("Catalogue elements insertion done!")
+    
+    def sync_with_hive(self, session):
+        # Synchronize the objects list with the data base
+        log.debug("This catalogue has %d elements to be inserted into Hive..."%len(self.objects))
+        if len(self.objects) == 0:
+            log.warning("No objects in the catalogue list. Try load_all_query?")
+        
+        rows = []
+        now = time.time()
+        for i, db_element in enumerate(self.objects):
+            rows.append(
+                textwrap.dedent("""\
+                    (
+                    {detection_id},
+                    {image_id},
+                    {insert_date},
+                    '{filter}',
+                    {background},
+                    {class_star},
+                    {spread_model},
+                    {spreaderr_model},
+                    {flux_auto},
+                    {flux_err_auto},
+                    {flux_psf},
+                    {flux_err_psf},
+                    {flux_model},
+                    {flux_err_model},
+                    {flags},
+                    {elongation},
+                    {ra},
+                    {dec},
+                    {x},
+                    {y},
+                    {zp_offset}
+                    )
+                    """
+                ).format(
+                    detection_id    = i,
+                    image_id        = db_element.image_id,
+                    insert_date     = now,
+                    filter          = db_element.band,
+                    background      = db_element.background,
+                    class_star      = db_element.class_star,
+                    spread_model    = db_element.spread_model,
+                    spreaderr_model = db_element.spreaderr_model,
+                    flux_auto       = db_element.flux_auto,
+                    flux_err_auto   = db_element.flux_err_auto,
+                    flux_psf        = db_element.flux_psf,
+                    flux_err_psf    = db_element.flux_err_psf,
+                    flux_model      = db_element.flux_model,
+                    flux_err_model  = db_element.flux_err_model,
+                    flags           = db_element.flags,
+                    elongation      = db_element.elongation,
+                    ra              = db_element.ra,
+                    dec             = db_element.dec,
+                    x               = db_element.x,
+                    y               = db_element.y,
+                    zp_offset       = db_element.zp_offset
+                )
+            )
+        session.execute('DELETE FROM paudm.detection WHERE image_id=%s' % db_element.image_id)
+        sql = 'INSERT INTO paudm.detection PARTITION(production_id=%s) VALUES ' % db_element.image.mosaic.production_id
+        sql += ', '.join(rows)
+        session.execute(sql)
+        
+        log.debug("Catalogue elements insertion done!")
+    
+    
     def merge_with_db(self, session):
         # Synchronize the objects list with the data base
         if len(self.objects) == 0:
             log.warning("No objects in the catalogue list. Try load_all_query?")
         for db_element in self.objects:
             session.merge(db_element)
-            
-        
-    
+
+
     # DETECTION TABLE methods
     @classmethod
     def create_db_detections_catalogue(cls, path, filename, extension = None, total_extensions = 1, input_type = 'ldac', mosaic = None):
