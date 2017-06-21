@@ -427,6 +427,7 @@ class StarZP(Base):
     expected_mag = Column(Float(24), nullable=False)  # expected magnitude
     expected_mag_err = Column(Float(24), nullable=False)  # expected magnitude error
     best_chi2 = Column(Float(24), nullable=False)  # best chi2 fit from sdss star to templates
+    best_chi2_id = Column(Integer, nullable=True)  # best chi2 fit from sdss star to templates
     zp_value = Column(Float(24), nullable=False)  # individual star zeropoint value
     zp_error = Column(Float(24), nullable=False)  # individual star zeropoint error
 
