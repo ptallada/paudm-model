@@ -1126,6 +1126,34 @@ Index('ik_sdsslocation', SDSS_Star.ra, SDSS_Star.dec)
     # Comment:
     # External table from SDSS DR12 (Star view). Stars for simulation and calibration.
 
+
+class gaia(Base):
+    __tablename__ = 'gaia'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('source_id'),
+            )     
+        
+    # Keys
+    source_id = Column(BigInteger,   nullable=False) #Unique identifier.
+    # Fields
+    ra = Column(Float(53),    nullable=False) #Right Ascension of the object (deg)"),
+    dec = Column(Float(53),    nullable=False) #Declination of the object (deg)"),
+    ra_err = Column(Float(24),    nullable=False) #Error in RA (arcsec)"),
+    dec_err = Column(Float(24),    nullable=False) #Error in DEC (arcsec)"),
+    phot_g_mean_mag = Column(Float(24),    nullable=False) #Magnitude in g filter"),
+    phot_g_mean_flux = Column(Float(24),    nullable=False) #Flux in g filter"),
+    phot_g_mean_flux_error = Column(Float(24),    nullable=False) #Flux error in g filter"),
+    ref_epoch = Column(Float(24),    nullable=False) #Ref epoch gaia"),
+    # Constraints
+    PrimaryKeyConstraint('source_id'),
+
+Index('ik_gaialocation', gaia.ra, gaia.dec)
+
+    # Comment:
+    # External table from gaia. Stars for simulation and calibration.
+    
+
 class SDSS_SpecPhoto(Base):
     __tablename__ = 'sdss_spec_photo'
     __table_args__ = (
