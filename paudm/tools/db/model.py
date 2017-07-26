@@ -361,7 +361,6 @@ class Image(Base):
     # Relationships
     mosaic = relationship('Mosaic', back_populates="images")
     detections = relationship('Detection', back_populates="image")
-    star_zps = relationship('StarZP', back_populates="image")
     detections_by_id = relationship('Detection', collection_class=attribute_mapped_collection('id'))
     forced_apertures = relationship('ForcedAperture', back_populates="image")
     star_photometries = relationship('StarPhotometry', back_populates="image")
