@@ -214,10 +214,10 @@ class Mosaic(object):
         import paudm.pipeline.nightly.delegates
         return paudm.pipeline.nightly.delegates.mosaic_create_overscanned_mosaic(self)
     
-    def load_ccd_raw(self, instrument, ccd_num, correct_overscan=True, correct_gain=True, check_rdnoise=True, job_id=None):
+    def load_ccd_raw(self, instrument, ccd_num, bias_correction=True, correct_gain=True, check_rdnoise=True, job_id=None):
         # Load amps and build overscan-corrected CCD
         import paudm.pipeline.nightly.delegates
-        return paudm.pipeline.nightly.delegates.load_ccd_raw(self, instrument, ccd_num, correct_overscan, correct_gain, check_rdnoise, job_id)
+        return paudm.pipeline.nightly.delegates.load_ccd_raw(self, instrument, ccd_num, bias_correction, correct_gain, check_rdnoise, job_id)
     
     # PIXELSIM Delegates
     def initialize_sim_params(self, exposure, environment, config, instrument):
