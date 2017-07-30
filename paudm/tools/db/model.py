@@ -662,6 +662,7 @@ class ForcedAperture(Base):
                         nullable=False)  # The per-pixel median of samples in the sky annulus after the sky outliers have been rejected
     sky_sigma = Column(Float(24),
                        nullable=False)  # The standard deviation of samples in the sky annulus after the sky outliers have been rejected
+    sky_samples = Column(Integer, nullable=False)
     aperture_radius = Column(Float(24), nullable=False)  # aperture size radius (arcsec)
     flag = Column(Boolean, nullable=False)  # Flag from pixel mask (False = Aperture OK, True = Aperture KO)
     flag_value = Column(Integer, nullable=True)  # Flag value from mask and analysis
