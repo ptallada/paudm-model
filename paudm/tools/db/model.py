@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound  # @UnusedImp
 from sqlalchemy.orm import backref
 from sqlalchemy.sql.expression import func
 from sqlalchemy.ext.declarative import declarative_base
-from base import Column, MetaData, Table
+from .base import Column, MetaData, Table
 from sqlalchemy.ext.hybrid import hybrid_property
 import brownthrower.model
 
