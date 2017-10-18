@@ -33,7 +33,6 @@ from scipy.interpolate import interp1d
 from astropy.coordinates import Angle
 from paudm.tools.common import constants
 from paudm.tools.common import qc_tools
-from paudm.pipeline.nightly.config import qc_constants
 from pkg_resources import resource_listdir, resource_string, resource_filename
 config = {}
 from paudm.tools.db import model
