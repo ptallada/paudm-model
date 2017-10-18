@@ -180,7 +180,7 @@ class Mosaic(object):
         if 'RJD-OBS' in header:
             fields['rjd_obs']    = header['RJD-OBS']
         else:
-            fields['rjd_obs']    = 57161 + (fields['date_obs']-datetime.date(2015,05,18)).days
+            fields['rjd_obs']    = 57161 + (fields['date_obs']-datetime.date(2015,5,18)).days
         
         fields['exp_time']   = header['EXPTIME'] if 'EXPTIME' in header else "0.0"
         fields['airmass']    = header['AIRMASS']
@@ -568,7 +568,7 @@ class Catalogue(object):
         else:
             error_msg = "Invalid input_type: %s" %input_type
             log.error(error_msg)
-            raise Exception, error_msg
+            raise Exception(error_msg)
         
         return catalog
     
@@ -637,7 +637,7 @@ class Catalogue(object):
         else:
             error_msg = "Invalid input_type: %s" %input_type
             log.error(error_msg)
-            raise Exception, error_msg
+            raise Exception(error_msg)
         
         return catalog
         
@@ -772,7 +772,7 @@ class Catalogue(object):
                     elif re_html.search(usno_line):
                         error_msg = "Problem querying USNO database.  Returned an HTML FILE: \n %s" %usno_out
                         log.error(error_msg)
-                        raise Exception, error_msg
+                        raise Exception(error_msg)
                     
                     usno_star_splitted = usno_line.split()
                     
@@ -787,7 +787,7 @@ class Catalogue(object):
                         else:
                             log.error("too long to print.  First non-comment line:")
                             log.error(usno_line)
-                        raise Exception, error_msg
+                        raise Exception(error_msg)
                         
                     fields = {}
                     
@@ -904,13 +904,13 @@ class Catalogue(object):
                 if len(sdss_catalogue[0].split(',')) != 23:
                     error_msg = "Unexpected SDSS query header for both primary and alternative mirrors!"
                     log.error(error_msg)
-                    raise Exception, error_msg
+                    raise Exception(error_msg)
             
             if len (sdss_catalogue) == 1:
                 # No objects found
                 error_msg = "No objects found in SDSS catalogue!"
                 log.error(error_msg)
-                raise Exception, error_msg
+                raise Exception(error_msg)
             else:
                 # remove first and last line 
                 sdss_catalogue.remove(sdss_catalogue[0])
@@ -933,7 +933,7 @@ class Catalogue(object):
                     else:
                         log.error("too long to print.  First line:")
                         log.error(sdss_star)
-                    raise Exception, error_msg
+                    raise Exception(error_msg)
             
                 # throw away any objects that are spectrally determined 
                 # to be not what we want: qsos, white dwarfs, carbon stars, 
@@ -1040,7 +1040,7 @@ class Catalogue(object):
             if( math.fabs(cosl) > 1. ):
                 error_msg = "starMaker.removeExtinction: conversion to galactic coordinates failed!"
                 log.error(error_msg)
-                raise Exception, error_msg
+                raise Exception(error_msg)
             
             sinl = (0.494109453628*math.cos(dec_rad)*math.cos(ra_rad) - 0.444829594298*math.cos(dec_rad)*math.sin(ra_rad) + 0.7469822487*math.sin(dec_rad))/math.cos(b)
             if( sinl > 1.0 and sinl < 1.0000000001 ):
@@ -1048,7 +1048,7 @@ class Catalogue(object):
             if( math.fabs(sinl) > 1. ):
                 error_msg = "starMaker.removeExtinction: conversion to galactic coordinates failed!"
                 log.error(error_msg)
-                raise Exception, error_msg
+                raise Exception(error_msg)
             
             l = math.atan2(sinl,cosl);
             if( l < 0. ):
@@ -1093,7 +1093,7 @@ class Catalogue(object):
             else:
                 error_msg = "removeExtinction: Trying to run on a non-SDSS or Truth object!  Fix me!"
                 log.error(error_msg)
-                raise Exception, error_msg
+                raise Exception(error_msg)
             
             
     
@@ -1129,7 +1129,7 @@ class Catalogue(object):
             if( math.fabs(cosl) > 1. ):
                 error_msg = "starMaker.removeExtinction: conversion to galactic coordinates failed!"
                 log.error(error_msg)
-                raise Exception, error_msg
+                raise Exception(error_msg)
                 
             sinl = (0.494109453628*math.cos(dec_rad)*math.cos(ra_rad) - 0.444829594298*math.cos(dec_rad)*math.sin(ra_rad) + 0.7469822487*math.sin(dec_rad))/math.cos(b)
             if( sinl > 1.0 and sinl < 1.0000000001 ):
@@ -1137,7 +1137,7 @@ class Catalogue(object):
             if( math.fabs(sinl) > 1. ):
                 error_msg = "starMaker.removeExtinction: conversion to galactic coordinates failed!"
                 log.error(error_msg)
-                raise Exception, error_msg
+                raise Exception(error_msg)
                 
             l = math.atan2(sinl,cosl)
             if( l < 0. ):
@@ -1231,7 +1231,7 @@ class Catalogue(object):
             except KeyError:
                 error_msg = "Error, trying to assign an sdss-like error when the filter is not known: %s" %filter
                 log.error(error_msg)
-                raise Exception, error_msg
+                raise Exception(error_msg)
                 
             best_dist = 999999.
             close_broadband = ''
@@ -1289,7 +1289,7 @@ class Catalogue(object):
             except KeyError:
                 error_msg = "Error, trying to assign an sdss-like mag when the filter is not known: %s" %filter
                 log.error(error_msg)
-                raise Exception, error_msg
+                raise Exception(error_msg)
                 
             best_dist = 999999.
             close_broadband = ''
@@ -2383,7 +2383,7 @@ class StarSEDs(object):
         if len(sed1.wavelengths) != len(sed2.wavelengths):
             error_msg = "combine_seds: SEDs are different lengths!"
             log.error(error_msg)
-            raise Exception, error_msg
+            raise Exception(error_msg)
             
         newSED = Spectrum(np.zeros(len(sed1.wavelengths)),np.zeros(len(sed1.wavelengths)))
         newSED.wavelengths = sed1.wavelengths
