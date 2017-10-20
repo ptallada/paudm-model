@@ -11,8 +11,8 @@ from pkg_resources import resource_filename
 def _read_csv(path):
     """Read in the SED files. These are all stored in the same format."""
 
-    band = os.path.basename(path).replace('.sed', '')
-    data = pd.io.api.read_csv(path, sep=' ', comment='#', names=['lmb', 'resp'])
+    band = os.path.splitext(os.path.basename(path))[0]
+    data = pd.read_csv(path, sep=' ', comment='#', names=['lmb', 'resp'])
     data = data.set_index('lmb')
 
     return band, data
