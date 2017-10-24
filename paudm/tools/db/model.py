@@ -641,7 +641,6 @@ class CrosstalkDiff(Base):
         PrimaryKeyConstraint('image_orig_id', 'image_dest_id', 'release'),
         ForeignKeyConstraint(['image_orig_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['image_dest_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('image_orig_id', 'image_dest_id', 'release'),
 
     )
     # Keys
@@ -656,8 +655,8 @@ class CrosstalkDiff(Base):
     npix_orig_sat = Column(Integer, nullable=False)  # Number of pixels at origin
 
     # Relationships
-    image_orig = relationship('Image', back_populates="image_diff_origs")
-    image_dest = relationship('Image', back_populates="image_diff_dests")
+    image_orig = relationship('Image', back_populates="image_diff_origs", foreign_keys=[image_orig_id])
+    image_dest = relationship('Image', back_populates="image_diff_dests", foreign_keys=[image_dest_id])
 
 Index('ik_crosstalkdiff', CrosstalkDiff.release, CrosstalkDiff.image_orig_id, CrosstalkDiff.image_dest_id)
 
@@ -673,7 +672,6 @@ class CrosstalkRatio(Base):
         PrimaryKeyConstraint('image_orig_id', 'image_dest_id', 'release'),
         ForeignKeyConstraint(['image_orig_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['image_dest_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('image_orig_id', 'image_dest_id', 'release'),
 
     )
     # Keys
@@ -685,8 +683,8 @@ class CrosstalkRatio(Base):
     ratio = Column(Float(24), nullable=False)  # crosstalk ratio between amplifiers
 
     # Relationships
-    image_orig = relationship('Image', back_populates="image_ratio_origs")
-    image_dest = relationship('Image', back_populates="image_ratio_dests")
+    image_orig = relationship('Image', back_populates="image_ratio_origs", foreign_keys=[image_orig_id])
+    image_dest = relationship('Image', back_populates="image_ratio_dests", foreign_keys=[image_dest_id])
 
 Index('ik_crosstalkratio', CrosstalkRatio.release, CrosstalkRatio.image_orig_id, CrosstalkRatio.image_dest_id)
 
