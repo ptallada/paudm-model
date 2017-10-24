@@ -365,7 +365,10 @@ class Image(Base):
     forced_apertures = relationship('ForcedAperture', back_populates="image")
     star_photometries = relationship('StarPhotometry', back_populates="image")
     image_zps = relationship('ImageZP', back_populates="image")
-
+    image_diff_origs = relationship('CrosstalkDiff', back_populates="image")
+    image_diff_dests = relationship('CrosstalkDiff', back_populates="image")
+    image_ratio_origs = relationship('CrosstalkRatio', back_populates="image")
+    image_ratio_dests = relationship('CrosstalkRatio', back_populates="image")
 
 Index('ik_imagelocation', Image.ra_min, Image.ra_max, Image.dec_min, Image.dec_max)
 
@@ -629,6 +632,67 @@ class PhotZP(Base):
 
     # Comment:
     # Contains the photometric zeropoints for a given production
+
+
+class CrosstalkDiff(Base):
+    __tablename__ = 'crosstalk_diff'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('image_orig_id', 'image_dest_id', 'release'),
+        ForeignKeyConstraint(['image_orig_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['image_dest_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        UniqueConstraint('image_orig_id', 'image_dest_id', 'release'),
+
+    )
+    # Keys
+    image_orig_id = Column(BigInteger, nullable=False)  # Origin image identifier
+    image_dest_id = Column(BigInteger, nullable=False)  # Destination image indetifier
+    release = Column(Integer, nullable=False)  # Crosstalk calibration id
+
+    # Fields
+    background_orig_all = Column(Float(24), nullable=False)  # Background level at origin for all pixels
+    background_dest_all = Column(Float(24), nullable=False)  # Background level at destination for all pixels
+    background_dest_sat = Column(Float(24), nullable=False)  # Background level at destination for saturated pixels
+    npix_orig_sat = Column(Integer, nullable=False)  # Number of pixels at origin
+
+    # Relationships
+    image_orig = relationship('Image', back_populates="image_diff_origs")
+    image_dest = relationship('Image', back_populates="image_diff_dests")
+
+Index('ik_crosstalkdiff', CrosstalkDiff.release, CrosstalkDiff.image_orig_id, CrosstalkDiff.image_dest_id)
+
+
+    # Comment:
+    # Crosstalk difference values
+
+
+class CrosstalkRatio(Base):
+    __tablename__ = 'crosstalk_ratio'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('image_orig_id', 'image_dest_id', 'release'),
+        ForeignKeyConstraint(['image_orig_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['image_dest_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        UniqueConstraint('image_orig_id', 'image_dest_id', 'release'),
+
+    )
+    # Keys
+    image_orig_id = Column(BigInteger, nullable=False)  # Origin image identifier
+    image_dest_id = Column(BigInteger, nullable=False)  # Destination image indetifier
+    release = Column(Integer, nullable=False)  # Crosstalk calibration id
+
+    # Fields
+    ratio = Column(Float(24), nullable=False)  # crosstalk ratio between amplifiers
+
+    # Relationships
+    image_orig = relationship('Image', back_populates="image_ratio_origs")
+    image_dest = relationship('Image', back_populates="image_ratio_dests")
+
+Index('ik_crosstalkratio', CrosstalkRatio.release, CrosstalkRatio.image_orig_id, CrosstalkRatio.image_dest_id)
+
+
+    # Comment:
+    # Crosstalk ratio values
 
 
 class ForcedAperture(Base):
