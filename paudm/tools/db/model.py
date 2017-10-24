@@ -365,10 +365,10 @@ class Image(Base):
     forced_apertures = relationship('ForcedAperture', back_populates="image")
     star_photometries = relationship('StarPhotometry', back_populates="image")
     image_zps = relationship('ImageZP', back_populates="image")
-    image_diff_origs = relationship('CrosstalkDiff', back_populates="image")
-    image_diff_dests = relationship('CrosstalkDiff', back_populates="image")
-    image_ratio_origs = relationship('CrosstalkRatio', back_populates="image")
-    image_ratio_dests = relationship('CrosstalkRatio', back_populates="image")
+    image_diff_origs = relationship('CrosstalkDiff', back_populates="image_orig", foreign_keys='[CrosstalkDiff.image_orig_id]')
+    image_diff_dests = relationship('CrosstalkDiff', back_populates="image_dest", foreign_keys='[CrosstalkDiff.image_dest_id]')
+    image_ratio_origs = relationship('CrosstalkRatio', back_populates="image_orig", foreign_keys='[CrosstalkRatio.image_orig_id]')
+    image_ratio_dests = relationship('CrosstalkRatio', back_populates="image_dest", foreign_keys='[CrosstalkRatio.image_dest_id]')
 
 Index('ik_imagelocation', Image.ra_min, Image.ra_max, Image.dec_min, Image.dec_max)
 
