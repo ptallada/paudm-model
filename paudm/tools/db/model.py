@@ -668,11 +668,6 @@ class CrosstalkRatio(Base):
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('ccd_num_orig', 'amp_num_orig', 'ccd_num_dest', 'amp_num_dest', 'release'),
-        ForeignKeyConstraint(['ccd_num_orig'], ['image.ccd_num'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['amp_num_orig'], ['image.amp_num'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['ccd_num_dest'], ['image.ccd_num'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['amp_num_dest'], ['image.amp_num'], onupdate='CASCADE', ondelete='CASCADE'),
-
     )
     # Keys
     ccd_num_orig = Column(SmallInteger, nullable=False)  # Origin CCD number
