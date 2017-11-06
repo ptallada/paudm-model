@@ -367,8 +367,6 @@ class Image(Base):
     image_zps = relationship('ImageZP', back_populates="image")
     image_diff_origs = relationship('CrosstalkDiff', back_populates="image_orig", foreign_keys='[CrosstalkDiff.image_orig_id]')
     image_diff_dests = relationship('CrosstalkDiff', back_populates="image_dest", foreign_keys='[CrosstalkDiff.image_dest_id]')
-    image_ratio_origs = relationship('CrosstalkRatio', back_populates="image_orig", foreign_keys='[CrosstalkRatio.image_orig_id]')
-    image_ratio_dests = relationship('CrosstalkRatio', back_populates="image_dest", foreign_keys='[CrosstalkRatio.image_dest_id]')
 
 Index('ik_imagelocation', Image.ra_min, Image.ra_max, Image.dec_min, Image.dec_max)
 
@@ -669,24 +667,25 @@ class CrosstalkRatio(Base):
     __tablename__ = 'crosstalk_ratio'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('image_orig_id', 'image_dest_id', 'release'),
-        ForeignKeyConstraint(['image_orig_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['image_dest_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        PrimaryKeyConstraint('ccd_num_orig', 'amp_num_orig', 'ccd_num_dest', 'amp_num_dest', 'release'),
+        ForeignKeyConstraint(['ccd_num_orig'], ['image.ccd_num'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['amp_num_orig'], ['image.amp_num'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['ccd_num_dest'], ['image.ccd_num'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['amp_num_dest'], ['image.amp_num'], onupdate='CASCADE', ondelete='CASCADE'),
 
     )
     # Keys
-    image_orig_id = Column(BigInteger, nullable=False)  # Origin image identifier
-    image_dest_id = Column(BigInteger, nullable=False)  # Destination image indetifier
+    ccd_num_orig = Column(SmallInteger, nullable=False)  # Origin CCD number
+    amp_num_orig = Column(SmallInteger, nullable=False)  # Origin amplifier number
+    ccd_num_dest = Column(SmallInteger, nullable=False)  # Destination CCD number
+    amp_num_dest = Column(SmallInteger, nullable=False)  # Destination amplifier number
     release = Column(Integer, nullable=False)  # Crosstalk calibration id
 
     # Fields
     ratio = Column(Float(24), nullable=False)  # crosstalk ratio between amplifiers
 
-    # Relationships
-    image_orig = relationship('Image', back_populates="image_ratio_origs", foreign_keys=[image_orig_id])
-    image_dest = relationship('Image', back_populates="image_ratio_dests", foreign_keys=[image_dest_id])
-
-Index('ik_crosstalkratio', CrosstalkRatio.release, CrosstalkRatio.image_orig_id, CrosstalkRatio.image_dest_id)
+Index('ik_crosstalkratio', CrosstalkRatio.release, CrosstalkRatio.ccd_num_orig, CrosstalkRatio.amp_num_orig,
+                                                   CrosstalkRatio.ccd_num_dest, CrosstalkRatio.amp_num_dest)
 
 
     # Comment:
