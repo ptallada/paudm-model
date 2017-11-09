@@ -720,6 +720,10 @@ class ForcedAperture(Base):
                        nullable=False)  # The standard deviation of samples in the sky annulus after the sky outliers have been rejected
     sky_samples = Column(Integer, nullable=False)
     aperture_radius = Column(Float(24), nullable=False)  # aperture size radius (arcsec)
+    annulus_radius_in = Column(Float(24), nullable=False)  # annulus inner radius (arcsec)
+    annulus_radius_out = Column(Float(24), nullable=False)  # annulus outer radius (arcsec)
+    global_bg_ellipticity = Column(Float(24), nullable=False)  # Global background ellipticity
+    local_bg_ellipticity = Column(Float(24), nullable=False)  # Local backrground ellipticity
     flag = Column(Boolean, nullable=False)  # Flag from pixel mask (False = Aperture OK, True = Aperture KO)
     flag_value = Column(Integer, nullable=True)  # Flag value from mask and analysis
     ra_offset = Column(Float(24), nullable=False)  # RA offset due to aperture recentering
