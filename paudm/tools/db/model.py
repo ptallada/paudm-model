@@ -649,9 +649,9 @@ class CrosstalkDiff(Base):
     release = Column(Integer, nullable=False)  # Crosstalk calibration id
 
     # Fields
-    background_orig_all = Column(Float(24), nullable=False)  # Background level at origin for all pixels
-    background_dest_all = Column(Float(24), nullable=False)  # Background level at destination for all pixels
-    background_dest_sat = Column(Float(24), nullable=False)  # Background level at destination for saturated pixels
+    background_orig_all = Column(Float(53), nullable=False)  # Background level at origin for all pixels
+    background_dest_all = Column(Float(53), nullable=False)  # Background level at destination for all pixels
+    background_dest_sat = Column(Float(53), nullable=False)  # Background level at destination for saturated pixels
     npix_orig_sat = Column(Integer, nullable=False)  # Number of pixels at origin
 
     # Relationships
@@ -679,7 +679,7 @@ class CrosstalkRatio(Base):
     release = Column(Integer, nullable=False)  # Crosstalk calibration id
 
     # Fields
-    ratio = Column(Float(24), nullable=False)  # crosstalk ratio between amplifiers
+    ratio = Column(Float(53), nullable=False)  # crosstalk ratio between amplifiers
 
 Index('ik_crosstalkratio', CrosstalkRatio.release, CrosstalkRatio.ccd_num_orig, CrosstalkRatio.amp_num_orig,
                                                    CrosstalkRatio.ccd_num_dest, CrosstalkRatio.amp_num_dest)
