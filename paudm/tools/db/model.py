@@ -525,7 +525,7 @@ class StarTemplateZP(Base):
 
     # Relationships
     star_zp = relationship('StarZP', back_populates="star_template_zps")
-    template_fit_band = relationship('TemplateFitBand', back_populates="star_template_zps")
+    #template_fit_band = relationship('TemplateFitBand', back_populates="star_template_zps")
 
     # Comment:
     # Contains the star-template duo zeropoint measurements
@@ -542,12 +542,14 @@ class Template(Base):
     id = Column(BigInteger, nullable=False)  # Unique identifier
 
     # Fields
-    template_lib = Column(Float(24), nullable=False)  # template library name
-    template_name = Column(Float(24), nullable=False)  # star template name
+    template_lib = Column(String(24), nullable=False)  # template library name
+    template_name = Column(String(24), nullable=True)  # star template name
+    template_index = Column(Float(24), nullable=True)  # star template index
     filename = Column(String(128), nullable=False)  # File name
 
     # Relationships
     template_fits = relationship('TemplateFit', back_populates="template")
+    template_bands = relationship('TemplateBand', back_populates="template")
 
     # Comment:
     # Contains list of stellar templates used for photometric calibration during the nightly pipeline
@@ -566,42 +568,42 @@ class TemplateFit(Base):
 
     # Non-relationable Keys
     ref_cat = Column(String(16), nullable=False)  # Reference catalogue
-    ref_id = Column(BigInteger, nullable=True)  # Reference catalogue star identifier
+    ref_id = Column(BigInteger, nullable=False)  # Reference catalogue star identifier
 
     # Fields
     fit_method = Column(String(16), nullable=False)  # Method used for template fitting
     chi2 = Column(Float(24), nullable=False)  # chi2 fit
-    odds = Column(Float(24), nullable=False)  # odds fit
+    #odds = Column(Float(24), nullable=True)  # odds fit
     amplitude = Column(Float(24), nullable=False)  # amplitude of fit
     amplitude_err = Column(Float(24), nullable=False)  # amplitude error of fit
 
     # Relationships
     template = relationship('Template', back_populates="template_fits")
-    template_fit_bands = relationship('TemplateFitBand', back_populates="template_fit")
 
     # Comment:
     # Contains the fit of each reference star to a specific template
 
 
-class TemplateFitBand(Base):
-    __tablename__ = 'template_fit_band'
+class TemplateBand(Base):
+    __tablename__ = 'template_band'
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
-        ForeignKeyConstraint(['template_fit_id'], ['template_fit.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['template_id'], ['template.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
-    template_fit_id = Column(BigInteger, nullable=False)  # CCD image number
+    template_id = Column(BigInteger, nullable=False)  # CCD image number
     band = Column(String(8), nullable=False)  # Band name
 
     # Fields
     ref_flux = Column(Float(24), nullable=False)  # chi2 fit
-    ref_flux_err = Column(Float(24), nullable=False)  # odds fit
-
+    #ref_flux_err = Column(Float(24), nullable=False)  # odds fit
+    project = Column(String(24), nullable=False)  # project name SDSS, PAU, ...
+    method =  Column(String(24), nullable=False)  # method used to convolve the templates to the filter curve
     # Relationships
-    template_fit = relationship('TemplateFit', back_populates="template_fit_bands")
-    star_template_zps = relationship('StarTemplateZP', back_populates="template_fit_band")
+    template = relationship('Template', back_populates="template_bands")
+    #star_template_zps = relationship('StarTemplateZP', back_populates="template_fit_band")
 
     # Comment:
     # Contains the reference fluxes for each band in each template fit
