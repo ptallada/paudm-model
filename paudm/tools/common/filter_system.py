@@ -21,7 +21,7 @@ def filter_throughput():
     """The full filter throughput (filter, atmosphere, detector)."""
 
     d = resource_filename('paudm.resources', 'throughput')
-    sed_glob = os.path.join(d, '*', '*.sed')
+    sed_glob = os.path.join(d, '*', '*.ssv')
     D = dict(map(_read_csv, glob.glob(sed_glob)))
     resp = pd.concat(D)
 
