@@ -638,7 +638,7 @@ class CrosstalkDiff(Base):
     __tablename__ = 'crosstalk_diff'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('image_orig_id', 'image_dest_id', 'release'),
+        PrimaryKeyConstraint('image_orig_id', 'image_dest_id', 'version'),
         ForeignKeyConstraint(['image_orig_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['image_dest_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
 
@@ -646,7 +646,7 @@ class CrosstalkDiff(Base):
     # Keys
     image_orig_id = Column(BigInteger, nullable=False)  # Origin image identifier
     image_dest_id = Column(BigInteger, nullable=False)  # Destination image indetifier
-    release = Column(Integer, nullable=False)  # Crosstalk calibration id
+    version = Column(Integer, nullable=False)  # Crosstalk calibration id
 
     # Fields
     background_orig_all = Column(Float(53), nullable=False)  # Background level at origin for all pixels
@@ -658,7 +658,7 @@ class CrosstalkDiff(Base):
     image_orig = relationship('Image', back_populates="image_diff_origs", foreign_keys=[image_orig_id])
     image_dest = relationship('Image', back_populates="image_diff_dests", foreign_keys=[image_dest_id])
 
-Index('ik_crosstalkdiff', CrosstalkDiff.release, CrosstalkDiff.image_orig_id, CrosstalkDiff.image_dest_id)
+Index('ik_crosstalkdiff', CrosstalkDiff.version, CrosstalkDiff.image_orig_id, CrosstalkDiff.image_dest_id)
 
 
     # Comment:
@@ -669,19 +669,19 @@ class CrosstalkRatio(Base):
     __tablename__ = 'crosstalk_ratio'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('ccd_num_orig', 'amp_num_orig', 'ccd_num_dest', 'amp_num_dest', 'release'),
+        PrimaryKeyConstraint('ccd_num_orig', 'amp_num_orig', 'ccd_num_dest', 'amp_num_dest', 'version'),
     )
     # Keys
     ccd_num_orig = Column(SmallInteger, nullable=False)  # Origin CCD number
     amp_num_orig = Column(SmallInteger, nullable=False)  # Origin amplifier number
     ccd_num_dest = Column(SmallInteger, nullable=False)  # Destination CCD number
     amp_num_dest = Column(SmallInteger, nullable=False)  # Destination amplifier number
-    release = Column(Integer, nullable=False)  # Crosstalk calibration id
+    version = Column(Integer, nullable=False)  # Crosstalk calibration id
 
     # Fields
     ratio = Column(Float(53), nullable=False)  # crosstalk ratio between amplifiers
 
-Index('ik_crosstalkratio', CrosstalkRatio.release, CrosstalkRatio.ccd_num_orig, CrosstalkRatio.amp_num_orig,
+Index('ik_crosstalkratio', CrosstalkRatio.version, CrosstalkRatio.ccd_num_orig, CrosstalkRatio.amp_num_orig,
                                                    CrosstalkRatio.ccd_num_dest, CrosstalkRatio.amp_num_dest)
 
 
