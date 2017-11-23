@@ -153,6 +153,8 @@ class Production(Base):
     truth_objects = relationship('Truth_Object', back_populates="production")
     targets = relationship('Target', back_populates="production")
     phot_zps = relationship('PhotZP', back_populates="production")
+    crosstalk_diffs = relationship('CrosstalkDiff', back_populates="production")
+    crosstalk_ratios = relationship('CrosstalkRatio', back_populates="production")
     parent = relationship('Production', back_populates='children',
                           primaryjoin='Production.input_production_id == Production.id',
                           remote_side='Production.id')
@@ -638,15 +640,15 @@ class CrosstalkDiff(Base):
     __tablename__ = 'crosstalk_diff'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('image_orig_id', 'image_dest_id', 'version'),
+        PrimaryKeyConstraint('image_orig_id', 'image_dest_id', 'production_id'),
         ForeignKeyConstraint(['image_orig_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['image_dest_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
-
+        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Keys
     image_orig_id = Column(BigInteger, nullable=False)  # Origin image identifier
     image_dest_id = Column(BigInteger, nullable=False)  # Destination image indetifier
-    version = Column(Integer, nullable=False)  # Crosstalk calibration id
+    production_id = Column(Integer, nullable=False)  # Production id
 
     # Fields
     background_orig_all = Column(Float(53), nullable=False)  # Background level at origin for all pixels
@@ -657,6 +659,7 @@ class CrosstalkDiff(Base):
     # Relationships
     image_orig = relationship('Image', back_populates="image_diff_origs", foreign_keys=[image_orig_id])
     image_dest = relationship('Image', back_populates="image_diff_dests", foreign_keys=[image_dest_id])
+    production = relationship('Production', back_populates="crosstalk_diffs")
 
 Index('ik_crosstalkdiff', CrosstalkDiff.version, CrosstalkDiff.image_orig_id, CrosstalkDiff.image_dest_id)
 
@@ -669,17 +672,22 @@ class CrosstalkRatio(Base):
     __tablename__ = 'crosstalk_ratio'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('ccd_num_orig', 'amp_num_orig', 'ccd_num_dest', 'amp_num_dest', 'version'),
+        PrimaryKeyConstraint('ccd_num_orig', 'amp_num_orig', 'ccd_num_dest', 'amp_num_dest', 'production_id'),
+        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Keys
     ccd_num_orig = Column(SmallInteger, nullable=False)  # Origin CCD number
     amp_num_orig = Column(SmallInteger, nullable=False)  # Origin amplifier number
     ccd_num_dest = Column(SmallInteger, nullable=False)  # Destination CCD number
     amp_num_dest = Column(SmallInteger, nullable=False)  # Destination amplifier number
-    version = Column(Integer, nullable=False)  # Crosstalk calibration id
+    production_id = Column(Integer, nullable=False)  # Production id
 
     # Fields
     ratio = Column(Float(53), nullable=False)  # crosstalk ratio between amplifiers
+
+    # Relationships
+    production = relationship('Production', back_populates="crosstalk_ratios")
+
 
 Index('ik_crosstalkratio', CrosstalkRatio.version, CrosstalkRatio.ccd_num_orig, CrosstalkRatio.amp_num_orig,
                                                    CrosstalkRatio.ccd_num_dest, CrosstalkRatio.amp_num_dest)
