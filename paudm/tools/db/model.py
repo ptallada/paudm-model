@@ -661,7 +661,7 @@ class CrosstalkDiff(Base):
     image_dest = relationship('Image', back_populates="image_diff_dests", foreign_keys=[image_dest_id])
     production = relationship('Production', back_populates="crosstalk_diffs")
 
-Index('ik_crosstalkdiff', CrosstalkDiff.version, CrosstalkDiff.image_orig_id, CrosstalkDiff.image_dest_id)
+Index('ik_crosstalkdiff', CrosstalkDiff.production_id, CrosstalkDiff.image_orig_id, CrosstalkDiff.image_dest_id)
 
 
     # Comment:
@@ -689,7 +689,7 @@ class CrosstalkRatio(Base):
     production = relationship('Production', back_populates="crosstalk_ratios")
 
 
-Index('ik_crosstalkratio', CrosstalkRatio.version, CrosstalkRatio.ccd_num_orig, CrosstalkRatio.amp_num_orig,
+Index('ik_crosstalkratio', CrosstalkRatio.production_id, CrosstalkRatio.ccd_num_orig, CrosstalkRatio.amp_num_orig,
                                                    CrosstalkRatio.ccd_num_dest, CrosstalkRatio.amp_num_dest)
 
 
