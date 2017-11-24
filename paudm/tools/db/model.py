@@ -729,7 +729,9 @@ class ForcedAperture(Base):
     sky_sigma = Column(Float(24),
                        nullable=False)  # The standard deviation of samples in the sky annulus after the sky outliers have been rejected
     sky_samples = Column(Integer, nullable=False)
-    aperture_radius = Column(Float(24), nullable=False)  # aperture size radius (arcsec)
+    aperture_a = Column(Float(24), nullable=False)  # aperture size radius for major axis (arcsec)
+    aperture_b = Column(Float(24), nullable=False)  # aperture size radius for minor axis (arcsec)
+    aperture_theta = Column(Float(24), nullable=False)  # aperture Position angle from N to E(deg)
     annulus_radius_in = Column(Float(24), nullable=False)  # annulus inner radius (arcsec)
     annulus_radius_out = Column(Float(24), nullable=False)  # annulus outer radius (arcsec)
     global_bg_ellipticity = Column(Float(24), nullable=False)  # Global background ellipticity
