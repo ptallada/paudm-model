@@ -145,16 +145,15 @@ class Production(Base):
 
     # Relationships
     mosaics = relationship('Mosaic', back_populates="production")
-    global_objects = relationship('Global_object', back_populates="production")
-    coadd_objects = relationship('Coadd_object', back_populates="production")
     forced_aperture_coadds = relationship('ForcedApertureCoadd', back_populates="production")
     forced_apertures = relationship('ForcedAperture', back_populates="production")
-    photo_zs = relationship('Photoz_BCNz', back_populates="production")
+    photoz_bcnzs = relationship('Photoz_BCNz', back_populates="production")
     truth_objects = relationship('Truth_Object', back_populates="production")
     targets = relationship('Target', back_populates="production")
     phot_zps = relationship('PhotZP', back_populates="production")
     crosstalk_diffs = relationship('CrosstalkDiff', back_populates="production")
     crosstalk_ratios = relationship('CrosstalkRatio', back_populates="production")
+    memba_ref_cats = relationship('MEMBARefCat', back_populates="production")
     parent = relationship('Production', back_populates='children',
                           primaryjoin='Production.input_production_id == Production.id',
                           remote_side='Production.id')
@@ -409,9 +408,6 @@ class Detection(Base):
     zp_offset = Column(Float(24), nullable=False)  # Offset zeropoint magnitude for unexpected corrections
     # Relationships
     image = relationship('Image', back_populates="detections")
-    global_objects = relationship('Global_object',
-                                  back_populates="detections",
-                                  secondary=lambda: Global_object_detections.__table__)
 
 
 Index('ik_detlocation', Detection.ra, Detection.dec)
@@ -692,67 +688,67 @@ class CrosstalkRatio(Base):
 Index('ik_crosstalkratio', CrosstalkRatio.production_id, CrosstalkRatio.ccd_num_orig, CrosstalkRatio.amp_num_orig,
                                                    CrosstalkRatio.ccd_num_dest, CrosstalkRatio.amp_num_dest)
 
-
     # Comment:
     # Crosstalk ratio values
 
 
+# MEMBA production to Reference Catalog Table
+class MEMBARefCat(Base):
+    __tablename__ = 'memba_ref_cat'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('production_id', 'ref_cat'),
+        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    )
+    # Keys
+    production_id = Column(Integer, nullable=False)  # Production id
+    ref_cat = Column(String(16),  nullable=True)  # Reference catalogue name
+    production = relationship('Production', back_populates="memba_ref_cats")
+
+
+# Forced Aperture Object Table
 class ForcedAperture(Base):
     __tablename__ = 'forced_aperture'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('id'),
+        PrimaryKeyConstraint('production_id', 'ref_id', 'image_id'),
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['image_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier
-    production_id = Column(Integer, nullable=False)  # Production number
-    pixel_id = Column(Integer, nullable=False)  # Healpix id (for area selection)
-    ref_id = Column(BigInteger, nullable=True)  # Unique identifier for the reference object
-    ref_cat = Column(String(16), nullable=True)  # Reference catalogue name
-    image_id = Column(BigInteger, nullable=False)  # CCD image number
-    insert_date = Column(DateTime, nullable=False, default=func.current_timestamp())  # Timestamp of insertion
-    band = Column(String(8), nullable=False)  # Band name
+    production_id = Column(Integer, nullable=False, comment='Production id')
+    image_id = Column(BigInteger, nullable=False, comment='CCD image id')
+    ref_id = Column(BigInteger, nullable=True, comment='Unique identifier of source in reference catalogue')
     # Fields
-    aperture_ra = Column(Float(53), nullable=False)  # Sky coordinates of aperture center
-    aperture_dec = Column(Float(53), nullable=False)  # Sky coordinates of aperture center
-    aperture_x = Column(Float(24), nullable=False)  # Image coordinates of aperture center
-    aperture_y = Column(Float(24), nullable=False)  # Image coordinates of aperture center
-    source_intensity = Column(Float(24), nullable=False)  # Integrated intensity of the source (in the aperture)
-    source_uncertainty = Column(Float(24), nullable=False)  # Uncertainty associated with the source intensity
-    magnitude = Column(Float(24), nullable=False)  # Magnitude representation of “SourceIntensity”.
-    mag_uncertainty = Column(Float(24), nullable=False)  # Magnitude uncertainty, given by 1.0857 times
-    # “SourceUncertainty” divided by “SourceIntensity”.
-    sky_median = Column(Float(24),
-                        nullable=False)  # The per-pixel median of samples in the sky annulus after the sky outliers have been rejected
-    sky_sigma = Column(Float(24),
-                       nullable=False)  # The standard deviation of samples in the sky annulus after the sky outliers have been rejected
-    sky_samples = Column(Integer, nullable=False)
-    aperture_a = Column(Float(24), nullable=False)  # aperture size radius for major axis (arcsec)
-    aperture_b = Column(Float(24), nullable=False)  # aperture size radius for minor axis (arcsec)
-    aperture_theta = Column(Float(24), nullable=False)  # aperture Position angle from N to E(deg)
-    annulus_radius_in = Column(Float(24), nullable=False)  # annulus inner radius (arcsec)
-    annulus_radius_out = Column(Float(24), nullable=False)  # annulus outer radius (arcsec)
-    global_bg_ellipticity = Column(Float(24), nullable=False)  # Global background ellipticity
-    local_bg_ellipticity = Column(Float(24), nullable=False)  # Local backrground ellipticity
-    flag = Column(Boolean, nullable=False)  # Flag from pixel mask (False = Aperture OK, True = Aperture KO)
-    flag_value = Column(Integer, nullable=True)  # Flag value from mask and analysis
-    ra_offset = Column(Float(24), nullable=False)  # RA offset due to aperture recentering
-    dec_offset = Column(Float(24), nullable=False)  # Dec offset due to aperture recentering
+    pixel_id = Column(Integer, nullable=False, comment='Healpix id')
+    aperture_x = Column(Float(24), nullable=False, comment='Image X coordinate of aperture center (pixels)')
+    aperture_y = Column(Float(24), nullable=False, comment='Image Y coordinate of aperture center (pixels)')
+    aperture_a = Column(Float(24), nullable=False, comment='aperture size radius for major axis (arcsec)')
+    aperture_b = Column(Float(24), nullable=False, comment='aperture size radius for minor axis (arcsec)')
+    aperture_theta = Column(Float(24), nullable=False, comment='aperture position angle from N to E(deg)')
+    annulus_radius_a_in = Column(Float(24), nullable=False, comment='annulus inner radius for major axis (arcsec)')
+    annulus_radius_a_out = Column(Float(24), nullable=False, comment='annulus outer radius for major axis (arcsec)')
+    annulus_radius_b_in = Column(Float(24), nullable=False, comment='annulus inner radius for minor axis (arcsec)')
+    annulus_radius_b_out = Column(Float(24), nullable=False, comment='annulus outer radius for minor axis (arcsec)')
+    flux = Column(Float(24), nullable=False, comment='Non calibrated flux in the aperture (e/s)')
+    flux_error = Column(Float(24), nullable=False, comment='Uncertainty associated to the non calibrated flux in the aperture')
+    sky_median = Column(Float(24), nullable=False, comment='Sky median in annulus after sigma clipping')
+    sky_sigma = Column(Float(24), nullable=False, comment='Sky standard deviation in annulus after sigma clipping')
+    sky_samples = Column(Integer, nullable=False, comment='The number of samples in the annulus used for sky statistics')
+    global_bg_ellipticity = Column(Float(24), nullable=False, comment='Global background ellipticity')
+    local_bg_ellipticity = Column(Float(24), nullable=False, comment='Local background ellipticity')
+    flag = Column(Integer, nullable=True, comment='Flag value from mask and MEMBA analysis')
 
     # Relationships
     image = relationship('Image', back_populates="forced_apertures")
     production = relationship('Production', back_populates="forced_apertures")
-    # Documentation
 
 
-Index('ik_falocation', ForcedAperture.aperture_ra, ForcedAperture.aperture_dec)
-Index('ik_fapixels', ForcedAperture.pixel_id)
-Index('ik_faband', ForcedAperture.band)
+# Indexes
+Index('ik_faepixels', ForcedAperture.production_id, ForcedAperture.pixel_id)
 
 
-# Comment:
+# Comment
 # Contains the individual image measurements using force photometry in MEMBA.
 
 
@@ -761,312 +757,26 @@ class ForcedApertureCoadd(Base):
     __tablename__ = 'forced_aperture_coadd'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('id'),
+        PrimaryKeyConstraint('production_id', 'ref_id', 'band'),
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('production_id', 'ref_id', 'ref_cat'),
     )
     # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier"),
-    production_id = Column(Integer, nullable=False)  # Production number"),
+    production_id = Column(Integer, nullable=False, comment='Production id')
+    ref_id = Column(BigInteger, nullable=False, comment='Unique identifier of source in reference catalogue')
+    band = Column(Enum('NB455', 'NB465', 'NB475', 'NB485', 'NB495',
+                       'NB505', 'NB515', 'NB525', 'NB535', 'NB545', 'NB555', 'NB565', 'NB575', 'NB585', 'NB595',
+                       'NB605', 'NB615', 'NB625', 'NB635', 'NB645', 'NB655', 'NB665', 'NB675', 'NB685', 'NB695',
+                       'NB705', 'NB715', 'NB725', 'NB735', 'NB745', 'NB755', 'NB765', 'NB775', 'NB785', 'NB795',
+                       'NB805', 'NB815', 'NB825', 'NB835', 'NB845', 'u', 'g', 'r', 'i', 'z', 'Y',
+                       name='pau_bands'), nullable=False, comment='Band')
     # Fields
-    ref_id = Column(BigInteger, nullable=False)  # Unique identifier for reference catalogue"),
-    ref_cat = Column(String(16), nullable=True)  # Reference catalogue name
-    ra = Column(Float(53), nullable=False)  # Windowed right ascension of barycenter (J2000) [ALPHAWIN_J2000] (deg)"),
-    dec = Column(Float(53), nullable=False)  # Windowed declination of barycenter (J2000) [DELTAWIN_J2000] (deg)"),
-    # Magnitudes
-    mag_u = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_u = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_g = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_g = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_r = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_r = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_i = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_i = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_z = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_z = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_Y = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_Y = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB455 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB455 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB465 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB465 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB475 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB475 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB485 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB485 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB495 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB495 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB505 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB505 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB515 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB515 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB525 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB525 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB535 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB535 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB545 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB545 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB555 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB555 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB565 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB565 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB575 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB575 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB585 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB585 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB595 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB595 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB605 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB605 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB615 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB615 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB625 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB625 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB635 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB635 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB645 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB645 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB655 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB655 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB665 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB665 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB675 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB675 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB685 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB685 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB695 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB695 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB705 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB705 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB715 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB715 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB725 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB725 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB735 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB735 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB745 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB745 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB755 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB755 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB765 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB765 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB775 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB775 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB785 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB785 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB795 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB795 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB805 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB805 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB815 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB815 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB825 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB825 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB835 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB835 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_NB845 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_NB845 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    # Fluxes
-    flux_u = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_u = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_g = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_g = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_r = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_r = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_i = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_i = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_z = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_z = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_Y = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_Y = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB455 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB455 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB465 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB465 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB475 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB475 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB485 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB485 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB495 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB495 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB505 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB505 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB515 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB515 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB525 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB525 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB535 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB535 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB545 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB545 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB555 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB555 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB565 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB565 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB575 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB575 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB585 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB585 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB595 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB595 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB605 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB605 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB615 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB615 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB625 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB625 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB635 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB635 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB645 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB645 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB655 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB655 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB665 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB665 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB675 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB675 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB685 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB685 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB695 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB695 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB705 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB705 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB715 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB715 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB725 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB725 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB735 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB735 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB745 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB745 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB755 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB755 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB765 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB765 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB775 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB775 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB785 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB785 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB795 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB795 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB805 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB805 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB815 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB815 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB825 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB825 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB835 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB835 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    flux_NB845 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    flux_err_NB845 = Column(Float(24), nullable=True)  # RMS error for the model fluxnitude"),
-    # Chi2
-    chi2_u = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_g = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_r = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_i = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_z = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_Y = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB455 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB465 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB475 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB485 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB495 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB505 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB515 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB525 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB535 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB545 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB555 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB565 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB575 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB585 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB595 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB605 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB615 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB625 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB635 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB645 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB655 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB665 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB675 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB685 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB695 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB705 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB715 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB725 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB735 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB745 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB755 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB765 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB775 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB785 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB795 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB805 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB815 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB825 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB835 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    chi2_NB845 = Column(Float(24), nullable=True)  # chi2nitude fitted using a galaxy model"),
-    # N
-    n_u = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_g = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_r = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_i = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_z = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_Y = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB455 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB465 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB475 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB485 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB495 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB505 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB515 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB525 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB535 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB545 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB555 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB565 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB575 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB585 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB595 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB605 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB615 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB625 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB635 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB645 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB655 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB665 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB675 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB685 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB695 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB705 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB715 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB725 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB735 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB745 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB755 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB765 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB775 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB785 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB795 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB805 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB815 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB825 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB835 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_NB845 = Column(Float(24), nullable=True)  # fluxnitude fitted using a galaxy model"),
-    n_bands = Column(Integer, nullable=True)  # number of bands available,
-    flags = Column(SmallInteger, nullable=True)  # Extraction flags [FLAGS]"),
-    star_flag = Column(Boolean, nullable=True)
+    flux = Column(Float(24), nullable=True, comment='Calibrated flux (e/s)')
+    flux_error = Column(Float(24), nullable=True, comment='Calibrated flux error')
+    chi2 = Column(Float(24), nullable=True, comment='Chi Square of fit from multiple observations')
+    n_coadd = Column(SmallInteger, nullable=True, comment='Number of coadded observations')
 
-    # Relationships
-    production = relationship('Production', back_populates="forced_aperture_coadds")
-    forced_aperture_reports = relationship('ForcedApertureReport', back_populates="fac")
-
-
-Index('ik_forcedcoaddlocation', ForcedApertureCoadd.production_id, ForcedApertureCoadd.ra, ForcedApertureCoadd.dec)
-
-
-# Comment:
-# Contains the combined measurements using force photometry in MEMBA for all bands and passes for each reference source.
+# Indexes
+# Already useful the primary keys
 
 
 # Forced Aperture Report table
@@ -1127,222 +837,30 @@ class ForcedApertureReport(Base):
 Index('ik_forcedreport', ForcedApertureReport.fac_id, ForcedApertureReport.band)
 
 
-# Global Object Table
-class Global_object(Base):
-    __tablename__ = 'global_object'
-    __table_args__ = (
-        # Constraints
-        PrimaryKeyConstraint('id'),
-        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('production_id', 'ra', 'dec'),
-    )
-    # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier"),
-    production_id = Column(Integer, nullable=False)  # Production number"),
-    # Fields
-    ra = Column(Float(53), nullable=False)  # Right Ascension"),
-    dec = Column(Float(53), nullable=False)  # Declination"),
-    sigma_offset_ra = Column(Float(24), nullable=False)  # Sigma offset at RA"),
-    sigma_offset_dec = Column(Float(24), nullable=False)  # Sigma offset at DEC"),
-    # Relationships
-
-    production = relationship('Production', back_populates="global_objects")
-    detections = relationship('Detection', back_populates="global_objects",
-                              secondary=lambda: Global_object_detections.__table__)
-    coadd_objects = relationship('Coadd_object', back_populates="global_object")
-
-
-Index('ik_globallocation', Global_object.ra, Global_object.dec)
-
-
-# Comment:
-# Contains the list of unique objects from the multiple Detections table. (Currently unused)
-
-
-# Global Object Detections Table
-class Global_object_detections(Base):
-    __tablename__ = 'global_object_detections'
-    __table_args__ = (
-        # Constraints
-        PrimaryKeyConstraint('global_object_id', 'detection_id'),
-        UniqueConstraint('detection_id', 'global_object_id'),
-        ForeignKeyConstraint(['detection_id'], ['detection.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['global_object_id'], ['global_object.id'], onupdate='CASCADE', ondelete='CASCADE'),
-    )
-    # Keys
-    global_object_id = Column(Integer, nullable=False)  # Global object identifier"),
-    detection_id = Column(BigInteger, nullable=False)  # Detection identifier"),
-    # Constraints
-
-    # Documentation
-    # Links multiple detections to unique global objects.",
-
-    # Comment:
-    # Many to Many intermediate table between Detection and Global_Object. (Currently unused)
-
-
-    # Coadd Object Table
-
-
-class Coadd_object(Base):
-    __tablename__ = 'coadd_object'
-    __table_args__ = (
-        # Constraints
-        PrimaryKeyConstraint('id'),
-        ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['global_object_id'], ['global_object.id'], onupdate='CASCADE', ondelete='RESTRICT'),
-        UniqueConstraint('production_id', 'ra', 'dec'),
-    )
-    # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier"),
-    production_id = Column(Integer, nullable=False)  # Production number"),
-    # template_image_tile_id = Column( BigInteger,   nullable=False) #CCD image number"),
-    global_object_id = Column(BigInteger, nullable=True)
-    insert_date = Column(DateTime, nullable=False)  # Timestamp of insertion", default=func.current_timestamp()),
-    # Fields
-    ra = Column(Float(53), nullable=False)  # Windowed right ascension of barycenter (J2000) [ALPHAWIN_J2000] (deg)"),
-    dec = Column(Float(53), nullable=False)  # Windowed declination of barycenter (J2000) [DELTAWIN_J2000] (deg)"),
-    class_star = Column(Float(24), nullable=True)  # Star-Galaxy classifier output [CLASS_STAR]"),
-    spread_model = Column(Float(24), nullable=True)  # Spread parameter from model-fitting [SPREAD_MODEL]"),
-    spreaderr_model = Column(Float(24), nullable=True)  # Spread parameter error from model-fitting [SPREADERR_MODEL]"),
-    mag_model_u = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_u = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_g = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_g = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_r = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_r = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_i = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_i = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_z = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_z = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_Y = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_Y = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n01 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n01 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n02 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n02 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n03 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n03 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n04 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n04 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n05 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n05 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n06 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n06 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n07 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n07 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n08 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n08 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n09 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n09 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n10 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n10 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n11 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n11 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n12 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n12 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n13 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n13 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n14 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n14 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n15 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n15 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n16 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n16 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n17 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n17 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n18 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n18 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n19 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n19 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n20 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n20 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n21 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n21 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n22 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n22 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n23 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n23 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n24 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n24 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n25 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n25 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n26 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n26 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n27 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n27 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n28 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n28 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n29 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n29 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n30 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n30 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n31 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n31 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n32 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n32 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n33 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n33 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n34 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n34 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n35 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n35 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n36 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n36 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n37 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n37 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n38 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n38 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n39 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n39 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n40 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n40 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n41 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n41 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    mag_model_n42 = Column(Float(24), nullable=True)  # Magnitude fitted using a galaxy model"),
-    mag_err_model_n42 = Column(Float(24), nullable=True)  # RMS error for the model Magnitude"),
-    flags = Column(SmallInteger, nullable=True)  # Extraction flags [FLAGS]"),
-    elongation = Column(Float(24), nullable=False)  # A_IMAGE/B_IMAGE  [ELONGATION]"),
-
-    # Reletionships
-    production = relationship('Production', back_populates="coadd_objects")
-    global_object = relationship('Global_object', back_populates="coadd_objects")
-
-    # Comment:
-    # Contains unique coadd objects extracted from coadd image tiles. (Currently unused)
-
-
-Index('ik_coaddlocation', Coadd_object.production_id, Coadd_object.ra, Coadd_object.dec)
-
-
 class Photoz_BCNz(Base):
     __tablename__ = 'photoz_bcnz'
     __table_args__ = (
         # Constraints
-        PrimaryKeyConstraint('id'),
+        PrimaryKeyConstraint('production_id', 'ref_id'),
         ForeignKeyConstraint(['production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier"),
-    production_id = Column(Integer, nullable=False)  # Production number"),
-    object_id = Column(BigInteger, nullable=False)  # WTF"),
+    production_id = Column(Integer, nullable=False, comment='Production id')
+    ref_id = Column(BigInteger, nullable=False, comment='Reference id')
     # Fields
-    zb = Column(Float(24), nullable=False)  # Photometric Redshift"),
-    zb_min = Column(Float(24), nullable=False)  # Photometric Redshift Error"),
-    zb_max = Column(Float(24), nullable=False)  # Photometric Redshift Error"),
-    t_b = Column(Float(24), nullable=False)  # Photometric Redshift Error"),
-    odds = Column(Float(24), nullable=False)  # Redshift odds"),
-    z_ml = Column(Float(24), nullable=False)  # Redshift odds"),
-    t_ml = Column(Float(24), nullable=False)  # Redshift odds"),
-    chi2 = Column(Float(24), nullable=False)  # Redshift odds"),
-    m0 = Column(Float(24), nullable=False)  # Redshift odds"),
+    zb = Column(Float(24), nullable=False, comment='Photometric redshift (peak of p(z))')
+    odds = Column(Float(24), nullable=False, comment='ODDS quality parameter')
+    pz_width = Column(Float(24), nullable=False, comment='pz_width quality parameter')
+    zb_mean = Column(Float(24), nullable=False, comment='Photometric redshift (mean of p(z))')
+    chi2 = Column(Float(24), nullable=False, comment='Minimum chi2')
+    n_band = Column(Float(24), nullable=False, comment='Number of bands used for chi2 fit')
+    ebv = Column(Float(24), nullable=False, comment='E(B-V) extinction value')
 
     # Relationships
-    production = relationship('Production', back_populates="photo_zs")
+    production = relationship('Production', back_populates="photoz_bcnzs")
 
     # Comment:
-    # Contains photometric redshift measurements from Coadd Forced Aperture measurements using the BCNz code.
-
+    # Contains photometric redshift measurements using the BCNz v2 code.
 
 Index('ik_photozredshift', Photoz_BCNz.production_id, Photoz_BCNz.zb)
 
@@ -1714,6 +1232,8 @@ class MatchToSpec(Base):
 Index('ik_matchtospec_ref', MatchToSpec.ref_cat, MatchToSpec.ref_id)
 
 
+### SIMULATION TABLES ###
+
 # Truth Objects table
 class Truth_Object(Base):
     __tablename__ = 'truth_object'
@@ -1861,11 +1381,11 @@ class Bkg_mag(Base):
     # Comment:
     # (Simulation) Contains simulated background magnitude measurements for each target for the simulation pipeline.
 
-    ###########    OPERATION Tables    ###########
+
+###########    OPERATION Tables    ###########
 
 
-    # Job Table
-
+# Job Table
 
 # class Job_pau(brownthrower.model.Job) :
 #         
