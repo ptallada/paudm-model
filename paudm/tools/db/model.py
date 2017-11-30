@@ -138,9 +138,9 @@ class Production(Base):
     input_production_id = Column(Integer, nullable=True)  # input release id (from configuration)
     pipeline = Column(String(32), nullable=True)  # Pipeline Name [pixelsim, nightly, memba, analysis]
     release = Column(String(64), nullable=False)  # Major release name [TESTX, DRX]
-    software_version = Column(String(32), nullable=False)  # Package version [DCX, vX.X]
+    software_version = Column(String(32), nullable=True)  # Package version [DCX, vX.X]
     _comments = Column('comments', Text, nullable=True)
-    job_id = Column(Integer, nullable=False)  # id of the job that generates the current production
+    job_id = Column(Integer, nullable=True)  # id of the job that generates the current production
     created = Column(DateTime, nullable=False, default=func.current_timestamp())  # Timestamp of insertion
 
     # Relationships
@@ -775,10 +775,14 @@ class ForcedApertureCoadd(Base):
     chi2 = Column(Float(24), nullable=True, comment='Chi Square of fit from multiple observations')
     n_coadd = Column(SmallInteger, nullable=True, comment='Number of coadded observations')
 
+    # Relationships
+    production = relationship('Production', back_populates="forced_aperture_coadds")
+
 # Indexes
 # Already useful the primary keys
 
 
+"""
 # Forced Aperture Report table
 class ForcedApertureReport(Base):
     __tablename__ = 'forced_aperture_report'
@@ -835,6 +839,7 @@ class ForcedApertureReport(Base):
 
 
 Index('ik_forcedreport', ForcedApertureReport.fac_id, ForcedApertureReport.band)
+"""
 
 
 class Photoz_BCNz(Base):
@@ -848,10 +853,10 @@ class Photoz_BCNz(Base):
     production_id = Column(Integer, nullable=False, comment='Production id')
     ref_id = Column(BigInteger, nullable=False, comment='Reference id')
     # Fields
-    zb = Column(Float(24), nullable=False, comment='Photometric redshift (peak of p(z))')
+    zb = Column(Float(24), nullable=False, comment='Bayesian photometric redshift (peak of p(z))')
     odds = Column(Float(24), nullable=False, comment='ODDS quality parameter')
     pz_width = Column(Float(24), nullable=False, comment='pz_width quality parameter')
-    zb_mean = Column(Float(24), nullable=False, comment='Photometric redshift (mean of p(z))')
+    zb_mean = Column(Float(24), nullable=False, comment='Bayesian photometric redshift (mean of p(z))')
     chi2 = Column(Float(24), nullable=False, comment='Minimum chi2')
     n_band = Column(Float(24), nullable=False, comment='Number of bands used for chi2 fit')
     ebv = Column(Float(24), nullable=False, comment='E(B-V) extinction value')
