@@ -735,8 +735,8 @@ class ForcedAperture(Base):
     annulus_median = Column(Float(24), nullable=False, comment='Sky median in annulus after sigma clipping')
     annulus_sigma = Column(Float(24), nullable=False, comment='Sky standard deviation in annulus after sigma clipping')
     annulus_samples = Column(Integer, nullable=False, comment='The number of samples in the annulus used for sky statistics')
-    annulus_ellipticity = Column(Float(24), nullable=False, comment='Local background ellipticity')
-    image_ellipticity = Column(Float(24), nullable=False, comment='Global background ellipticity')
+    annulus_ellipticity = Column(Float(24), nullable=True, comment='Local background ellipticity')
+    image_ellipticity = Column(Float(24), nullable=True, comment='Global background ellipticity')
     flag = Column(Integer, nullable=True, comment='Flag value from mask and MEMBA analysis')
 
     # Relationships
