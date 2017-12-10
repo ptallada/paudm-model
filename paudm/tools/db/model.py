@@ -466,7 +466,7 @@ class StarPhotometry(Base):
     bg = Column(Float(24), nullable=False)  # measured background flux
     bg_err = Column(Float(24), nullable=False)  # measured background flux error
     flags = Column(SmallInteger, nullable=True)  # Extraction flags
-    phot_method = Column(String(16), nullable=False)  # Photometry method
+    phot_method_id = Column(Integer, nullable=False)  # Photometry method id
 
     # Relationships
     image = relationship('Image', back_populates="star_photometries")
@@ -475,6 +475,33 @@ class StarPhotometry(Base):
     # Comment:
     # Contains the individual photometry measurements for each star matched with the reference catalogue
     # during the nightly photometry
+
+class PhotMethod(Base):
+    __tablename__ = 'phot_method'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('id'),
+    )
+    # Keys
+    id = Column(BigInteger, nullable=False)  # Unique identifier
+
+    # Extraction method
+    extraction_code = Column(String(16), nullable=False)  # Code used for extraction (i.e. sextractor/photutils)
+    extraction_method = Column(String(16), nullable=False)  # Extraction method (i.e. APER/AUTO)
+    extraction_value = Column(Float(24), nullable=True)  # Optional parameter for extraction
+
+    # Background method
+    background_method = Column(String(16), nullable=False)  # Background method (global, local, annulus)
+    background_value = Column(Float(24), nullable=True)  # Optional parameter for extraction
+
+    # Scatterlight method
+    scatterlight_method = Column(String(16), nullable=False)  # Scatterlight correction method
+    scatterlight_value = Column(Float(24), nullable=True)  # Optional parameter for Scatterlight correction
+
+    _comments = Column('comments', Text, nullable=True)
+
+    # Comment:
+    # Contains the information of the photometry method
 
 
 class ImageZP(Base):
