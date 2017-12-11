@@ -504,7 +504,7 @@ class PhotMethod(Base):
     _comments = Column('comments', Text, nullable=True)
 
     star_photometries = relationship('StarPhotometry', back_populates="phot_method")
-    image_zps = relationship('StarPhotometry', back_populates="phot_method")
+    image_zps = relationship('ImageZP', back_populates="phot_method")
 
     # Comment:
     # Contains the information of the photometry method
