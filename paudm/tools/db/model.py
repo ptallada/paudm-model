@@ -527,6 +527,7 @@ class ImageZP(Base):
     zp_error = Column(Float(24), nullable=False)  # Image zeropoint error
     phot_method_id = Column(Integer, nullable=False)  # Photometry method
     calib_method = Column(String(16), nullable=False)  # Calibration method
+    transparency = Column(Float(24), nullable=True)  # Image zeropoint value
 
     # Relationships
     image = relationship('Image', back_populates="image_zps")
