@@ -486,7 +486,7 @@ class PhotMethod(Base):
         PrimaryKeyConstraint('id'),
     )
     # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier
+    id = Column(Integer, nullable=False)  # Unique identifier
 
     # Extraction method
     extraction_code = Column(String(16), nullable=False)  # Code used for extraction (i.e. sextractor/photutils)
