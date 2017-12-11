@@ -449,6 +449,7 @@ class StarPhotometry(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['image_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['phot_method_id'], ['phot_method.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
@@ -471,6 +472,8 @@ class StarPhotometry(Base):
     # Relationships
     image = relationship('Image', back_populates="star_photometries")
     star_zps = relationship('StarZP', back_populates="star_photometry")
+    phot_method = relationship('PhotMethod', back_populates="star_photometries")
+
 
     # Comment:
     # Contains the individual photometry measurements for each star matched with the reference catalogue
@@ -488,17 +491,20 @@ class PhotMethod(Base):
     # Extraction method
     extraction_code = Column(String(16), nullable=False)  # Code used for extraction (i.e. sextractor/photutils)
     extraction_method = Column(String(16), nullable=False)  # Extraction method (i.e. APER/AUTO)
-    extraction_value = Column(Float(24), nullable=True)  # Optional parameter for extraction
+    extraction_parameter = Column(Float(24), nullable=True)  # Optional parameter for extraction
 
     # Background method
     background_method = Column(String(16), nullable=False)  # Background method (global, local, annulus)
-    background_value = Column(Float(24), nullable=True)  # Optional parameter for extraction
+    background_parameter = Column(Float(24), nullable=True)  # Optional parameter for extraction
 
     # Scatterlight method
     scatterlight_method = Column(String(16), nullable=False)  # Scatterlight correction method
-    scatterlight_value = Column(Float(24), nullable=True)  # Optional parameter for Scatterlight correction
+    scatterlight_parameter = Column(Float(24), nullable=True)  # Optional parameter for Scatterlight correction
 
     _comments = Column('comments', Text, nullable=True)
+
+    star_photometries = relationship('StarPhotometry', back_populates="phot_method")
+    image_zps = relationship('StarPhotometry', back_populates="phot_method")
 
     # Comment:
     # Contains the information of the photometry method
@@ -510,6 +516,7 @@ class ImageZP(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['image_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['phot_method_id'], ['phot_method.id'], onupdate='CASCADE', ondelete='CASCADE'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
@@ -518,11 +525,12 @@ class ImageZP(Base):
     # Fields
     zp = Column(Float(24), nullable=False)  # Image zeropoint value
     zp_error = Column(Float(24), nullable=False)  # Image zeropoint error
-    phot_method = Column(String(16), nullable=False)  # Photometry method
+    phot_method_id = Column(Integer, nullable=False)  # Photometry method
     calib_method = Column(String(16), nullable=False)  # Calibration method
 
     # Relationships
     image = relationship('Image', back_populates="image_zps")
+    phot_method = relationship('PhotMethod', back_populates="image_zps")
 
     # Comment:
     # Contains the image zeropoint measurements for each photometry-calibration method
