@@ -423,6 +423,7 @@ class StarZP(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['star_photometry_id'], ['star_photometry.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        UniqueConstraint('star_photometry_id', 'calib_method'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
@@ -450,6 +451,7 @@ class StarPhotometry(Base):
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['image_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['phot_method_id'], ['phot_method.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        UniqueConstraint('image_id', 'ref_id', 'phot_method_id'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
@@ -517,6 +519,7 @@ class ImageZP(Base):
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['image_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['phot_method_id'], ['phot_method.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        UniqueConstraint('image_id', 'ref_id', 'phot_method_id'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
@@ -570,6 +573,9 @@ class Template(Base):
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
+        UniqueConstraint('template_lib', 'template_name'),
+        UniqueConstraint('template_lib', 'template_index'),
+
     )
 
     # Keys
@@ -595,6 +601,7 @@ class TemplateFit(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['template_id'], ['template.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        UniqueConstraint('template_id', 'ref_id', 'ref_cat', 'fit_method'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
@@ -624,6 +631,7 @@ class TemplateBand(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['template_id'], ['template.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        UniqueConstraint('template_id', 'band', 'project', 'method'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
