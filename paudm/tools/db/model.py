@@ -423,7 +423,7 @@ class StarZP(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['star_photometry_id'], ['star_photometry.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('star_photometry_id', 'calib_method'),
+        # UniqueConstraint('star_photometry_id', 'calib_method'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
@@ -451,7 +451,7 @@ class StarPhotometry(Base):
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['image_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['phot_method_id'], ['phot_method.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('image_id', 'ref_id', 'phot_method_id'),
+        # UniqueConstraint('image_id', 'ref_id', 'phot_method_id'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
@@ -519,7 +519,7 @@ class ImageZP(Base):
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['image_id'], ['image.id'], onupdate='CASCADE', ondelete='CASCADE'),
         ForeignKeyConstraint(['phot_method_id'], ['phot_method.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('image_id', 'ref_id', 'phot_method_id'),
+        # UniqueConstraint('image_id', 'ref_id', 'phot_method_id'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
