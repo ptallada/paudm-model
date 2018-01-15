@@ -779,8 +779,8 @@ class ForcedAperture(Base):
     annulus_median = Column(Float(24), nullable=False, comment='Sky median in annulus after sigma clipping')
     annulus_sigma = Column(Float(24), nullable=False, comment='Sky standard deviation in annulus after sigma clipping')
     annulus_samples = Column(Integer, nullable=False, comment='The number of samples in the annulus used for sky statistics')
-    annulus_ellipticity = Column(Float(24), nullable=False, comment='Local background ellipticity')
-    image_ellipticity = Column(Float(24), nullable=False, comment='Global background ellipticity')
+    annulus_ellipticity = Column(Float(24), nullable=True, comment='Local background ellipticity')
+    image_ellipticity = Column(Float(24), nullable=True, comment='Global background ellipticity')
     flag = Column(Integer, nullable=True, comment='Flag value from mask and MEMBA analysis')
 
     # Relationships
@@ -818,6 +818,7 @@ class ForcedApertureCoadd(Base):
     flux_error = Column(Float(24), nullable=True, comment='Calibrated flux error')
     chi2 = Column(Float(24), nullable=True, comment='Chi Square of fit from multiple observations')
     n_coadd = Column(SmallInteger, nullable=True, comment='Number of coadded observations')
+    run = Column(SmallInteger, nullable=True, comment='run number for coadds in memba production')
 
     # Relationships
     production = relationship('Production', back_populates="forced_aperture_coadds")
