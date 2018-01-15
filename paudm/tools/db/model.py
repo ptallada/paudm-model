@@ -774,6 +774,7 @@ class ForcedApertureCoadd(Base):
     flux_error = Column(Float(24), nullable=True, comment='Calibrated flux error')
     chi2 = Column(Float(24), nullable=True, comment='Chi Square of fit from multiple observations')
     n_coadd = Column(SmallInteger, nullable=True, comment='Number of coadded observations')
+    run = Column(SmallInteger, nullable=True, comment='run number for coadds in memba production')
 
     # Relationships
     production = relationship('Production', back_populates="forced_aperture_coadds")
