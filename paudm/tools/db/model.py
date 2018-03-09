@@ -643,6 +643,7 @@ class TemplateBand(Base):
     #ref_flux_err = Column(Float(24), nullable=False)  # odds fit
     project = Column(String(24), nullable=False)  # project name SDSS, PAU, ...
     method =  Column(String(24), nullable=False)  # method used to convolve the templates to the filter curve
+    EBV = Column(Float(24), nullable=False)  # EBV default 0
     # Relationships
     template = relationship('Template', back_populates="template_bands")
     #star_template_zps = relationship('StarTemplateZP', back_populates="template_fit_band")
