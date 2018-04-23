@@ -443,6 +443,8 @@ class StarZP(Base):
     # Contains the individual zeropoint measurements for each star matched with the reference catalog
     # during the nightly photometry
 
+Index('ik__star_zp__star_photometry_id', StarZP.star_photometry_id)
+
 
 class StarPhotometry(Base):
     __tablename__ = 'star_photometry'
@@ -480,6 +482,10 @@ class StarPhotometry(Base):
     # Comment:
     # Contains the individual photometry measurements for each star matched with the reference catalogue
     # during the nightly photometry
+
+Index('ik__star_photometry__image_id', StarPhotometry.image_id)
+Index('ik__star_photometry__phot_method_id', StarPhotometry.phot_method_id)
+
 
 class PhotMethod(Base):
     __tablename__ = 'phot_method'
@@ -539,6 +545,9 @@ class ImageZP(Base):
     # Comment:
     # Contains the image zeropoint measurements for each photometry-calibration method
 
+Index('ik__image_zp__image_id', ImageZP.image_id)
+Index('ik__image_zp__phot_method_id', ImageZP.phot_method_id)
+
 
 class StarTemplateZP(Base):
     __tablename__ = 'star_template_zp'
@@ -566,6 +575,9 @@ class StarTemplateZP(Base):
 
     # Comment:
     # Contains the star-template duo zeropoint measurements
+
+Index('ik__star_template_zp__star_zp_id', StarTemplateZP.star_zp_id)
+Index('ik__star_template_zp__template_fit_id', StarTemplateZP.template_fit_band_id)
 
 
 class Template(Base):
@@ -791,7 +803,7 @@ class ForcedAperture(Base):
 
 # Indexes
 Index('ik_faepixels', ForcedAperture.production_id, ForcedAperture.pixel_id)
-
+Index('ik__fa__image_id', ForcedAperture.image_id)
 
 # Comment
 # Contains the individual image measurements using force photometry in MEMBA.
