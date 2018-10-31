@@ -1147,7 +1147,6 @@ class CFHTLenS(Base):
     # Keys
     paudm_id = Column(BigInteger, nullable=False)  # PAUdm numeric id for reference table"),
     # Fields
-    id = Column(String(16), nullable=False)  # object id"),
     alpha_j2000 = Column(Float(53), nullable=False)  # Right Ascension (in decimal degrees, J2000),
     delta_j2000 = Column(Float(53), nullable=False)  # Declination (in decimal degrees, J2000),
     flag = Column(Integer, nullable=False)  # whether the object has flags or not, 0: no flags, 1: some flags,
