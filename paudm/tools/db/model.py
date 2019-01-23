@@ -423,7 +423,6 @@ class StarZP(Base):
         # Constraints
         PrimaryKeyConstraint('id'),
         ForeignKeyConstraint(['star_photometry_id'], ['star_photometry.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        # UniqueConstraint('star_photometry_id', 'calib_method'),
     )
     # Keys
     id = Column(BigInteger, nullable=False)  # Unique identifier
