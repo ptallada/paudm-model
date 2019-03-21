@@ -210,30 +210,30 @@ class Mosaic(object):
     
     # NIGHTLY Delegates
     def create_overscanned_mosaic(self):
-        import paudm.pipeline.nightly.delegates
-        return paudm.pipeline.nightly.delegates.mosaic_create_overscanned_mosaic(self)
+        import paudm.nightly.delegates
+        return paudm.nightly.delegates.mosaic_create_overscanned_mosaic(self)
     
     def load_ccd_raw(self, instrument, ccd_num, bias_correction=True, correct_gain=True, check_rdnoise=True, job_id=None):
         # Load amps and build overscan-corrected CCD
-        import paudm.pipeline.nightly.delegates
-        return paudm.pipeline.nightly.delegates.load_ccd_raw(self, instrument, ccd_num, bias_correction, correct_gain, check_rdnoise, job_id)
+        import paudm.nightly.delegates
+        return paudm.nightly.delegates.load_ccd_raw(self, instrument, ccd_num, bias_correction, correct_gain, check_rdnoise, job_id)
     
     # PIXELSIM Delegates
     def initialize_sim_params(self, exposure, environment, config, instrument):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.initialize_sim_params(self, exposure, environment, config, instrument)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.initialize_sim_params(self, exposure, environment, config, instrument)
     
     def simulate(self,config, instrument, production_id, extra_skymaker_confs = None):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.simulate_mosaic(self, config, instrument, production_id, extra_skymaker_confs)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.simulate_mosaic(self, config, instrument, production_id, extra_skymaker_confs)
     
     def initialize_global_header(self, config, AMPS_X_CCD):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.initialize_global_header(self, config['instrument_name'].lower(), config['release'], config['ccd_limit'], AMPS_X_CCD, config['post_prod'])
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.initialize_global_header(self, config['instrument_name'].lower(), config['release'], config['ccd_limit'], AMPS_X_CCD, config['post_prod'])
     
     def infer_pixel_rectangle(self, instrument):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.infer_pixel_rectangle(self, instrument)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.infer_pixel_rectangle(self, instrument)
     
 
 class Image(object):
@@ -346,57 +346,57 @@ class Image(object):
     
     # NIGHTLY Methods
     def bias_subtract(self):
-        import paudm.pipeline.nightly.delegates
-        return paudm.pipeline.nightly.delegates.bias_subtract(self)
+        import paudm.nightly.delegates
+        return paudm.nightly.delegates.bias_subtract(self)
     
     def flatfield_correct(self):
-        import paudm.pipeline.nightly.delegates
-        return paudm.pipeline.nightly.delegates.flatfield_correct(self)
+        import paudm.nightly.delegates
+        return paudm.nightly.delegates.flatfield_correct(self)
     
     def badcols_interpolate(self):
-        import paudm.pipeline.nightly.delegates
-        return paudm.pipeline.nightly.delegates.badcols_interpolate(self)
+        import paudm.nightly.delegates
+        return paudm.nightly.delegates.badcols_interpolate(self)
     
     def badpix_interpolate(self):
-        import paudm.pipeline.nightly.delegates
-        return paudm.pipeline.nightly.delegates.badpix_interpolate(self)
+        import paudm.nightly.delegates
+        return paudm.nightly.delegates.badpix_interpolate(self)
     
     # PIXELSIM Methods
     def initialize_extension_header(self, config, instrument, ccd_id, amp_id):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.initialize_extension_header(self, config, instrument, ccd_id, amp_id)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.initialize_extension_header(self, config, instrument, ccd_id, amp_id)
     
     def update_simulation_keywords(self):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.update_simulation_keywords(self)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.update_simulation_keywords(self)
     
     def set_sim_WCS(self, telescope_pointing,instrument, ccd_id, amp_id=None):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.set_sim_WCS(self, telescope_pointing, instrument, ccd_id, amp_id)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.set_sim_WCS(self, telescope_pointing, instrument, ccd_id, amp_id)
     
     def contains_pixels(self, pixelPos, buffer_width=0):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.contains_pixels(self, pixelPos, buffer_width)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.contains_pixels(self, pixelPos, buffer_width)
     
     def prepare_psf(self):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.prepare_psf(self)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.prepare_psf(self)
     
     def simulate_image(self, config, instrument, extra_skymaker_conf=""):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.simulate_image(self, config, instrument, extra_skymaker_conf)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.simulate_image(self, config, instrument, extra_skymaker_conf)
     
     def post_production(self, config, instrument):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.post_production(self, config, instrument)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.post_production(self, config, instrument)
     
     def get_sim_amp(self, amp_num, config, instrument):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.get_sim_amp(self, amp_num, config, instrument)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.get_sim_amp(self, amp_num, config, instrument)
 
     def add_bias_and_overscan(self, config, instrument, ccd_id, amp_id):
-        import paudm.pipeline.pixelsim.delegates
-        return paudm.pipeline.pixelsim.delegates.add_bias_and_overscan(self, config, instrument, ccd_id, amp_id)
+        import paudm.pixelsim.delegates
+        return paudm.pixelsim.delegates.add_bias_and_overscan(self, config, instrument, ccd_id, amp_id)
 
 
 
