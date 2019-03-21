@@ -1,0 +1,10 @@
+*.egg-info
+*.egg
+*.EGG
+*.EGG-INFO
+*.py[co]
+.settings
+.project
+.pydevproject
+.idea/
+.DS_Store
