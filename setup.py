@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-
 from setuptools import setup, find_packages
 
 install_requires = [
@@ -16,28 +15,19 @@ install_requires = [
     'zope.sqlalchemy',
 ]
 
-# Read README and CHANGES files for the long description
+version = {}
 here = os.path.abspath(os.path.dirname(__file__))
-#README  = open(os.path.join(here, 'README.txt')).read()
 
-# Read the version information
-execfile(os.path.join(here, 'paudm', 'tools', 'release.py'))
+with open(os.path.join(here, 'paudm', 'tools', 'version.py')) as fp:
+    exec(fp.read(), version)
 
 setup(
-    name = 'paudm.tools',
-    version = __version__, # @UndefinedVariable
-    packages = find_packages(),
-    namespace_packages = ['paudm'],
-    
-    install_requires = install_requires,
-    
-    description = "PAUdm tools",
-    #long_description = README,
-    #author = 'Pau Tallada Crespí',
-    #author_email = 'pau.tallada@gmail.com',
-    #maintainer = 'Pau Tallada Crespí',
-    #maintainer_email = 'pau.tallada@gmail.com',
-    
+    name='paudm.tools',
+    version=version['__version__'],
+    packages=find_packages(),
+    namespace_packages=['paudm'],
+    install_requires=install_requires,
+    description="PAUdm tools",
     include_package_data=True,
     zip_safe=True,
 )
