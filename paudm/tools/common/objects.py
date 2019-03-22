@@ -94,7 +94,7 @@ class Mosaic(object):
     # TODO: Turn into the getter of self.header
     def get_keyword(self, key):
         # Get keyword from global header
-        if not self.header.has_key(key):
+        if key not in self.header:
             raise KeyError('Keyword does not exist in header')
         else:
             return self.header.get(key)
@@ -285,7 +285,7 @@ class Image(object):
     # TODO: Turn into the getter of self.header
     def get_keyword(self, key):
         # Get keyword from image header
-        if not key in self.header.keys():
+        if not key in list(self.header.keys()):
             raise KeyError('Keyword does not exist in header')
         else:
             return self.header.get(key)
@@ -730,7 +730,7 @@ class Catalogue(object):
     def usno_load_external(self, sky_region, config):
     
         log.debug("Query to USNO external data base...")
-        import urllib
+        import urllib.request, urllib.parse, urllib.error
         #url='http://irsa.ipac.caltech.edu/cgi-bin/Gator/nph-query'
         url = config['urls']['usno'][0]
         fmt='csv'
@@ -755,7 +755,7 @@ class Catalogue(object):
             cmd = ("outfmt=1&objstr=%f%s%f&spatial=Polygon&polygon=%f%s%f,%f%s%f,%f%s%f,%f%s%f&selcols=ra,dec,e_ra,e_dec,b1_mag,b2_mag,r1_mag,r2_mag,USNO_B1&catalog=usno_b1" %(ra_mid, separator, dec_mid, sky_reg['ra']['min'],separator,sky_reg['dec']['min'],sky_reg['ra']['max'],separator,sky_reg['dec']['min'],sky_reg['ra']['max'],separator,sky_reg['dec']['max'],sky_reg['ra']['min'],separator,sky_reg['dec']['max']))
             #log.debug( cmd );
             
-            usno_out = (urllib.urlopen(url+'?%s' % cmd)).read()
+            usno_out = (urllib.request.urlopen(url+'?%s' % cmd)).read()
             
             log.debug("...selection received.")
             
@@ -856,7 +856,7 @@ class Catalogue(object):
         
         # query code is from sdss.py in pixelsim
         log.debug("Query to SDSS external data base...")
-        import urllib
+        import urllib.request, urllib.parse, urllib.error
 #        us_url = 'http://skyserver.sdss3.org/dr8/en/tools/search/x_sql.asp' #http://cas.sdss.org/astro/en/tools/search/x_sql.asp'
 #        uk_url = 'http://www.sdss.org.uk/dr7/en/tools/search/x_sql.asp'
         us_url =  config['urls']['sdss'][0]
@@ -884,10 +884,10 @@ class Catalogue(object):
                      "P.raErr,P.decErr,P.type,P.probPSF " + 
                      "from star as P left outer join SpecObj as S on P.objID = S.BestObjID " + 
                      "where P.ra between %f and %f and P.dec between %f and %f and P.clean=1" %(sky_reg['ra']['min'], sky_reg['ra']['max'], sky_reg['dec']['min'], sky_reg['dec']['max']))
-            params = urllib.urlencode({'cmd': sqlcmd, 'format': fmt})
+            params = urllib.parse.urlencode({'cmd': sqlcmd, 'format': fmt})
             
             # Call to primary mirror
-            sdss_out = (urllib.urlopen(primary_url + '?%s' % params)).read()
+            sdss_out = (urllib.request.urlopen(primary_url + '?%s' % params)).read()
             log.debug("...selection received.")
             
             sdss_catalogue = sdss_out.split('\n')
@@ -897,7 +897,7 @@ class Catalogue(object):
             if len(sdss_catalogue[0].split(',')) != 23:
                 log.warning("Primary SDSS mirror failed. Trying with alternative...")
                 # Call to alternative
-                sdss_out = (urllib.urlopen(alternative_url + '?%s' % params)).read()
+                sdss_out = (urllib.request.urlopen(alternative_url + '?%s' % params)).read()
                 sdss_catalogue = sdss_out.split('\n')
                 log.debug("SDSS Alternative mirror header response: %s" %sdss_catalogue[0].split(','))
                 if len(sdss_catalogue[0].split(',')) != 23:
@@ -1236,7 +1236,7 @@ class Catalogue(object):
             close_broadband = ''
             
             # Loop over the broad band filters with error information (All Broad bands except Y)
-            for bfilter in errors.keys():
+            for bfilter in list(errors.keys()):
                 broad_wvl = instrument['FILTER_ASSOCIATIONS'][bfilter]['WAVELEN']
                 wvl_dist = abs(broad_wvl - wvl)
                 if( wvl_dist < best_dist ):
@@ -1322,7 +1322,7 @@ class Catalogue(object):
         self.removeExtinction(instrument)
         
         # translate the SEDs from floats into strings
-        sed_string_indexing = star_seds.seds.keys()
+        sed_string_indexing = list(star_seds.seds.keys())
         
         index=0
         sdss_objects = []
@@ -1441,11 +1441,11 @@ class Catalogue(object):
     def sdss_assign_seds(self, filter_system, star_seds):
         
         colors = {}
-        for sed in star_seds.seds.keys():
+        for sed in list(star_seds.seds.keys()):
             colors[sed] = {}
         
         # first, for every sed calculate the sdss colors.
-        for sed in star_seds.seds.keys():
+        for sed in list(star_seds.seds.keys()):
             uflux = filter_system.filters['u'].sed_to_flux( star_seds.seds[sed], filter_system.filters['i'], 19.0, True )
             gflux = filter_system.filters['g'].sed_to_flux( star_seds.seds[sed], filter_system.filters['i'], 19.0, True )
             rflux = filter_system.filters['r'].sed_to_flux( star_seds.seds[sed], filter_system.filters['i'], 19.0, True )
@@ -1483,7 +1483,7 @@ class Catalogue(object):
             worstcolor = 0
             worstNsigma = 1e9
             bestSED = None
-            for sed in star_seds.seds.keys():
+            for sed in list(star_seds.seds.keys()):
                 # don't use u-g?
                 ug_sigma = 0
                 #ug_sigma = math.fabs(colors[sed]['u_minus_g'] - u_minus_g)/u_minus_g_error
@@ -2204,7 +2204,7 @@ class FilterSystem(object):
             
         # calculate the normalization for each filter, 
         # which we will need for making mags out of seds+filters
-        for filter_name in filter_curves_matchedwvls.keys():
+        for filter_name in list(filter_curves_matchedwvls.keys()):
             dlambda = filter_curves_matchedwvls[filter_name].wavelengths[1] - filter_curves_matchedwvls[filter_name].wavelengths[0]
             mult_array = filter_curves_matchedwvls[filter_name].fluxes/filter_curves_matchedwvls[filter_name].wavelengths
             filter_curves_matchedwvls[filter_name].norm = np.sum(mult_array)*dlambda

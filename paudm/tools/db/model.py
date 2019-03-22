@@ -1509,12 +1509,12 @@ def compile_biginteger_sqlite(type_, compiler, **kw):
 def add_criteria(query, criteria):
     q = query
 
-    for table_name, columns in criteria.iteritems():
-        for column_name, filtr in columns.iteritems():
+    for table_name, columns in criteria.items():
+        for column_name, filtr in columns.items():
             if isinstance(filtr, list):
                 q = q.filter(tables[table_name].columns[column_name].in_(filtr))
             elif isinstance(filtr, dict):
-                for operator, value in filtr.iteritems():
+                for operator, value in filtr.items():
                     q = q.filter(tables[table_name].columns[column_name].op(operator)(value))
             else:
                 q = q.filter(tables[table_name].columns[column_name] == filtr)
@@ -1546,7 +1546,7 @@ def main(argv=None):
     init(options.url)
 
     if not options.force:
-        answer = raw_input("The database will be ERASED and recreated. Do you want to proceed? (y/N): ")
+        answer = input("The database will be ERASED and recreated. Do you want to proceed? (y/N): ")
         if answer.upper() != "Y":
             return
 

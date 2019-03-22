@@ -4,7 +4,7 @@
 import datetime
 import random
 
-import model
+from . import model
 
 def recreate():
     model.metadata.drop_all()
@@ -15,7 +15,7 @@ def bench_insert(count = 100, *args):
     count = int(count)
     
     randf = random.random()
-    randi = random.randint(0, 0x7fffffffL)
+    randi = random.randint(0, 0x7fffffff)
     
     obs_set = model.Obs_set(
         instrument = 'BENCH',
@@ -89,7 +89,7 @@ def bench_insert(count = 100, *args):
     
     for i in range(count):
         randf = random.random()
-        randi = random.randint(0, 0xffffffffL)
+        randi = random.randint(0, 0xffffffff)
         
         model.session.add(model.Detection(
             production = production,

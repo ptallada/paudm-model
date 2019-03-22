@@ -220,7 +220,7 @@ def srm_download(config_grid, dest_path, file_list = None, decompress_at_destina
                 if subprocess.call(cmd_cp, shell=True) > 0:
                     error_msg = config_grid['srm_copy_cmd'] + " error while downloading %s to %s" %(file_tape, file_nfs)
                     log.error(error_msg)
-                    raise Exception, error_msg
+                    raise Exception(error_msg)
     else:
         log.warning("No files to download. Return")
         return
@@ -264,7 +264,7 @@ def decompress_file(file_name, file_path, funpack_bin= "funpack"):
             else:
                 error_msg = "Error while unzipping the file %s with gz" %zipfilename
                 log.error(error_msg)
-                raise Exception, error_msg
+                raise Exception(error_msg)
             
         # FPACK file
         elif extension == '.fz':
@@ -272,7 +272,7 @@ def decompress_file(file_name, file_path, funpack_bin= "funpack"):
             if not os.path.exists(funpack_bin):
                 msg_error = "Could not find funpack code in %s" %funpack_bin
                 log.error(msg_error)
-                raise Exception, msg_error
+                raise Exception(msg_error)
                 
             cmd_funpack = funpack_bin + ' '+ os.path.join(dest_path, zipfilename)
             log.debug(cmd_funpack) 
@@ -284,7 +284,7 @@ def decompress_file(file_name, file_path, funpack_bin= "funpack"):
             else:
                 error_msg = "Error while unpacking the file %s with funpack" %zipfilename
                 log.error(msg_error)
-                raise Exception, msg_error
+                raise Exception(msg_error)
         else:
             log.debug("Unknown extension for decompression: %s. Ignoring it." %extension)
 
@@ -304,7 +304,7 @@ def download(config_grid, file_list, dest_path = "./", protocol = "SRM"):
     else:
         msg_error = "Unknown protocol %s" %protocol
         log.error(msg_error)
-        raise Exception, msg_error
+        raise Exception(msg_error)
         
     log.info( 'PreStage DONE' )
 
@@ -424,7 +424,7 @@ def upload(config, dir_in = None, dir_out= None, file_in = None, file_out = None
     log.info("Number of Files not transferred: %d / %d "% (len(list_failed), len(list_dir_in)))
 
     if n_failed >0:
-        raise Exception, "Uploading error for file(s) " + str(list_failed)
+        raise Exception("Uploading error for file(s) " + str(list_failed))
     
     log.info("UPLOAD completed!")
     

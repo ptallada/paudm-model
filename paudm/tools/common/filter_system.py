@@ -22,7 +22,7 @@ def filter_throughput():
 
     d = resource_filename('paudm.resources', 'throughput')
     sed_glob = os.path.join(d, '*', '*.ssv')
-    D = dict(map(_read_csv, glob.glob(sed_glob)))
+    D = dict(list(map(_read_csv, glob.glob(sed_glob))))
     resp = pd.concat(D)
 
     return resp
