@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [Unreleased]
+### Changed
+- Python 3.X compatible
+- Added install db from environment
+
 ## [2.1.0] - 2019-03-21
 ### Changed
 - Minor changes to calibration tables
