@@ -13,6 +13,7 @@ install_requires = [
     'setuptools',
     'sqlalchemy',
     'zope.sqlalchemy',
+    'psycopg2-binary'
 ]
 
 version = {}
