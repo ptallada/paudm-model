@@ -40,6 +40,6 @@ For further instructions on how to install this package at PIC go to[Astro and C
 
 ## Version
 
-Latest stable version is v2.1.0
+Latest stable version is v2.2.0
 
 This project adheres to [Semantic Versioning](http://semver.org/).
