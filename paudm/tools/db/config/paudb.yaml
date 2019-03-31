@@ -1,3 +1,0 @@
-engine : postgresql://tonello:q3lpdDB@db01.pau.pic.es/
-echo   : false
-

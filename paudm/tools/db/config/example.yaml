@@ -1,2 +1,0 @@
-engine: postgresql://USER:PASSWORD@HOST/
-echo: False
