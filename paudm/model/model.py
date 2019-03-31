@@ -9,14 +9,11 @@ from sqlalchemy import ForeignKeyConstraint, Index, PrimaryKeyConstraint, Unique
 from sqlalchemy import create_engine
 from sqlalchemy.types import BigInteger, Boolean, Date, Enum, Float, Integer, SmallInteger, String, Text, Time, DateTime
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.orm import mapper, relationship, sessionmaker, scoped_session, synonym, contains_eager
-from zope.sqlalchemy import ZopeTransactionExtension
+from sqlalchemy.orm import relationship, sessionmaker, scoped_session, synonym, contains_eager
 from sqlalchemy.orm.collections import attribute_mapped_collection
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound  # @UnusedImport
 from sqlalchemy.orm import backref
 from sqlalchemy.sql.expression import func
-from sqlalchemy.ext.declarative import declarative_base
-from .base import Column, MetaData, Table
+from .base import Column
 from sqlalchemy.ext.hybrid import hybrid_property
 import brownthrower.model
 
