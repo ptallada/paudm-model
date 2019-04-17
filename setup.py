@@ -5,11 +5,7 @@ import os
 from setuptools import setup, find_packages
 
 install_requires = [
-    'matplotlib',
-    'numpy',
-    'astropy',
     'pyyaml',
-    'scipy',
     'setuptools',
     'sqlalchemy',
     'zope.sqlalchemy',
@@ -23,12 +19,12 @@ with open(os.path.join(here, 'paudm', 'model', 'version.py')) as fp:
     exec(fp.read(), version)
 
 setup(
-    name='paudm.tools',
+    name='paudm.model',
     version=version['__version__'],
     packages=find_packages(),
     namespace_packages=['paudm'],
     install_requires=install_requires,
-    description="PAUdm tools",
+    description="PAUdm model",
     include_package_data=True,
     zip_safe=True,
 )
