@@ -3,12 +3,16 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## [3.0.0] - UNRELEASED
+## [3.0.0] - 2019-04-17
 ### Changed
 - Compatible with environment refactoring (v3.0)
 - Left only model code - removed common and grid sections
 
-## [2.2.0]
+### Removed
+- Grid Section
+- Common Objects module
+
+## [2.2.0] - 2019-03-29
 ### Changed
 - Python 3.X compatible
 - Added install db from environment

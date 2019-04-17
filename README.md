@@ -6,24 +6,16 @@ PAU data management database model
 
 - database table definition and relations
 - functions to create a database session
-
-(to be moved/removed)
-- common functions across the different pipelines
 - constants
 - quality control tools
-- grid storage utils
 
 ## Requirements
 
-Python 2.7 compatible 
+Python 2.7 & Python 3 compatible 
 
 ## Dependencies
 
-- matplotlib
-- numpy
-- astropy
 - pyyaml
-- scipy
 - sqlalchemy
 - zope.sqlalchemy
 
@@ -40,6 +32,6 @@ For further instructions on how to install this package at PIC go to[Astro and C
 
 ## Version
 
-Latest stable version is v2.2.0
+Latest stable version is v3.0.0
 
 This project adheres to [Semantic Versioning](http://semver.org/).
