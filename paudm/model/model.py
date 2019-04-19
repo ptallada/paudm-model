@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import datetime
-import hashlib
 import optparse
 import yaml
 
@@ -19,36 +18,10 @@ import brownthrower.model
 
 Base = brownthrower.model.Base
 metadata = Base.metadata
-session = None
 tables = {}
 mappers = {}
 
 _salt = 'djhferuyunniurnlp097jlknf8holanhgnhhrf'
-
-
-def init(url):
-    """
-    Initialize the tables, mapping classes and establish a session with the DB
-    
-    @param url: Configuration URL for the SQLAlchemy engine
-    @type url: str
-    """
-    global session
-
-    twophase = False
-    if url.startswith('postgresql'):
-        engine = create_engine(url, echo=False)
-    else:
-        engine = create_engine(url, connect_args={'check_same_thread': False}, echo=False)
-        twophase = False
-    metadata.bind = engine
-
-    session = scoped_session(sessionmaker(bind=engine,
-                                          twophase=twophase,
-                                          # extension = ZopeTransactionExtension()
-                                          ))()
-
-    return session
 
 
 class Project(Base):
