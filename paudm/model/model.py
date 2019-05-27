@@ -183,9 +183,9 @@ class Mosaic(Base):
     id = Column(BigInteger, nullable=False)  # Identifier
     production_id = Column(Integer, nullable=False)  # Production identifier
     obs_set_id = Column(Integer, nullable=False)  # obs_set number
-    filename = Column(String(128), nullable=False)  # File name
+    filename = Column(String(128), nullable=True)  # File name
     comment = Column(Text, nullable=True)
-    archivepath = Column(String(128), nullable=False)  # Path in the archive
+    archivepath = Column(String(128), nullable=True)  # Path in the archive
     kind = Column(
         Enum(
             'ARC', 'BIAS', 'DARK', 'FLASH', 'FLAT', 'FOCUS', 'GLANCE', 'PUPIL', 'SCIENCE',
@@ -301,6 +301,8 @@ class Image(Base):
     id = Column(BigInteger, nullable=False)
     mosaic_id = Column(BigInteger, nullable=False)
     # Fields
+    filename = Column(String(128), nullable=True)  # File name
+    archivepath = Column(String(128), nullable=True)  # Path in the archive
     image_num = Column(SmallInteger, nullable=False)  # Extension number
     ccd_num = Column(SmallInteger, nullable=False)  # CCD Number"
     amp_num = Column(SmallInteger, nullable=False)  # Amplifier number (-1 for full CCD)
