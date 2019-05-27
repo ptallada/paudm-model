@@ -184,6 +184,8 @@ class Mosaic(Base):
     production_id = Column(Integer, nullable=False)  # Production identifier
     obs_set_id = Column(Integer, nullable=False)  # obs_set number
     filename = Column(String(128), nullable=True)  # File name
+    astrocat_filename = Column(String(128), nullable=True)  # File name for astro catalogue
+    psf_filename = Column(String(128), nullable=True)  # File name for psf model
     comment = Column(Text, nullable=True)
     archivepath = Column(String(128), nullable=True)  # Path in the archive
     kind = Column(
