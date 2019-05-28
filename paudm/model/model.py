@@ -965,7 +965,45 @@ Index('ik_gaialocation', gaia.ra, gaia.dec)
 
     # Comment:
     # External table from gaia. Stars for simulation and calibration.
-    
+
+
+class gaia_dr2(Base):
+    __tablename__ = 'gaia_dr2'
+    __table_args__ = (
+        # Constraints
+        PrimaryKeyConstraint('source_id'),
+    )
+
+    # Keys
+    source_id = Column(BigInteger, nullable=False)  # Unique identifier.
+    # Fields
+    duplicated_source = Column(Boolean, nullable=False)
+    ra = Column(Float(53), nullable=False)  # Right Ascension of the object (deg)
+    dec = Column(Float(53), nullable=False)  # Declination of the object (deg)
+    ra_err = Column(Float(24), nullable=False)  # Error in RA (arcsec)
+    dec_err = Column(Float(24), nullable=False)  # Error in DEC (arcsec)
+    pmra = Column(Float(24), nullable=False)  # Proper motion in RA
+    pmdec = Column(Float(24), nullable=False)  # Proper motion in Dec
+    pmra_error = Column(Float(24), nullable=False)  # Proper motion error in RA
+    pmdec_error = Column(Float(24), nullable=False)  # Proper motion error in Dec
+    phot_g_mean_mag = Column(Float(24), nullable=False)  # Magnitude in g filter
+    phot_g_mean_flux = Column(Float(24), nullable=False)  # Flux in g filter
+    phot_g_mean_flux_error = Column(Float(24), nullable=False)  # Flux error in g filter
+    phot_bp_mean_mag = Column(Float(24), nullable=False)  # Magnitude in bp filter
+    phot_bp_mean_flux = Column(Float(24), nullable=False)  # Flux in bp filter
+    phot_bp_mean_flux_error = Column(Float(24), nullable=False)  # Flux error in bp filter
+    phot_rp_mean_mag = Column(Float(24), nullable=False)  # Magnitude in rp filter
+    phot_rp_mean_flux = Column(Float(24), nullable=False)  # Flux in rp filter
+    phot_rp_mean_flux_error = Column(Float(24), nullable=False)  # Flux error in rp filter
+    # Constraints
+    PrimaryKeyConstraint('source_id'),
+
+
+Index('ik_gaia_dr2location', gaia_dr2.ra, gaia_dr2.dec)
+
+
+# Comment:
+# External table from gaia. Stars for simulation and calibration.
 
 class SDSS_SpecPhoto(Base):
     __tablename__ = 'sdss_spec_photo'
