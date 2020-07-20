@@ -102,6 +102,7 @@ class Production(Base):
         # Unique key
         UniqueConstraint('pipeline', 'release'),
         ForeignKeyConstraint(['input_production_id'], ['production.id'], onupdate='CASCADE', ondelete='CASCADE'),
+        ForeignKeyConstraint(['job_id'], ['job.id']),
     )
     # Columns
     id = Column(Integer, nullable=False)  #
@@ -405,12 +406,11 @@ class StarZP(Base):
     # Fields
     zp = Column(Float(24), nullable=False)  # individual star zeropoint value
     zp_error = Column(Float(24), nullable=False)  # individual star zeropoint error
-    zp_weight = Column(Float(24), nullable=False)  # individual star zeropoint weight
+    chi2 = Column(Float(24), nullable=False)  # individual star fit chi2
     calib_method = Column(String(16), nullable=False)  # Calibration Method
 
     # Relationships
     star_photometry = relationship('StarPhotometry', back_populates="star_zps")
-    star_template_zps = relationship('StarTemplateZP', back_populates="star_zp")
 
     # Comment:
     # Contains the individual zeropoint measurements for each star matched with the reference catalog
@@ -507,6 +507,7 @@ class ImageZP(Base):
     # Fields
     zp = Column(Float(24), nullable=False)  # Image zeropoint value
     zp_error = Column(Float(24), nullable=False)  # Image zeropoint error
+    n_stars = Column(Integer, nullable=True)  # Number of stars used to build image zp
     phot_method_id = Column(Integer, nullable=False)  # Photometry method
     calib_method = Column(String(16), nullable=False)  # Calibration method
     transparency = Column(Float(24), nullable=True)  # Image zeropoint value
@@ -520,121 +521,6 @@ class ImageZP(Base):
 
 Index('ik__image_zp__image_id', ImageZP.image_id)
 Index('ik__image_zp__phot_method_id', ImageZP.phot_method_id)
-
-
-class StarTemplateZP(Base):
-    __tablename__ = 'star_template_zp'
-    __table_args__ = (
-        # Constraints
-        PrimaryKeyConstraint('id'),
-        ForeignKeyConstraint(['star_zp_id'], ['star_zp.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        ForeignKeyConstraint(['template_fit_band_id'], ['template_fit_band.id'], onupdate='CASCADE',
-                             ondelete='CASCADE'),
-    )
-
-    # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier
-    star_zp_id = Column(BigInteger, nullable=False)  # Star ZP identifier
-    template_fit_band_id = Column(BigInteger, nullable=False)  # Template fit band identifier
-
-    # Fields
-    zp = Column(Float(24), nullable=False)  # individual star-template zeropoint value
-    zp_error = Column(Float(24), nullable=False)  # individual star-template zeropoint error
-    zp_weight = Column(Float(24), nullable=False)  # individual star-template zeropoint weight
-
-    # Relationships
-    star_zp = relationship('StarZP', back_populates="star_template_zps")
-    #template_fit_band = relationship('TemplateFitBand', back_populates="star_template_zps")
-
-    # Comment:
-    # Contains the star-template duo zeropoint measurements
-
-Index('ik__star_template_zp__star_zp_id', StarTemplateZP.star_zp_id)
-Index('ik__star_template_zp__template_fit_id', StarTemplateZP.template_fit_band_id)
-
-
-class Template(Base):
-    __tablename__ = 'template'
-    __table_args__ = (
-        # Constraints
-        PrimaryKeyConstraint('id'),
-        UniqueConstraint('template_lib', 'template_name'),
-        UniqueConstraint('template_lib', 'template_index'),
-
-    )
-
-    # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier
-
-    # Fields
-    template_lib = Column(String(24), nullable=False)  # template library name
-    template_name = Column(String(24), nullable=True)  # star template name
-    template_index = Column(Float(24), nullable=True)  # star template index
-    filename = Column(String(128), nullable=False)  # File name
-
-    # Relationships
-    template_fits = relationship('TemplateFit', back_populates="template")
-    template_bands = relationship('TemplateBand', back_populates="template")
-
-    # Comment:
-    # Contains list of stellar templates used for photometric calibration during the nightly pipeline
-
-
-class TemplateFit(Base):
-    __tablename__ = 'template_fit'
-    __table_args__ = (
-        # Constraints
-        PrimaryKeyConstraint('id'),
-        ForeignKeyConstraint(['template_id'], ['template.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('template_id', 'ref_id', 'ref_cat', 'fit_method'),
-    )
-    # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier
-    template_id = Column(BigInteger, nullable=False)  # Template identifier
-
-    # Non-relationable Keys
-    ref_cat = Column(String(16), nullable=False)  # Reference catalogue
-    ref_id = Column(BigInteger, nullable=False)  # Reference catalogue star identifier
-
-    # Fields
-    fit_method = Column(String(16), nullable=False)  # Method used for template fitting
-    chi2 = Column(Float(24), nullable=False)  # chi2 fit
-    #odds = Column(Float(24), nullable=True)  # odds fit
-    amplitude = Column(Float(24), nullable=False)  # amplitude of fit
-    amplitude_err = Column(Float(24), nullable=False)  # amplitude error of fit
-
-    # Relationships
-    template = relationship('Template', back_populates="template_fits")
-
-    # Comment:
-    # Contains the fit of each reference star to a specific template
-
-
-class TemplateBand(Base):
-    __tablename__ = 'template_band'
-    __table_args__ = (
-        # Constraints
-        PrimaryKeyConstraint('id'),
-        ForeignKeyConstraint(['template_id'], ['template.id'], onupdate='CASCADE', ondelete='CASCADE'),
-        UniqueConstraint('template_id', 'band', 'project', 'method'),
-    )
-    # Keys
-    id = Column(BigInteger, nullable=False)  # Unique identifier
-    template_id = Column(BigInteger, nullable=False)  # CCD image number
-    band = Column(String(8), nullable=False)  # Band name
-
-    # Fields
-    ref_flux = Column(Float(24), nullable=False)  # chi2 fit
-    #ref_flux_err = Column(Float(24), nullable=False)  # odds fit
-    project = Column(String(24), nullable=False)  # project name SDSS, PAU, ...
-    method =  Column(String(24), nullable=False)  # method used to convolve the templates to the filter curve
-    EBV = Column(Float(24), nullable=False)  # EBV default 0
-    # Relationships
-    template = relationship('Template', back_populates="template_bands")
-    #star_template_zps = relationship('StarTemplateZP', back_populates="template_fit_band")
-
-    # Comment:
-    # Contains the reference fluxes for each band in each template fit
 
 
 class PhotZP(Base):
@@ -1485,6 +1371,7 @@ class Quality_control(Base):
     __table_args__ = (
         # Constraints
         PrimaryKeyConstraint('id'),
+        ForeignKeyConstraint(['job_id'], ['job.id'], ondelete='CASCADE')
 
     )
     # Keys

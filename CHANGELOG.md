@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [3.1.0] - 2020-07-20
+### Added
+- In table image_zp, new column n_stars
+
+### Changed
+- In table star_zp, column zp_weight -> chi2
+
+### Removed
+- Tables template, template_band, template_fit, star_template_zp
+
 ## [3.0.0] - 2019-04-17
 ### Changed
 - Compatible with environment refactoring (v3.0)
