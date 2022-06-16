@@ -635,7 +635,12 @@ class ForcedAperture(Base):
     production_id = Column(Integer, nullable=False, comment='Production id')
     image_id = Column(BigInteger, nullable=False, comment='CCD image id')
     ref_id = Column(BigInteger, nullable=True, comment='Unique identifier of source in reference catalogue')
-    aperture = Column(Decimal(10, 4), nullable=True, comment='Photometry aperture (light fraction if <1, physical in pkpc if >=1)')
+    aperture = Column(
+        Enum(
+            '0.5', '0.625', '0.75', '0.9', '25', '50', '75', '100', '150', '200', 
+            '225', '250', '275', '300', name='aperture_list'
+            ), nullable=False,
+        comment='Photometry aperture (light fraction if <1, physical in pkpc if >=1)')
     # Fields
     pixel_id = Column(Integer, nullable=False, comment='Healpix id')
     aperture_x = Column(Float(24), nullable=False, comment='Image X coordinate of aperture center (pixels)')
@@ -686,7 +691,12 @@ class ForcedApertureCoadd(Base):
                        'NB705', 'NB715', 'NB725', 'NB735', 'NB745', 'NB755', 'NB765', 'NB775', 'NB785', 'NB795',
                        'NB805', 'NB815', 'NB825', 'NB835', 'NB845', 'u', 'g', 'r', 'i', 'z', 'Y',
                        name='pau_bands'), nullable=False, comment='Band')
-    aperture = Column(Decimal(10, 4), nullable=True, comment='Photometry aperture (light fraction if <1, physical in pkpc if >=1)')
+    aperture = Column(
+        Enum(
+            '0.5', '0.625', '0.75', '0.9', '25', '50', '75', '100', '150', '200', 
+            '225', '250', '275', '300', name='aperture_list'
+            ), nullable=False,
+        comment='Photometry aperture (light fraction if <1, physical in pkpc if >=1)')
     # Fields
     flux = Column(Float(24), nullable=True, comment='Calibrated flux (e/s)')
     flux_error = Column(Float(24), nullable=True, comment='Calibrated flux error')
@@ -1193,7 +1203,7 @@ class MatchToSpec(Base):
 Index('ik_matchtospec_ref', MatchToSpec.ref_cat, MatchToSpec.ref_id)
 
 
-### SIMULATION TABLES ###
+# ## SIMULATION TABLES ###
 
 # Truth Objects table
 class Truth_Object(Base):
@@ -1343,7 +1353,7 @@ class Bkg_mag(Base):
     # (Simulation) Contains simulated background magnitude measurements for each target for the simulation pipeline.
 
 
-###########    OPERATION Tables    ###########
+# ##########    OPERATION Tables    ###########
 
 
 # Job Table
